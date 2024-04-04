@@ -1,6 +1,5 @@
 using Anura.ConfigurationModule.Managers;
 using Photon.Pun;
-using System;
 using UnityEngine;
 
 public class PlayerComponent : MonoBehaviour
@@ -50,8 +49,10 @@ public class PlayerComponent : MonoBehaviour
         if (!isMultiplayer || (photonView != null && photonView.IsMine))
         {
             RoomStateManager.OnStateUpdated += OnStateUpdatedForMyPlayer;
+            InputManager.OnDragged += MobileMovement;
+            InputManager.OnDragEnded += StopMobileMovement;
+            InputManager.OnDoubleTap += MobileJump;
         }
-
     }
 
     private void OnDisable()
@@ -61,7 +62,37 @@ public class PlayerComponent : MonoBehaviour
         if (photonView != null && photonView.IsMine)
         {
             RoomStateManager.OnStateUpdated -= OnStateUpdatedForMyPlayer;
+            InputManager.OnDragged -= MobileMovement;
+            InputManager.OnDragEnded -= StopMobileMovement;
+            InputManager.OnDoubleTap -= MobileJump;
         }
+    }
+
+    private void MobileMovement(Vector3 _direction)
+    {
+        if (!playerActions.enabled)
+        {
+            return;
+        }
+        playerMotionBehaviour.OnMovementPerformed(_direction.x);
+    }
+    
+    private void StopMobileMovement()
+    {
+        if (!playerActions.enabled)
+        {
+            return;
+        }
+        playerMotionBehaviour.OnMovementPerformed(0);
+    }
+    
+    private void MobileJump(Vector2 _obj)
+    {
+        if (!playerActions.enabled)
+        {
+            return;
+        }
+        playerMotionBehaviour.OnJumpPerformed();
     }
 
     private void SetupMyPlayer()

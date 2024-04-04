@@ -1,6 +1,5 @@
-using Anura;
-using Anura.ConfigurationModule.Managers;
 using System;
+using Anura.ConfigurationModule.Managers;
 using UnityEngine;
 
 public class PlayerMotionBehaviour : MonoBehaviour
@@ -17,7 +16,6 @@ public class PlayerMotionBehaviour : MonoBehaviour
 
 
     private float lastJumpTime = 0;
-
 
     private void Awake()
     {
@@ -61,7 +59,7 @@ public class PlayerMotionBehaviour : MonoBehaviour
         OnJumpPerformed();
     }
 
-    private void OnJumpPerformed()
+    public void OnJumpPerformed()
     {
         if (isPaused) return;
         //Throttle
@@ -76,7 +74,7 @@ public class PlayerMotionBehaviour : MonoBehaviour
         OnMovementPerformed(value.ReadValue<float>());
     }
 
-    private void OnMovementPerformed(float direction)
+    public void OnMovementPerformed(float direction)
     {
         if (isPaused) return;
         SetMovementDirection(direction);
@@ -110,6 +108,7 @@ public class PlayerMotionBehaviour : MonoBehaviour
 
         Move(playerState.movementDirection * Time.deltaTime * GetSpeed(), playerState.hasJumpImpulseQueued);
     }
+
 
     public void Move(float move, bool jumpQueued)
     {

@@ -1,19 +1,49 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
-using Unity.VisualScripting;
+using BoomDaoWrapper;
+using Newtonsoft.Json;
 using UnityEngine;
 
 public class ChallengesManager : MonoBehaviour
 {
+    public static Action OnChallengeClaimed;
+    public const int AMOUNT_OF_CHALLENGES = 3;
+    
+    public const string GENERATE_DAILY_CHALLENGE = "generateDailyChallenge";
+    public const string CHALLENGE_NUMBER = "challengeNumber";
+    public const string CHALLENGE_IDENTIFIER = "challengeIdentifier";
+    
+    public const string SET_RESET_TIME = "dailyChallengesSetResetTime";
+    public const string NEXT_RESET = "nextReset";
+    public const string DAILY_CHALLENGES = "dailyChallenges";
+    public const string DAILY_CHALLENGE = "dailyChallenge";
+    public const string CLAIMED_LUCKY_SPIN = "claimedLuckySpin";
+
+    public const string PROGRESS_VALUE = "value";
+    public const string PROGRESS_CLAIMED = "claimed";
+
+    public const string CHALLENGE_ID = "id";
+    public const string CHALLENGE_DESCRIPTION = "description";
+    public const string CHALLENGE_AMOUNT_NEEDED = "amountNeeded";
+    public const string CHALLENGE_REWARD_AMOUNT = "rewardAmount";
+    public const string CHALLENGE_REWARD_TYPE = "rewardType";
+    public const string CHALLENGE_CATEGORY = "category";
+
+    public const string CHALLENGES_REWARD_LUCKY_SPIN = "challengesLuckyWheel";
+    public const string CHALLENGES_CLAIM_DAILY_CHALLENGE = "setChallengeAsClaimed";
+    
+    private const string UPDATE_CHALLENGE_PROGRESS = "increaseChallengeProgress";
+
     public static ChallengesManager Instance;
-
-    private readonly int amountOfChallenges=3;
-
-    private bool isInit;
+    private bool isGeneratingNewChallenges;
     private bool isSubscribed;
-    private List<ChallengeSO> allChallenges = new List<ChallengeSO>();
+    
+    private List<ChallengeUpdateProgress> progressToUpdate = new();
+    private bool isUpdatingProgress;
+
+    private List<ChallengeProgress> challengesToClaim = new();
+    private bool isClaiming;
 
     private void OnEnable()
     {
@@ -23,41 +53,110 @@ public class ChallengesManager : MonoBehaviour
     private void OnDisable()
     {
         ChallengeDisplay.OnClaimPressed -= ClaimedChallenge;
-    }
-    
-    public void ClaimedChallenge(ChallengeData _challengeData)
-    {
-        ChallengeSO _challengeSO = allChallenges.Find(_element => _element.Id == _challengeData.Id);
-        _challengeData.Claimed = true;
-        switch (_challengeSO.RewardType)
-        {
-            case ChallengeRewardType.SeasonExperience:
-                if (DataManager.Instance.GameData.SeasonEnds<DateTime.Now)
-                {
-                    return;
-                }
-                DataManager.Instance.PlayerData.Experience += _challengeSO.RewardAmount;
-                break;
-            case ChallengeRewardType.JugOfMilk:
-                DataManager.Instance.PlayerData.JugOfMilk += _challengeSO.RewardAmount;
-                break;
-            case ChallengeRewardType.Snacks:
-                DataManager.Instance.PlayerData.Snacks += _challengeSO.RewardAmount;
-                break;
-            default:
-                throw new ArgumentOutOfRangeException();
-        }
-        DataManager.Instance.SaveChallenges();
+        UnsubscribeEvents();
     }
 
+    private void ClaimedChallenge(ChallengeProgress _challengeProgress)
+    {
+        if (_challengeProgress.IsClaiming)
+        {
+            return;
+        }
+
+        foreach (ChallengeProgress _claimingChallenge in challengesToClaim)
+        {
+            if (DataManager.Instance.GameData.GetChallengeByIdentifier(_claimingChallenge.Identifier)==DataManager.Instance.GameData
+            .GetChallengeByIdentifier(_challengeProgress.Identifier))
+            {
+                return;
+            }
+        }
+        challengesToClaim.Add(_challengeProgress);
+        TryClaim();
+    }
+
+    private void TryClaim()
+    {
+        if (isClaiming)
+        {
+            return;
+        }
+
+        if (challengesToClaim.Count==0)
+        {
+            return;
+        }
+
+        isClaiming = true;
+        var _challengeProgress = challengesToClaim[0];
+        _challengeProgress.IsClaiming = true;
+        
+        List<ActionParameter> _parameters = new List<ActionParameter>
+        {
+            new() { Key = CHALLENGE_NUMBER, Value = PlayerData.DAILY_CHALLENGE_PROGRESS+DataManager.Instance.GameData.GetChallengeIndex(_challengeProgress) }
+        };
+        
+        Debug.Log($"{CHALLENGE_NUMBER}: meaning challenge name is {PlayerData.DAILY_CHALLENGE_PROGRESS+DataManager.Instance.GameData.GetChallengeIndex(_challengeProgress)}, calling for action {CHALLENGES_CLAIM_DAILY_CHALLENGE}");
+        
+        BoomDaoUtility.Instance.ExecuteActionWithParameter(CHALLENGES_CLAIM_DAILY_CHALLENGE, _parameters, _ =>
+        {
+            _challengeProgress.Claimed = true;
+            ChallengeData _challengeData = DataManager.Instance.GameData.GetChallengeByIdentifier(_challengeProgress.Identifier);
+            string _claimActionId;
+            switch (_challengeData.RewardType)
+            {
+                case ItemType.CommonShard:
+                    _claimActionId = RewardActions.REWARD_N_COMMON_CRYSTALS;
+                    break;
+                case ItemType.UncommonShard:
+                    _claimActionId = RewardActions.REWARD_N_UNCOMMON_CRYSTALS;
+                    break;
+                case ItemType.RareShard:
+                    _claimActionId = RewardActions.REWARD_N_RARE_CRYSTALS;
+                    break;
+                case ItemType.EpicShard:
+                    _claimActionId = RewardActions.REWARD_N_EPIC_CRYSTALS;
+                    break;
+                case ItemType.LegendaryShard:
+                    _claimActionId = RewardActions.REWARD_N_LEGENDARY_CRYSTALS;
+                    break;
+                case ItemType.Snack:
+                    _claimActionId = RewardActions.REWARD_N_SNACKS;
+                    break;
+                case ItemType.JugOfMilk:
+                    _claimActionId = RewardActions.REWARD_N_JUG_OF_MILKS;
+                    break;
+                case ItemType.GlassOfMilk:
+                    _claimActionId = RewardActions.REWARD_N_GLASS_OF_MILKS;
+                    break;
+                case ItemType.SeasonExperience:
+                    _claimActionId = RewardActions.REWARD_N_XPS;
+                    break;
+                default:
+                    throw new Exception("Don't know how to reward item type: "+_challengeData.RewardType);
+            }
+        
+            List<ActionParameter> _claimedParameters = new List<ActionParameter>
+            {
+                new() { Key = BoomDaoUtility.AMOUNT_KEY, Value = _challengeData.RewardAmount.ToString() }
+            };
+            BoomDaoUtility.Instance.ExecuteActionWithParameter(_claimActionId,_claimedParameters,_ =>
+            {
+                challengesToClaim.RemoveAt(0);
+                isClaiming = false;
+                OnChallengeClaimed?.Invoke();
+                TryClaim();
+            });
+        });
+        
+    }
 
     private void Awake()
     {
-        if (Instance==null)
+        if (Instance == null)
         {
             Instance = this;
             DontDestroyOnLoad(gameObject);
-            allChallenges = Resources.LoadAll<ChallengeSO>("Challenges").ToList();
         }
         else
         {
@@ -65,29 +164,83 @@ public class ChallengesManager : MonoBehaviour
         }
     }
 
-    public void Init()
+    public void Setup()
     {
-        if (isInit)
+        if (DataManager.Instance.GameData.HasDailyChallenges)
         {
-            return;
+            SubscribeEvents();
+            StartCheckForReset();
         }
+        else
+        {
+            GenerateChallenges();
+        }
+    }
 
-        isInit = true;
+    private void GenerateChallenges()
+    {
+        GenerateNewChallenges(StartCheckForReset);
+    }
+
+    private void StartCheckForReset()
+    {
         StartCoroutine(CheckForReset());
     }
 
     private IEnumerator CheckForReset()
     {
-        if (DateTime.UtcNow>DataManager.Instance.PlayerData.Challenges.NextReset)
+        while (true)
         {
-            GenerateNewChallenges();
+            if (DateTime.UtcNow > DataManager.Instance.GameData.DailyChallenges.NextReset)
+            {
+                GenerateNewChallenges(StartCheckForReset);
+                yield break;
+            }
+
+            yield return new WaitForSeconds(1);
         }
-        else
+    }
+    
+    private void GenerateNewChallenges(Action _callBack)
+    {
+        if (isGeneratingNewChallenges)
         {
-            SubscribeEvents();
+            return;
+        }
+        
+        UnsubscribeEvents();
+        isGeneratingNewChallenges = true;
+
+        BoomDaoUtility.Instance.ExecuteAction(PlayerData.RESET_AMOUNT_OF_GAMES_PLAYED_TODAY, null);
+        int _counter = 0;
+        CheckForFinishCreating(null);
+
+        void CheckForFinishCreating(List<ActionOutcome> _)
+        {
+            if (_counter<AMOUNT_OF_CHALLENGES)
+            {
+                List<ActionParameter> _parameters = new List<ActionParameter>
+                {
+                    new () { Key = CHALLENGE_NUMBER, Value = DAILY_CHALLENGE+_counter },
+                    new () { Key = CHALLENGE_IDENTIFIER, Value = Guid.NewGuid().ToString() },
+                    new () { Key = "progressNumber" , Value = PlayerData.DAILY_CHALLENGE_PROGRESS+_counter }
+                };
+                BoomDaoUtility.Instance.ExecuteActionWithParameter(GENERATE_DAILY_CHALLENGE,_parameters, CheckForFinishCreating);
+                _counter++;
+            }
+            else
+            {
+                long _nextResetTime = Utilities.DateTimeToNanoseconds(DateTime.UtcNow.AddDays(1));
+                List<ActionParameter> _parameters = new List<ActionParameter> { new() { Key = NEXT_RESET, Value = _nextResetTime.ToString() } };
+                BoomDaoUtility.Instance.ExecuteActionWithParameter(SET_RESET_TIME,_parameters, Finish);
+            }
         }
 
-        yield return new WaitForSeconds(1);
+        void Finish(List<ActionOutcome> _)
+        {
+            SubscribeEvents();
+            _callBack?.Invoke();
+        }
     }
 
     private void SubscribeEvents()
@@ -98,104 +251,84 @@ public class ChallengesManager : MonoBehaviour
         }
 
         isSubscribed = true;
-        foreach (var _challengeDataDB in DataManager.Instance.PlayerData.Challenges.ChallengesData)
+        foreach (var _challengeProgress in DataManager.Instance.PlayerData.ChallengeProgresses)
         {
-            if (_challengeDataDB.Completed)
+            if (_challengeProgress.Completed)
             {
                 continue;
             }
 
-            ChallengeSO _challengeData = allChallenges.Find(_element => _element.Id == _challengeDataDB.Id);
-            if (_challengeData.Category == ChallengeCategory.WinGame)
+            ChallengeData _challengeData = DataManager.Instance.GameData.GetChallengeByIdentifier(_challengeProgress.Identifier);
+            switch (_challengeData.Category)
             {
-                EventsManager.OnWonGame += _challengeDataDB.IncreaseAmount;
+                case ChallengeCategory.WinGame:
+                    EventsManager.OnWonGame += _challengeProgress.IncreaseAmount;
+                    break;
+                case ChallengeCategory.CraftItem:
+                    EventsManager.OnCraftedItem += _challengeProgress.IncreaseAmount;
+                    break;
+                case ChallengeCategory.CraftShard:
+                    EventsManager.OnCraftedCrystal += _challengeProgress.IncreaseAmount;
+                    break;
+                case ChallengeCategory.GainExperience:
+                    EventsManager.OnGotExperience += _challengeProgress.IncreaseAmount;
+                    break;
+                case ChallengeCategory.GainLeaderboardPoints:
+                    EventsManager.OnWonLeaderboardPoints += _challengeProgress.IncreaseAmount;
+                    break;
+                case ChallengeCategory.WinWithFullHp:
+                    EventsManager.OnWonGameWithFullHp += _challengeProgress.IncreaseAmount;
+                    break;
+                case ChallengeCategory.LoseMatch:
+                    EventsManager.OnLostGame += _challengeProgress.IncreaseAmount;
+                    break;
+                case ChallengeCategory.DealDamage:
+                    EventsManager.OnDealtDamageToOpponent += _challengeProgress.IncreaseAmount;
+                    break;
+                case ChallengeCategory.UseMilkBottle:
+                    EventsManager.OnUsedMilkBottle += _challengeProgress.IncreaseAmount;
+                    break;
+                case ChallengeCategory.HealYourKitty:
+                    EventsManager.OnHealedKitty += _challengeProgress.IncreaseAmount;
+                    break;
+                case ChallengeCategory.PlayMatch:
+                    EventsManager.OnPlayedMatch += _challengeProgress.IncreaseAmount;
+                    break;
+                case ChallengeCategory.ShootRocket:
+                    EventsManager.OnUsedRocket += _challengeProgress.IncreaseAmount;
+                    break;
+                case ChallengeCategory.ShootCannon:
+                    EventsManager.OnUsedCannon += _challengeProgress.IncreaseAmount;
+                    break;
+                case ChallengeCategory.ShootTripleRocket:
+                    EventsManager.OnUsedTripleRocket += _challengeProgress.IncreaseAmount;
+                    break;
+                case ChallengeCategory.ShootPlane:
+                    EventsManager.OnUsedAirplane += _challengeProgress.IncreaseAmount;
+                    break;
+                case ChallengeCategory.ShootMouse:
+                    EventsManager.OnUsedMouse += _challengeProgress.IncreaseAmount;
+                    break;
+                case ChallengeCategory.ShootArrow:
+                    EventsManager.OnUsedArrow += _challengeProgress.IncreaseAmount;
+                    break;
+                case ChallengeCategory.WinMatchesInARow:
+                    EventsManager.OnWonGame += _challengeProgress.IncreaseAmount;
+                    EventsManager.OnLostGame += _challengeProgress.Reset;
+                    break;
+                case ChallengeCategory.WinMatchWithLessThan10Hp:
+                    EventsManager.OnWonWithHpLessThan10 += _challengeProgress.IncreaseAmount;
+                    break;
+                case ChallengeCategory.WinMatchWithLessThan20Hp:
+                    EventsManager.OnWonWithHpLessThan20 += _challengeProgress.IncreaseAmount;
+                    break;
+                case ChallengeCategory.WinMatchWithLessThan30Hp:
+                    EventsManager.OnWonWithHpLessThan30 += _challengeProgress.IncreaseAmount;
+                    break;
             }
-            else if (_challengeData.Category == ChallengeCategory.CraftItem)
-            {
-                EventsManager.OnCraftedItem += _challengeDataDB.IncreaseAmount;
-            }
-            else if (_challengeData.Category == ChallengeCategory.CraftShard)
-            {
-                EventsManager.OnCraftedCrystal += _challengeDataDB.IncreaseAmount;
-            }
-            else if (_challengeData.Category == ChallengeCategory.GainExperience)
-            {
-                EventsManager.OnGotExperience += _challengeDataDB.IncreaseAmount;
-            }
-            else if (_challengeData.Category == ChallengeCategory.GainLeaderboardPoints)
-            {
-                EventsManager.OnWonLeaderboardPoints += _challengeDataDB.IncreaseAmount;
-            }
-            else if (_challengeData.Category == ChallengeCategory.WinWithFullHp)
-            {
-                EventsManager.OnWonGameWithFullHp += _challengeDataDB.IncreaseAmount;
-            }
-            else if (_challengeData.Category == ChallengeCategory.LoseMatch)
-            {
-                EventsManager.OnLostGame += _challengeDataDB.IncreaseAmount;
-            }
-            else if (_challengeData.Category == ChallengeCategory.DealDamage)
-            {
-                EventsManager.OnDealtDamageToOpponent += _challengeDataDB.IncreaseAmount;
-            }
-            else if (_challengeData.Category == ChallengeCategory.UseMilkBottle)
-            {
-                EventsManager.OnUsedMilkBottle += _challengeDataDB.IncreaseAmount;
-            }
-            else if (_challengeData.Category == ChallengeCategory.HealYourKitty)
-            {
-                EventsManager.OnHealedKitty += _challengeDataDB.IncreaseAmount;
-            }
-            else if (_challengeData.Category == ChallengeCategory.PlayMatch)
-            {
-                EventsManager.OnPlayedMatch += _challengeDataDB.IncreaseAmount;
-            }
-            else if (_challengeData.Category == ChallengeCategory.ShootRocket)
-            {
-                EventsManager.OnUsedRocket += _challengeDataDB.IncreaseAmount;
-            }
-            else if (_challengeData.Category == ChallengeCategory.ShootCannon)
-            {
-                EventsManager.OnUsedCannon += _challengeDataDB.IncreaseAmount;
-            }
-            else if (_challengeData.Category == ChallengeCategory.ShootTripleRocket)
-            {
-                EventsManager.OnUsedTripleRocket += _challengeDataDB.IncreaseAmount;
-            }
-            else if (_challengeData.Category == ChallengeCategory.ShootPlane)
-            {
-                EventsManager.OnUsedAirplane += _challengeDataDB.IncreaseAmount;
-            }
-            else if (_challengeData.Category == ChallengeCategory.ShootMouse)
-            {
-                EventsManager.OnUsedMouse += _challengeDataDB.IncreaseAmount;
-            }
-            else if (_challengeData.Category == ChallengeCategory.ShootArrow)
-            {
-                EventsManager.OnUsedArrow += _challengeDataDB.IncreaseAmount;
-            }
-            else if (_challengeData.Category == ChallengeCategory.WinMatchesInARow)
-            {
-                EventsManager.OnWonGame += _challengeDataDB.IncreaseAmount;
-                EventsManager.OnLostGame += _challengeDataDB.Reset;
-            }
-            else if (_challengeData.Category == ChallengeCategory.WinMatchWithLessThan10Hp)
-            {
-                EventsManager.OnWonWithHpLessThan10 += _challengeDataDB.IncreaseAmount;
-            }
-            else if (_challengeData.Category == ChallengeCategory.WinMatchWithLessThan20Hp)
-            {
-                EventsManager.OnWonWithHpLessThan20 += _challengeDataDB.IncreaseAmount;
-            }
-            else if (_challengeData.Category == ChallengeCategory.WinMatchWithLessThan30Hp)
-            {
-                EventsManager.OnWonWithHpLessThan30 += _challengeDataDB.IncreaseAmount;
-            }
-
-            _challengeDataDB.IsSubscribed = true;
         }
     }
-
+    
     private void UnsubscribeEvents()
     {
         if (!isSubscribed)
@@ -204,155 +337,111 @@ public class ChallengesManager : MonoBehaviour
         }
 
         isSubscribed = false;
-        foreach (var _challengeDataDB in DataManager.Instance.PlayerData.Challenges.ChallengesData)
+        foreach (var _challengeProgress in DataManager.Instance.PlayerData.ChallengeProgresses)
         {
-            if (_challengeDataDB.Completed)
+            if (_challengeProgress.Completed)
             {
                 continue;
             }
-            ChallengeSO _challengeData = allChallenges.Find(_element => _element.Id == _challengeDataDB.Id);
-            if (_challengeData.Category == ChallengeCategory.WinGame)
-            {
-                EventsManager.OnWonGame -= _challengeDataDB.IncreaseAmount;
-            }
-            else if (_challengeData.Category == ChallengeCategory.CraftItem)
-            {
-                EventsManager.OnCraftedItem -= _challengeDataDB.IncreaseAmount;
-            }
-            else if (_challengeData.Category == ChallengeCategory.CraftShard)
-            {
-                EventsManager.OnCraftedCrystal -= _challengeDataDB.IncreaseAmount;
-            }
-            else if (_challengeData.Category == ChallengeCategory.GainExperience)
-            {
-                EventsManager.OnGotExperience -= _challengeDataDB.IncreaseAmount;
-            }
-            else if (_challengeData.Category == ChallengeCategory.GainLeaderboardPoints)
-            {
-                EventsManager.OnWonLeaderboardPoints -= _challengeDataDB.IncreaseAmount;
-            }
-            else if (_challengeData.Category == ChallengeCategory.WinWithFullHp)
-            {
-                EventsManager.OnWonGameWithFullHp -= _challengeDataDB.IncreaseAmount;
-            }
-            else if (_challengeData.Category == ChallengeCategory.LoseMatch)
-            {
-                EventsManager.OnLostGame -= _challengeDataDB.IncreaseAmount;
-            }
-            else if (_challengeData.Category == ChallengeCategory.DealDamage)
-            {
-                EventsManager.OnDealtDamageToOpponent -= _challengeDataDB.IncreaseAmount;
-            }
-            else if (_challengeData.Category == ChallengeCategory.UseMilkBottle)
-            {
-                EventsManager.OnUsedMilkBottle -= _challengeDataDB.IncreaseAmount;
-            }
-            else if (_challengeData.Category == ChallengeCategory.HealYourKitty)
-            {
-                EventsManager.OnHealedKitty -= _challengeDataDB.IncreaseAmount;
-            }
-            else if (_challengeData.Category == ChallengeCategory.PlayMatch)
-            {
-                EventsManager.OnPlayedMatch -= _challengeDataDB.IncreaseAmount;
-            }
-            else if (_challengeData.Category == ChallengeCategory.ShootRocket)
-            {
-                EventsManager.OnUsedRocket -= _challengeDataDB.IncreaseAmount;
-            }
-            else if (_challengeData.Category == ChallengeCategory.ShootCannon)
-            {
-                EventsManager.OnUsedCannon -= _challengeDataDB.IncreaseAmount;
-            }
-            else if (_challengeData.Category == ChallengeCategory.ShootTripleRocket)
-            {
-                EventsManager.OnUsedTripleRocket -= _challengeDataDB.IncreaseAmount;
-            }
-            else if (_challengeData.Category == ChallengeCategory.ShootPlane)
-            {
-                EventsManager.OnUsedAirplane -= _challengeDataDB.IncreaseAmount;
-            }
-            else if (_challengeData.Category == ChallengeCategory.ShootMouse)
-            {
-                EventsManager.OnUsedMouse -= _challengeDataDB.IncreaseAmount;
-            }
-            else if (_challengeData.Category == ChallengeCategory.ShootArrow)
-            {
-                EventsManager.OnUsedArrow -= _challengeDataDB.IncreaseAmount;
-            }
-            else if (_challengeData.Category == ChallengeCategory.WinMatchesInARow)
-            {
-                EventsManager.OnWonGame -= _challengeDataDB.IncreaseAmount;
-                EventsManager.OnLostGame -= _challengeDataDB.Reset;
-            }
-            else if (_challengeData.Category == ChallengeCategory.WinMatchWithLessThan10Hp)
-            {
-                EventsManager.OnWonWithHpLessThan10 -= _challengeDataDB.IncreaseAmount;
-            }
-            else if (_challengeData.Category == ChallengeCategory.WinMatchWithLessThan20Hp)
-            {
-                EventsManager.OnWonWithHpLessThan20 -= _challengeDataDB.IncreaseAmount;
-            }
-            else if (_challengeData.Category == ChallengeCategory.WinMatchWithLessThan30Hp)
-            {
-                EventsManager.OnWonWithHpLessThan30 -= _challengeDataDB.IncreaseAmount;
-            }
+            ChallengeData _challengeData = DataManager.Instance.GameData.GetChallengeByIdentifier(_challengeProgress.Identifier);
 
-            _challengeDataDB.IsSubscribed = false;
-        }
-    }
-
-    private void GenerateNewChallenges()
-    {
-        UnsubscribeEvents();
-        List<ChallengeSO> _allChallenges = allChallenges.ToList().OrderBy(_element => Guid.NewGuid()).ToList();
-        DataManager.Instance.PlayerData.Challenges.ChallengesData = new List<ChallengeData>();
-
-        int _counter = -1;
-        while (DataManager.Instance.PlayerData.Challenges.ChallengesData.Count<amountOfChallenges)
-        {
-            bool _skip = false;
-            _counter++;
-
-            ChallengeSO _challenge = _allChallenges[_counter];
-
-            foreach (var _chData in DataManager.Instance.PlayerData.Challenges.ChallengesData)
+            switch (_challengeData.Category)
             {
-                ChallengeSO _challengeSO = _allChallenges.Find(_element => _element.Id == _chData.Id);
-                if (_challenge.Category==_challengeSO.Category)
-                {
-                    _skip = true;
+                case ChallengeCategory.WinGame:
+                    EventsManager.OnWonGame -= _challengeProgress.IncreaseAmount;
                     break;
-                }
+                case ChallengeCategory.CraftItem:
+                    EventsManager.OnCraftedItem -= _challengeProgress.IncreaseAmount;
+                    break;
+                case ChallengeCategory.CraftShard:
+                    EventsManager.OnCraftedCrystal -= _challengeProgress.IncreaseAmount;
+                    break;
+                case ChallengeCategory.GainExperience:
+                    EventsManager.OnGotExperience -= _challengeProgress.IncreaseAmount;
+                    break;
+                case ChallengeCategory.GainLeaderboardPoints:
+                    EventsManager.OnWonLeaderboardPoints -= _challengeProgress.IncreaseAmount;
+                    break;
+                case ChallengeCategory.WinWithFullHp:
+                    EventsManager.OnWonGameWithFullHp -= _challengeProgress.IncreaseAmount;
+                    break;
+                case ChallengeCategory.LoseMatch:
+                    EventsManager.OnLostGame -= _challengeProgress.IncreaseAmount;
+                    break;
+                case ChallengeCategory.DealDamage:
+                    EventsManager.OnDealtDamageToOpponent -= _challengeProgress.IncreaseAmount;
+                    break;
+                case ChallengeCategory.UseMilkBottle:
+                    EventsManager.OnUsedMilkBottle -= _challengeProgress.IncreaseAmount;
+                    break;
+                case ChallengeCategory.HealYourKitty:
+                    EventsManager.OnHealedKitty -= _challengeProgress.IncreaseAmount;
+                    break;
+                case ChallengeCategory.PlayMatch:
+                    EventsManager.OnPlayedMatch -= _challengeProgress.IncreaseAmount;
+                    break;
+                case ChallengeCategory.ShootRocket:
+                    EventsManager.OnUsedRocket -= _challengeProgress.IncreaseAmount;
+                    break;
+                case ChallengeCategory.ShootCannon:
+                    EventsManager.OnUsedCannon -= _challengeProgress.IncreaseAmount;
+                    break;
+                case ChallengeCategory.ShootTripleRocket:
+                    EventsManager.OnUsedTripleRocket -= _challengeProgress.IncreaseAmount;
+                    break;
+                case ChallengeCategory.ShootPlane:
+                    EventsManager.OnUsedAirplane -= _challengeProgress.IncreaseAmount;
+                    break;
+                case ChallengeCategory.ShootMouse:
+                    EventsManager.OnUsedMouse -= _challengeProgress.IncreaseAmount;
+                    break;
+                case ChallengeCategory.ShootArrow:
+                    EventsManager.OnUsedArrow -= _challengeProgress.IncreaseAmount;
+                    break;
+                case ChallengeCategory.WinMatchesInARow:
+                    EventsManager.OnWonGame -= _challengeProgress.IncreaseAmount;
+                    EventsManager.OnLostGame -= _challengeProgress.Reset;
+                    break;
+                case ChallengeCategory.WinMatchWithLessThan10Hp:
+                    EventsManager.OnWonWithHpLessThan10 -= _challengeProgress.IncreaseAmount;
+                    break;
+                case ChallengeCategory.WinMatchWithLessThan20Hp:
+                    EventsManager.OnWonWithHpLessThan20 -= _challengeProgress.IncreaseAmount;
+                    break;
+                case ChallengeCategory.WinMatchWithLessThan30Hp:
+                    EventsManager.OnWonWithHpLessThan30 -= _challengeProgress.IncreaseAmount;
+                    break;
             }
-
-            if (_skip)
-            {
-                continue;
-            }
-
-            ChallengeData _challengeData = new ChallengeData()
-            {
-                Id = _challenge.Id,
-                Completed = false,
-                Claimed = false,
-                Value = 0
-            };
-            DataManager.Instance.PlayerData.Challenges.ChallengesData.Add(_challengeData);    
         }
-        
-
-        DateTime _nextReset = DateTime.UtcNow.AddDays(1);
-
-        DataManager.Instance.PlayerData.Challenges.ClaimedLuckySpin = false;
-        DataManager.Instance.PlayerData.Challenges.NextReset =
-            new DateTime(_nextReset.Year, _nextReset.Month, _nextReset.Day, 0, 0, 0);
-        DataManager.Instance.SaveChallenges();
-        SubscribeEvents();
     }
 
-
-    public ChallengeSO Get(int _id)
+    public void IncreaseProgress(ChallengeUpdateProgress _progressData)
     {
-        return allChallenges.Find(_element => _element.Id == _id);
+        progressToUpdate.Add(_progressData);
+        TryUpdate();
+    }
+
+    private void TryUpdate()
+    {
+        if (isUpdatingProgress)
+        {
+            return;
+        }
+
+        if (progressToUpdate.Count==0)
+        {
+            return;
+        }
+
+        isUpdatingProgress = true;
+        BoomDaoUtility.Instance.ExecuteActionWithParameter(UPDATE_CHALLENGE_PROGRESS, progressToUpdate[0].Parameters, FinishedUpdating);
+    }
+
+    private void FinishedUpdating(List<ActionOutcome> _)
+    {
+        isUpdatingProgress = false;
+        Debug.Log("Finished updating: "+JsonConvert.SerializeObject(progressToUpdate[0]));
+        progressToUpdate.RemoveAt(0);
+        TryUpdate();
     }
 }

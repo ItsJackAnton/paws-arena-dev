@@ -23,7 +23,7 @@ public class GameplayPVPLevelBar : MonoBehaviour
     {
         if (isMine)
         {
-            DataManager.Instance.PlayerData.UpdatedExp += TellOpponentThatIEarnedExp;
+            PlayerData.OnUpdatedExp += TellOpponentThatIEarnedExp;
         }
     }
 
@@ -31,7 +31,7 @@ public class GameplayPVPLevelBar : MonoBehaviour
     {
         if (isMine)
         {
-            DataManager.Instance.PlayerData.UpdatedExp -= TellOpponentThatIEarnedExp;
+            PlayerData.OnUpdatedExp -= TellOpponentThatIEarnedExp;
         }
     }
 
@@ -58,8 +58,8 @@ public class GameplayPVPLevelBar : MonoBehaviour
 
     private void TellOpponentMyLevel()
     {
-        int _experience=0;
-        if (DataManager.Instance.GameData.SeasonEnds > DateTime.Now)
+        double _experience=0;
+        if (DataManager.Instance.GameData.IsSeasonActive)
         {
             _experience = DataManager.Instance.PlayerData.Experience;
         }

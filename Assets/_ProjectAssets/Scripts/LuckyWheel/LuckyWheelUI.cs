@@ -1,17 +1,18 @@
-using System;
 using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
-using Photon.Pun;
-using Newtonsoft.Json;
 using TMPro;
+using System.Collections.Generic;
+using BoomDaoWrapper;
 
 public class LuckyWheelUI : MonoBehaviour
 {
+    private const string BATTLE_WON_ACTION_KEY = "battle_outcome_won";
+    
     [SerializeField] private GameObject playerPlatform;
     [SerializeField] private LuckyWheel luckyWheel;
     [SerializeField] private LuckyWheelClaimDisplay rewardDisplay;
-    [SerializeField] private Button respinButton;
+    // [SerializeField] private Button respinButton;
     [SerializeField] private Button claimButton;
     [SerializeField] private GameObject insuficiantSnacksForRespin;
     [SerializeField] private TextMeshProUGUI insuficiantSnacksText;
@@ -21,28 +22,51 @@ public class LuckyWheelUI : MonoBehaviour
     private LuckyWheelRewardSO choosenReward;
     public static EquipmentData EquipmentData = null;
 
-    private bool requestedToSeeReward = false;
+    private bool requestedToSeeReward;
     private int currentRespinPrice;
 
-    public async void RequestReward()
+    public void RequestReward()
     {
-        int _rewardId = -1;
-        try
+        List<ActionParameter> _parameters = new()
         {
-            string resp = await NetworkManager.GETRequestCoroutine("/leaderboard/spin-the-wheel?matchId=" + PhotonNetwork.CurrentRoom.Name,
-            (code, err) =>
-            {
-                Debug.LogWarning($"Failed to get reward type {err} : {code}");
-            }, true);
+            new ActionParameter { Key = PlayerData.EARNED_XP_KEY, Value = DamageDealingDisplay.XpEarned.ToString()}
+        };
+        BoomDaoUtility.Instance.ExecuteActionWithParameter(BATTLE_WON_ACTION_KEY,_parameters, OnGotRewards);
+    }
 
-            LuckyWheelRewardResponse _response = JsonConvert.DeserializeObject<LuckyWheelRewardResponse>(resp);
-            _rewardId = _response.RewardType;
-        }
-        catch
+    public void RequestRewardChallenges()
+    {
+        BoomDaoUtility.Instance.ExecuteAction(ChallengesManager.CHALLENGES_REWARD_LUCKY_SPIN, OnGotRewards);
+    }
+    
+    private void OnGotRewards(List<ActionOutcome> _rewards)
+    {
+        if (_rewards==null)
         {
-            _rewardId = 1;
+            return;
         }
-        choosenReward = LuckyWheelRewardSO.Get(_rewardId);
+
+        foreach (var _reward in _rewards)
+        {
+            switch (_reward.Name)
+            {
+                case PlayerData.COMMON_SHARD:
+                case PlayerData.UNCOMMON_SHARD:
+                case PlayerData.RARE_SHARD:
+                case PlayerData.EPIC_SHARD:
+                case PlayerData.LEGENDARY_SHARD:
+                    choosenReward = LuckyWheelRewardSO.Get(_reward.Name);
+                    break;
+                case "gift":
+                    Debug.Log("Received gift");
+                    choosenReward = LuckyWheelRewardSO.Get(1);
+                    break;
+                default:
+                    Debug.Log($"Don't know how to handle {_reward.Value} of {_reward.Name}");
+                    break;
+            }
+        }
+
         if (requestedToSeeReward)
         {
             Setup();
@@ -68,7 +92,7 @@ public class LuckyWheelUI : MonoBehaviour
         }
         gameObject.SetActive(true);
 
-        respinButton.gameObject.SetActive(false);
+        // respinButton.gameObject.SetActive(false);
         claimButton.gameObject.SetActive(false);
         
         currentRespinPrice = DataManager.Instance.GameData.RespinPrice;
@@ -78,13 +102,13 @@ public class LuckyWheelUI : MonoBehaviour
     private void OnEnable()
     {
         claimButton.onClick.AddListener(ClaimReward);
-        respinButton.onClick.AddListener(Respin);
+        // respinButton.onClick.AddListener(Respin);
     }
 
     private void OnDisable()
     {
         claimButton.onClick.RemoveListener(ClaimReward);
-        respinButton.onClick.RemoveListener(Respin);
+        // respinButton.onClick.RemoveListener(Respin);
     }
 
     private void ClaimReward()
@@ -94,24 +118,25 @@ public class LuckyWheelUI : MonoBehaviour
 
     private void Claim(LuckyWheelRewardSO _reward)
     {
+        //todo increase amount of crystals
         switch (_reward.Type)
         {
-            case ItemType.Common:
-                DataManager.Instance.PlayerData.Crystals.CommonCrystal++;
+            case ItemType.CommonShard:
+                // DataManager.Instance.PlayerData.Crystals.CommonCrystal++;
                 break;
-            case ItemType.Uncommon:
-                DataManager.Instance.PlayerData.Crystals.UncommonCrystal++;
+            case ItemType.UncommonShard:
+                // DataManager.Instance.PlayerData.Crystals.UncommonCrystal++;
                 break;
-            case ItemType.Rare:
-                DataManager.Instance.PlayerData.Crystals.RareCrystal++;
+            case ItemType.RareShard:
+                // DataManager.Instance.PlayerData.Crystals.RareCrystal++;
                 break;
-            case ItemType.Epic:
-                DataManager.Instance.PlayerData.Crystals.EpicCrystal++;
+            case ItemType.EpicShard:
+                // DataManager.Instance.PlayerData.Crystals.EpicCrystal++;
                 break;
-            case ItemType.Legendary:
-                DataManager.Instance.PlayerData.Crystals.LegendaryCrystal++;
+            case ItemType.LegendaryShard:
+                // DataManager.Instance.PlayerData.Crystals.LegendaryCrystal++;
                 break;
-            case ItemType.Gift:
+            case ItemType.GlassOfMilk:
                 EquipmentData = equipments.CraftItem();
                 DataManager.Instance.PlayerData.AddOwnedEquipment(EquipmentData.Id);
                 break;
@@ -132,6 +157,7 @@ public class LuckyWheelUI : MonoBehaviour
 
     private void Respin()
     {
+        //todo remove previous reward
         if (DataManager.Instance.PlayerData.Snacks< currentRespinPrice)
         {
             insuficiantSnacksForRespin.SetActive(true);
@@ -140,8 +166,8 @@ public class LuckyWheelUI : MonoBehaviour
             return;
         }
 
-        DataManager.Instance.PlayerData.Snacks -= currentRespinPrice;
-        respinButton.gameObject.SetActive(false);
+        // DataManager.Instance.PlayerData.Snacks -= currentRespinPrice;
+        // respinButton.gameObject.SetActive(false);
         claimButton.gameObject.SetActive(false);
         choosenReward = null;
         currentRespinPrice *= 2;
@@ -162,7 +188,7 @@ public class LuckyWheelUI : MonoBehaviour
     {
         yield return new WaitForSeconds(1);
         claimButton.gameObject.SetActive(true);
-        respinButton.gameObject.SetActive(true);
+        // respinButton.gameObject.SetActive(true);
     }
 
     public void Close()

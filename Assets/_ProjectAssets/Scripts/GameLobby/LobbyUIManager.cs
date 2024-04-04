@@ -1,8 +1,6 @@
-using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using TMPro;
 using Photon.Pun;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
@@ -41,6 +39,8 @@ public class LobbyUIManager : MonoBehaviour
     [SerializeField] private Sprite normalFightSprite;
     [SerializeField] private Sprite injuredFightSprite;
 
+    [SerializeField] private GameObject noNftsMessage;
+
 
     private void OnEnable()
     {
@@ -70,6 +70,7 @@ public class LobbyUIManager : MonoBehaviour
         {
             screen.SetActive(true);
         }
+        GameState.SetSelectedNFT(null);
     }
 
     public void OpenEquipmentScreen()
@@ -96,6 +97,14 @@ public class LobbyUIManager : MonoBehaviour
 
     public void OpenGameMenu()
     {
+        if (GameState.selectedNFT==null)
+        {
+            if (GameState.nfts.Count==0)
+            {
+                noNftsMessage.SetActive(true);
+            }
+            return;
+        }
         loadingScreen.SetActive(false);
         connectingToServerScreen.SetActive(false);
         passwordScreen.SetActive(false);
@@ -128,9 +137,11 @@ public class LobbyUIManager : MonoBehaviour
     {
         if (!GameState.selectedNFT.CanFight)
         {
+            RecoveryMessageDisplay.Instance.ShowMessage();
             OpenNFTSelectionScreen();
             return;
         }
+        
         CloseGameMenu();
         connectingToRoom.SetActive(true);
 
@@ -145,11 +156,37 @@ public class LobbyUIManager : MonoBehaviour
         photonManager.Connect();
     }
 
+    public void TryConnectToFriendlyRoom(string _name)
+    {
+        if (!GameState.selectedNFT.CanFight)
+        {
+            RecoveryMessageDisplay.Instance.ShowMessage();
+            OpenNFTSelectionScreen();
+            return;
+        }
 
+        photonManager.OnConnectedServer += () =>
+        {
+            connectingToRoomText.text = "Connected succeeded!";
+            lobbyPhotonConnection.photonManager.JoinFriendlyRoom(_name);;
+        };
+
+        photonManager.Connect();
+    }
+
+    public void GoToConnecting()
+    {
+        CloseGameMenu();
+        connectingToRoom.SetActive(true);
+
+        connectingToRoomText.text = "Connecting to Multiplayer Server(" + PhotonNetwork.CloudRegion + ")...";
+    }
+    
     public void TryConnectToTrainingRoom()
     {
         SceneManager.LoadScene("GameSceneTutorial", LoadSceneMode.Single);
     }
+    
     public void GoToSinglePlayer()
     {
         SceneManager.LoadScene("PlayerTest_new", LoadSceneMode.Single);

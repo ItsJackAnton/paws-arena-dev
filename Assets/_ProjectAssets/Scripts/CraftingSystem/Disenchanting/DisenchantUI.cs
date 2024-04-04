@@ -84,27 +84,7 @@ public class DisenchantUI : MonoBehaviour
         itemBackground.gameObject.SetActive(true);
         disenchantButton.gameObject.SetActive(true);
         selectedItemDisplay.gameObject.SetActive(true);
-        CraftingRecepieSO _craftingSO = null;
-        switch (_equipmentData.Rarity)
-        {
-            case EquipmentRarity.Common:
-                _craftingSO = CraftingRecepieSO.Get(ItemType.Common);
-                break;
-            case EquipmentRarity.Uncommon:
-                _craftingSO = CraftingRecepieSO.Get(ItemType.Uncommon);
-                break;
-            case EquipmentRarity.Rare:
-                _craftingSO = CraftingRecepieSO.Get(ItemType.Rare);
-                break;
-            case EquipmentRarity.Epic:
-                _craftingSO = CraftingRecepieSO.Get(ItemType.Epic);
-                break;
-            case EquipmentRarity.Legendary:
-                _craftingSO = CraftingRecepieSO.Get(ItemType.Legendary);
-                break;
-            default:
-                throw new ArgumentOutOfRangeException();
-        }
+        CraftingRecepieSO _craftingSO = Utilities.EquipmentRarityToCraftingRecipe(_equipmentData.Rarity);
         
         rewardText.text = $"Get 1 <color={_craftingSO.IngridiantColor}>{_equipmentData.Rarity}</color> shard by from disenchanting";
 
@@ -113,26 +93,22 @@ public class DisenchantUI : MonoBehaviour
     private void Disenchant()
     {
         HideRightUI();
+        //todo increase amount of selectedEquipment.Rarity shards
         switch (selectedEquipment.Rarity)
         {
             case EquipmentRarity.Common:
-                DataManager.Instance.PlayerData.Crystals.CommonCrystal += 1;
                 rewardDisplay.Setup(crystalSprites[0]);
                 break;
             case EquipmentRarity.Uncommon:
-                DataManager.Instance.PlayerData.Crystals.UncommonCrystal += 1;
                 rewardDisplay.Setup(crystalSprites[1]);
                 break;
             case EquipmentRarity.Rare:
-                DataManager.Instance.PlayerData.Crystals.RareCrystal += 1;
                 rewardDisplay.Setup(crystalSprites[2]);
                 break;
             case EquipmentRarity.Epic:
-                DataManager.Instance.PlayerData.Crystals.EpicCrystal += 1;
                 rewardDisplay.Setup(crystalSprites[3]);
                 break;
             case EquipmentRarity.Legendary:
-                DataManager.Instance.PlayerData.Crystals.LegendaryCrystal += 1;
                 rewardDisplay.Setup(crystalSprites[4]);
                 break;
             default:

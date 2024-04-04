@@ -1,15 +1,16 @@
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using BoomDaoWrapper;
 using UnityEngine;
 using TMPro;
 using UnityEngine.UI;
-using System;
 
 public class CraftingUI : MonoBehaviour
 {
-    [SerializeField] private TextMeshProUGUI limeAmountDisplay;
-    [SerializeField] private TextMeshProUGUI greenAmountDisplay;
-    [SerializeField] private TextMeshProUGUI blueAmountDisplay;
-    [SerializeField] private TextMeshProUGUI purpleAmountDisplay;
-    [SerializeField] private TextMeshProUGUI orangeAmountDisplay;
+    private const string CRAFT_ACTION = "craft";
+    private const string CRAFTING_END_TIME_SPAN = "currentTimeSpan";
+    private const string FINISH_CRAFTING_PROCESS = "craftingReward";
 
     [SerializeField] private Button commonButton;
     [SerializeField] private Button uncommonButton;
@@ -41,151 +42,88 @@ public class CraftingUI : MonoBehaviour
     [SerializeField] private CraftedItemDisplay itemDisplay;
     [SerializeField] private CraftFinishedDisplay craftingFinished;
     private CraftingRecepieSO showingRecepie;
+    private bool isProcessingAction;
     
     public void Setup()
     {
-        DataManager.Instance.PlayerData.Crystals.UpdatedCommonCrystal += ShowCristals;
-        DataManager.Instance.PlayerData.Crystals.UpdatedUncommonCrystal += ShowCristals;
-        DataManager.Instance.PlayerData.Crystals.UpdatedRareCrystal += ShowCristals;
-        DataManager.Instance.PlayerData.Crystals.UpdatedEpicCrystal += ShowCristals;
-        DataManager.Instance.PlayerData.Crystals.UpdatedLegendaryCrystal += ShowCristals;
         CraftingProcess.OnFinishedCrafting += FinishedCrafting;
 
-        commonButton.onClick.AddListener(() => ShowRecepie(ItemType.Common));
-        uncommonButton.onClick.AddListener(() => ShowRecepie(ItemType.Uncommon));
-        rareButton.onClick.AddListener(() => ShowRecepie(ItemType.Rare));
-        epicButton.onClick.AddListener(() => ShowRecepie(ItemType.Epic));
-        legendaryButton.onClick.AddListener(() => ShowRecepie(ItemType.Legendary));
+        commonButton.onClick.AddListener(() => ShowRecipe(ItemType.CommonShard));
+        uncommonButton.onClick.AddListener(() => ShowRecipe(ItemType.UncommonShard));
+        rareButton.onClick.AddListener(() => ShowRecipe(ItemType.RareShard));
+        epicButton.onClick.AddListener(() => ShowRecipe(ItemType.EpicShard));
+        legendaryButton.onClick.AddListener(() => ShowRecipe(ItemType.LegendaryShard));
         craftCrystalButton.onClick.AddListener(CraftCrystal);
         botCraftItemButton.onClick.AddListener(CraftItem);
 
-        ShowRecepie(ItemType.Common);
-        ShowCristals();
+        ShowRecipe(ItemType.CommonShard);
         gameObject.SetActive(true);
     }
 
     private void OnDisable()
     {
-        DataManager.Instance.PlayerData.Crystals.UpdatedCommonCrystal -= ShowCristals;
-        DataManager.Instance.PlayerData.Crystals.UpdatedUncommonCrystal -= ShowCristals;
-        DataManager.Instance.PlayerData.Crystals.UpdatedRareCrystal -= ShowCristals;
-        DataManager.Instance.PlayerData.Crystals.UpdatedEpicCrystal -= ShowCristals;
-        DataManager.Instance.PlayerData.Crystals.UpdatedLegendaryCrystal -= ShowCristals;
         CraftingProcess.OnFinishedCrafting -= FinishedCrafting;
 
-        craftCrystalButton.onClick.RemoveListener(CraftCrystal);
         commonButton.onClick.RemoveAllListeners();
         uncommonButton.onClick.RemoveAllListeners();
         rareButton.onClick.RemoveAllListeners();
         epicButton.onClick.RemoveAllListeners();
         legendaryButton.onClick.RemoveAllListeners();
+        craftCrystalButton.onClick.RemoveListener(CraftCrystal);
         botCraftItemButton.onClick.RemoveListener(CraftItem);
     }
 
-    private void ShowCristals()
+    private void ShowRecipe(ItemType _ingredient)
     {
-        limeAmountDisplay.text = DataManager.Instance.PlayerData.Crystals.CommonCrystal.ToString();
-        greenAmountDisplay.text = DataManager.Instance.PlayerData.Crystals.UncommonCrystal.ToString();
-        blueAmountDisplay.text = DataManager.Instance.PlayerData.Crystals.RareCrystal.ToString();
-        purpleAmountDisplay.text = DataManager.Instance.PlayerData.Crystals.EpicCrystal.ToString();
-        orangeAmountDisplay.text = DataManager.Instance.PlayerData.Crystals.LegendaryCrystal.ToString();
-        ShowRecepie(showingRecepie.Inggrdiant);
-    }
+        showingRecepie = CraftingRecepieSO.Get(_ingredient);
 
-    private void ShowRecepie(ItemType _ingridiant)
-    {
-        showingRecepie = CraftingRecepieSO.Get(_ingridiant);
-
-        if (_ingridiant == ItemType.Common)
+        if (_ingredient == ItemType.CommonShard)
         {
             messageDisplay.SetActive(true);
-            ShowBotFrame(_ingridiant);
+            ShowBotFrame(_ingredient);
             topHolder.SetActive(false);
             return;
         }
-        else
-        {
-            messageDisplay.SetActive(false);
-        }
         
+        messageDisplay.SetActive(false);
         topHolder.SetActive(true);
 
-        CraftingRecepieSO _topRecepie = CraftingRecepieSO.Get((ItemType)((int)_ingridiant-1));
-        ingridiantImage.sprite = _topRecepie.EndProductSprite;
-        craftText.text = $"Get 1 <color={_topRecepie.EndProductColor}>{_topRecepie.EndProduct}</color> shard by\ncombining {_topRecepie.AmountNeeded} <color={_topRecepie.IngridiantColor}>{_topRecepie.Inggrdiant}</color> shards";
-        float _amountOfIngridiants;
-        switch (_topRecepie.Inggrdiant)
+        CraftingRecepieSO _topRecipe = CraftingRecepieSO.Get((ItemType)((int)_ingredient-1));
+        ingridiantImage.sprite = _topRecipe.EndProductSprite;
+        craftText.text = $"Get 1 <color={_topRecipe.EndProductColor}>{Utilities.GetCrystalTypeString(_topRecipe.EndProduct)}</color> shard by\ncombining {_topRecipe.AmountNeeded} <color={_topRecipe.IngridiantColor}>{Utilities.GetCrystalTypeString(_topRecipe.Inggrdiant)}</color> shards";
+        double _amountOfIngredients = DataManager.Instance.PlayerData.GetAmountOfCrystals(_topRecipe.Inggrdiant);
+        if (_amountOfIngredients >= showingRecepie.AmountNeeded)
         {
-            case ItemType.Common:
-                _amountOfIngridiants = DataManager.Instance.PlayerData.Crystals.CommonCrystal;
-                break;
-            case ItemType.Uncommon:
-                _amountOfIngridiants = DataManager.Instance.PlayerData.Crystals.UncommonCrystal;
-                break;
-            case ItemType.Rare:
-                _amountOfIngridiants = DataManager.Instance.PlayerData.Crystals.RareCrystal;
-                break;
-            case ItemType.Epic:
-                _amountOfIngridiants = DataManager.Instance.PlayerData.Crystals.EpicCrystal;
-                break;
-            case ItemType.Legendary:
-                _amountOfIngridiants = DataManager.Instance.PlayerData.Crystals.LegendaryCrystal;
-                break;
-            default:
-                throw new System.Exception("Dont know how to check if player can craft: " + _topRecepie.Inggrdiant);
-        }
-        if (_amountOfIngridiants >= showingRecepie.AmountNeeded)
-        {
-            craftAmountDisplay.text = $"<color=#00ff00>{_amountOfIngridiants}</color>/<color={_topRecepie.EndProductColor}>{_topRecepie.AmountNeeded}</color>";
+            craftAmountDisplay.text = $"<color=#00ff00>{_amountOfIngredients}</color>/<color={_topRecipe.EndProductColor}>{_topRecipe.AmountNeeded}</color>";
             craftCrystalButton.interactable = true;
         }
         else
         {
-            craftAmountDisplay.text = $"<color=#ff0000>{_amountOfIngridiants}</color>/<color={_topRecepie.EndProductColor}>{_topRecepie.AmountNeeded}</color>";
+            craftAmountDisplay.text = $"<color=#ff0000>{_amountOfIngredients}</color>/<color={_topRecipe.EndProductColor}>{_topRecipe.AmountNeeded}</color>";
             craftCrystalButton.interactable = false;
         }
 
-        endResultImage.sprite = _topRecepie.IngridiantSprite;
+        endResultImage.sprite = _topRecipe.IngridiantSprite;
         ingridiantImage.SetNativeSize();
         endResultImage.SetNativeSize();
         craftButtonText.text = "Craft";
         shardBackground.sprite = showingRecepie.TopOfferBackground;
 
-        if (DataManager.Instance.PlayerData.CraftingProcess != null)
+        if (DataManager.Instance.PlayerData.IsCrafting)
         {
             craftCrystalButton.interactable = false;
         }
 
-        ShowBotFrame(_ingridiant);
+        ShowBotFrame(_ingredient);
     }
 
-    private void ShowBotFrame(ItemType _ingridiant)
+    private void ShowBotFrame(ItemType _ingredient)
     {
-        CraftingRecepieSO _recepie = CraftingRecepieSO.Get(_ingridiant);
-        botFrameText.text = $"Combine {_recepie.BotAmountNeeded} <color={_recepie.IngridiantColor}>{_recepie.Inggrdiant}</color> shards\nto get 1 <color={_recepie.IngridiantColor}>{_recepie.Inggrdiant}</color> item";
-        float _amountGot = 0;
-        switch (_ingridiant)
-        {
-            case ItemType.Common:
-                _amountGot = DataManager.Instance.PlayerData.Crystals.CommonCrystal;
-                break;
-            case ItemType.Uncommon:
-                _amountGot = DataManager.Instance.PlayerData.Crystals.UncommonCrystal;
-                break;
-            case ItemType.Rare:
-                _amountGot = DataManager.Instance.PlayerData.Crystals.RareCrystal;
-                break;
-            case ItemType.Epic:
-                _amountGot = DataManager.Instance.PlayerData.Crystals.EpicCrystal;
-                break;
-            case ItemType.Legendary:
-                _amountGot = DataManager.Instance.PlayerData.Crystals.LegendaryCrystal;
-                break;
-            default:
-                throw new Exception("Don't know how to show bot frame for item: " + _ingridiant);
-        }
-        botAmountDisplay.text = $"<color={_recepie.IngridiantColor}>{_amountGot}</color>/<color={showingRecepie.IngridiantColor}>{showingRecepie.BotAmountNeeded}</color>";
-        if (_amountGot >= _recepie.BotAmountNeeded)
+        CraftingRecepieSO _recipe = CraftingRecepieSO.Get(_ingredient);
+        botFrameText.text = $"Combine {_recipe.BotAmountNeeded} <color={_recipe.IngridiantColor}>{Utilities.GetCrystalTypeString(_recipe.Inggrdiant)}</color> shards\nto get 1 <color={_recipe.IngridiantColor}>{Utilities.GetCrystalTypeString(_recipe.Inggrdiant)}</color> item";
+        double _amountGot = DataManager.Instance.PlayerData.GetAmountOfCrystals(_ingredient);
+        botAmountDisplay.text = $"<color={_recipe.IngridiantColor}>{_amountGot}</color>/<color={showingRecepie.IngridiantColor}>{showingRecepie.BotAmountNeeded}</color>";
+        if (_amountGot >= _recipe.BotAmountNeeded)
         {
             botCraftItemButton.interactable = true;
         }
@@ -194,41 +132,23 @@ public class CraftingUI : MonoBehaviour
             botCraftItemButton.interactable = false;
         }
 
-        botFrameImage.sprite = _recepie.BottomOfferBackground;
+        botFrameImage.sprite = _recipe.BottomOfferBackground;
     }
 
     private void CraftCrystal()
     {
-        CraftingRecepieSO _topRecepie = CraftingRecepieSO.Get((ItemType)((int)showingRecepie.Inggrdiant-1));
+        string _actionKey = CRAFT_ACTION + Utilities.GetItemKey(showingRecepie.Inggrdiant).UpperFirstLetter();
+        BoomDaoUtility.Instance.ExecuteActionWithParameter(_actionKey,
+            new List<ActionParameter>
+            {
+                new() { Key = CRAFTING_END_TIME_SPAN, Value = Utilities.DateTimeToNanoseconds(DateTime.UtcNow).ToString() }
+            }, HandleActionExecuted);
+    }
 
-        CraftingProcess _craftingProcess = new CraftingProcess();
-        _craftingProcess.DateStarted = DateTime.UtcNow;
-        _craftingProcess.Ingridiant = _topRecepie.Inggrdiant;
-
-        DataManager.Instance.PlayerData.CraftingProcess = _craftingProcess;
-
-        switch (_topRecepie.Inggrdiant)
-        {
-            case ItemType.Common:
-                DataManager.Instance.PlayerData.Crystals.CommonCrystal -= _topRecepie.AmountNeeded;
-                break;
-            case ItemType.Uncommon:
-                DataManager.Instance.PlayerData.Crystals.UncommonCrystal -= _topRecepie.AmountNeeded;
-                break;
-            case ItemType.Rare:
-                DataManager.Instance.PlayerData.Crystals.RareCrystal -= _topRecepie.AmountNeeded;
-                break;
-            case ItemType.Epic:
-                DataManager.Instance.PlayerData.Crystals.EpicCrystal -= _topRecepie.AmountNeeded;
-                break;
-            case ItemType.Legendary:
-                DataManager.Instance.PlayerData.Crystals.LegendaryCrystal -= _topRecepie.AmountNeeded;
-                break;
-            default:
-                throw new System.Exception("Don't know how to start crafting process for ingredient: " + _topRecepie.Inggrdiant);
-        }
-
-        ShowRecepie(showingRecepie.Inggrdiant);
+    private void HandleActionExecuted(List<ActionOutcome> _outcomes)
+    {
+        Debug.Log("Started crafting process");
+        ShowRecipe(showingRecepie.Inggrdiant);
     }
 
     public void Close()
@@ -236,51 +156,50 @@ public class CraftingUI : MonoBehaviour
         gameObject.SetActive(false);
     }
 
-    private void FinishedCrafting()
+    private void FinishedCrafting(ItemType _endProduct)
     {
-        craftingFinished.Setup($"Congratulations, you just crafted a {showingRecepie.EndProduct} shard");
-        ShowCristals();
-        ShowRecepie(showingRecepie.Inggrdiant);
+        if (isProcessingAction)
+        {
+            return;
+        }
+
+        if (!DataManager.Instance.PlayerData.IsCrafting)
+        {
+            return;
+        }
+
+        isProcessingAction = true;
+        craftingFinished.Setup($"Congratulations, you just crafted a {Utilities.GetItemName(_endProduct)} shard");
+        ShowRecipe(showingRecepie.Inggrdiant);
         craftButtonText.text = "Craft";
+        BoomDaoUtility.Instance.ExecuteAction(FINISH_CRAFTING_PROCESS+Utilities.GetItemKey(_endProduct).UpperFirstLetter(), HandleCraftingFinished);
         EventsManager.OnCraftedCrystal?.Invoke();
+    }
+
+    private void HandleCraftingFinished(List<ActionOutcome> _)
+    {
+        isProcessingAction = false;
+        ShowRecipe(showingRecepie.Inggrdiant);
     }
 
     private void CraftItem()
     {
+        return;
         EquipmentData _equipmentData = equipments.CraftItem(showingRecepie);
         ShowItem(_equipmentData);
         DataManager.Instance.PlayerData.AddOwnedEquipment(_equipmentData.Id);
-        switch (showingRecepie.Inggrdiant)
-        {
-            case ItemType.Common:
-                DataManager.Instance.PlayerData.Crystals.CommonCrystal -= showingRecepie.BotAmountNeeded;
-                break;
-            case ItemType.Uncommon:
-                DataManager.Instance.PlayerData.Crystals.UncommonCrystal -= showingRecepie.BotAmountNeeded;
-                break;
-            case ItemType.Rare:
-                DataManager.Instance.PlayerData.Crystals.RareCrystal -= showingRecepie.BotAmountNeeded;
-                break;
-            case ItemType.Epic:
-                DataManager.Instance.PlayerData.Crystals.EpicCrystal -= showingRecepie.BotAmountNeeded;
-                break;
-            case ItemType.Legendary:
-                DataManager.Instance.PlayerData.Crystals.LegendaryCrystal -= showingRecepie.BotAmountNeeded;
-                break;
-            default:
-                throw new Exception("Don't know how to craft item for: " + showingRecepie.Inggrdiant);
-        }
+        //todo decrease amount of showingRecepie.Inggrdiant type cristals
         EventsManager.OnCraftedItem?.Invoke();
     }
 
-    private async void ShowItem(EquipmentData _equipmentData)
+    private void ShowItem(EquipmentData _equipmentData)
     {
         itemDisplay.Setup(_equipmentData);
     }
 
     private void Update()
     {
-        if (DataManager.Instance.PlayerData.CraftingProcess != null)
+        if (DataManager.Instance.PlayerData.IsCrafting)
         {
             craftButtonText.text = DataManager.Instance.PlayerData.CraftingProcess.GetFinishTime();
         }
