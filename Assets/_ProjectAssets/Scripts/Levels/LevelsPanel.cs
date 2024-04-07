@@ -33,12 +33,11 @@ public class LevelsPanel : MonoBehaviour
 
     private void OnEnable()
     {
+        PlayerData.OnClaimedReward += ShowRewards;
         closeButton.onClick.AddListener(Close);
         showPrevious.onClick.AddListener(ShowPrevious);
         showNext.onClick.AddListener(ShowNext);
         claimAllButton.onClick.AddListener(ClaimAll);
-
-        DataManager.Instance.PlayerData.UpdatedSnacks += SetupDisplays;
 
         SetupDisplays();
 
@@ -53,19 +52,18 @@ public class LevelsPanel : MonoBehaviour
 
     private void OnDisable()
     {
+        PlayerData.OnClaimedReward -= ShowRewards;
         closeButton.onClick.RemoveListener(Close);
         showPrevious.onClick.RemoveListener(ShowPrevious);
         showNext.onClick.RemoveListener(ShowNext);
         claimAllButton.onClick.RemoveListener(ClaimAll);
-
-        DataManager.Instance.PlayerData.UpdatedSnacks -= SetupDisplays;
     }
 
     private void SetupDisplays()
     {
         levelDisplay.text = DataManager.Instance.PlayerData.Level.ToString();
         seasonNumberDisplay.text = "Season "+DataManager.Instance.GameData.SeasonNumber;
-        ShowSeasonEndDiplay();
+        ShowStatus();
     }
 
     private void Close()
@@ -133,7 +131,7 @@ public class LevelsPanel : MonoBehaviour
         {
             levelsBackgroundDisplay[i].sprite = i < _progressLevel ? reachedLevelBackground : notReachedLevelBackground;
         }
-        _progressLevel = Mathf.Clamp(_progressLevel, 0, 5);
+        
         if (DataManager.Instance.PlayerData.Level<firstRewardLevel)
         {
             progressDispaly.fillAmount = 0;
@@ -166,34 +164,45 @@ public class LevelsPanel : MonoBehaviour
 
     private void Update()
     {
-        ShowSeasonEndDiplay();
+        ShowStatus();
     }
 
-    private void ShowSeasonEndDiplay()
+    private void ShowStatus()
     {
         if (DataManager.Instance.GameData.HasSeasonEnded)
         {
             seasonEndDisplay.text = "Ended";
+            return;
+        }
+        TimeSpan _timeSpan;
+        string _status;
+        
+        if(DataManager.Instance.GameData.HasSeasonStarted)
+        {
+            _status = "ends";
+            _timeSpan = DataManager.Instance.GameData.SeasonEnds - DateTime.UtcNow;
         }
         else
         {
-            TimeSpan _seasonEndsIn = DataManager.Instance.GameData.SeasonEnds - DateTime.UtcNow;
-            if (_seasonEndsIn.TotalDays>1)
-            {
-                seasonEndDisplay.text = $"Season ends: {(int)_seasonEndsIn.TotalDays}days";
-            }
-            else if (_seasonEndsIn.Hours>1)
-            {
-                seasonEndDisplay.text = $"Season ends: {(int)_seasonEndsIn.TotalDays}hours";
-            }
-            else if (_seasonEndsIn.Minutes>1)
-            {
-                seasonEndDisplay.text = $"Season ends: {(int)_seasonEndsIn.Minutes}minutes";
-            }
-            else
-            {
-                seasonEndDisplay.text = $"Season ends: {(int)_seasonEndsIn.Seconds}secounds";
-            }
+            _status = "starts";
+            _timeSpan = DataManager.Instance.GameData.SeasonStarts - DateTime.UtcNow;
+        }
+        
+        if (_timeSpan.TotalDays>1)
+        {
+            seasonEndDisplay.text = $"Season {_status}: {(int)_timeSpan.TotalDays}days";
+        }
+        else if (_timeSpan.Hours>1)
+        {
+            seasonEndDisplay.text = $"Season {_status}: {(int)_timeSpan.TotalDays}hours";
+        }
+        else if (_timeSpan.Minutes>1)
+        {
+            seasonEndDisplay.text = $"Season {_status}: {_timeSpan.Minutes}minutes";
+        }
+        else
+        {
+            seasonEndDisplay.text = $"Season {_status}: {_timeSpan.Seconds}seconds";
         }
     }
 

@@ -1,7 +1,7 @@
-using Photon.Pun;
 using System;
-using System.Collections;
 using System.Collections.Generic;
+using BoomDaoWrapper;
+using Newtonsoft.Json;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -10,6 +10,12 @@ namespace com.colorfulcoding.AfterGame
 {
     public class AfterGameMainTitle : MonoBehaviour
     {
+        private const string BATTLE_LOST_ACTION_KEY = "battle_outcome_lost";
+        private const string HURT_KITTY = "hurtKitty";
+        
+        private const string SET_LEADERBOARD_POINTS = "setLeaderboardPoints";
+        
+        
         public GameObject winTitle;
         public GameObject loseTitle;
         public GameObject drawTitle;
@@ -25,9 +31,6 @@ namespace com.colorfulcoding.AfterGame
 
         [Header("Cat Stand")]
         public SpriteRenderer standGlow;
-        public Color standWinColor;
-        public Color standLoseColor;
-        public Color standDrawColor;
 
         [SerializeField] private LuckyWheelUI luckyWheelUI;
         [SerializeField] private GameObject leaveButton;
@@ -36,7 +39,9 @@ namespace com.colorfulcoding.AfterGame
         {
             int checkIfIWon;
             EventsManager.OnPlayedMatch?.Invoke();
-
+            
+            SaveKittyHealth();
+            
             //If unexpected error happened, we override result type
             if (GameState.pointsChange.gameResultType == 0)
             {
@@ -76,6 +81,11 @@ namespace com.colorfulcoding.AfterGame
             }
             else if (checkIfIWon < 0)
             {
+                List<ActionParameter> _parameters = new()
+                {
+                    new ActionParameter { Key = PlayerData.EARNED_XP_KEY, Value = DamageDealingDisplay.XpEarned.ToString()}
+                };
+                BoomDaoUtility.Instance.ExecuteActionWithParameter(BATTLE_LOST_ACTION_KEY,_parameters,null);
                 EventsManager.OnLostGame?.Invoke();
                 loseTitle.SetActive(true);
                 bg.GetComponent<Image>().color = loseColor;
@@ -98,7 +108,15 @@ namespace com.colorfulcoding.AfterGame
 
             if (GameState.pointsChange.points != 0)
             {
-                LeanTween.value(gameObject, 0, GameState.pointsChange.points, 2f).setOnUpdate((float val) =>
+                List<ActionParameter> _parameters = new()
+                {
+                    new ActionParameter { Key = GameData.LEADERBOARD_NICK_NAME, Value = DataManager.Instance.PlayerData.Username},
+                    new ActionParameter { Key = GameData.LEADERBOARD_KITTY_URL, Value = GameState.selectedNFT.imageUrl},
+                    new ActionParameter { Key = GameData.LEADERBOARD_POINTS, Value = (GameState.pointsChange.oldPoints+GameState.pointsChange.points).ToString()}
+                };
+                Debug.Log(JsonConvert.SerializeObject(_parameters));
+                BoomDaoUtility.Instance.ExecuteActionWithParameter(SET_LEADERBOARD_POINTS, _parameters,null);
+                LeanTween.value(gameObject, 0, GameState.pointsChange.points, 2f).setOnUpdate(val =>
                 {
                     totalCoinsValue.text = "" + Math.Floor(GameState.pointsChange.oldPoints + val);
                     deltaPoints.text = "+" + Math.Floor(val);
@@ -117,6 +135,28 @@ namespace com.colorfulcoding.AfterGame
                 reasonText.SetActive(true);
                 reasonText.transform.GetChild(0).GetComponent<TextMeshProUGUI>().text = GameState.pointsChange.reason;
             }
+        }
+
+        private void SaveKittyHealth()
+        {
+            float _maxHp = 100;
+            float _minutesItWillTakeToRecover = (RecoveryHandler.RecoveryInMinutes / _maxHp) * (_maxHp - PlayerManager.HealthAtEnd);
+            if (_minutesItWillTakeToRecover <= 1)
+            {
+                return;
+            }
+
+            DateTime _recoveryEnds = DateTime.UtcNow.AddMinutes(_minutesItWillTakeToRecover);
+            GameState.selectedNFT.RecoveryEndDate = _recoveryEnds;
+
+            Debug.Log("Recovery ends: "+_recoveryEnds);
+            BoomDaoUtility.Instance.ExecuteActionWithParameter(HURT_KITTY,
+                new List<ActionParameter>
+                {
+                    new() { Key = PlayerData.KITTY_RECOVERY_KEY, Value = Utilities.DateTimeToNanoseconds(_recoveryEnds).ToString() },
+                    new() { Key = PlayerData.KITTY_KEY, Value = GameState.selectedNFT.imageUrl }
+                }, null);
+
         }
     }
 }

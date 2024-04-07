@@ -231,9 +231,6 @@ MonoBehaviour:
   drawColor: {r: 0.7176471, g: 0.67058825, b: 0.5764706, a: 1}
   reasonText: {fileID: 0}
   standGlow: {fileID: 1890641202}
-  standWinColor: {r: 0.53333336, g: 1, b: 0.7607843, a: 1}
-  standLoseColor: {r: 1, g: 0, b: 0.08235294, a: 1}
-  standDrawColor: {r: 1, g: 1, b: 1, a: 1}
   luckyWheelUI: {fileID: 4324128802771578787}
   leaveButton: {fileID: 1466782754}
 --- !u!1 &258123387
@@ -1152,7 +1149,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1011119103}
   m_Layer: 0
-  m_Name: Managers
+  m_Name: ConfigurationManager
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2989,6 +2986,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4f231c4fb786f3946a6b90b886c48677, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  m_SendPointerHoverToParent: 1
   m_HorizontalAxis: Horizontal
   m_VerticalAxis: Vertical
   m_SubmitButton: Submit
@@ -3126,6 +3124,10 @@ PrefabInstance:
       value: WheelHolder
       objectReference: {fileID: 0}
     - target: {fileID: 4324128801988241771, guid: 776983f5fb4a240209700b4c4ad5ec9c, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4324128802302725505, guid: 776983f5fb4a240209700b4c4ad5ec9c, type: 3}
       propertyPath: m_IsActive
       value: 0
       objectReference: {fileID: 0}

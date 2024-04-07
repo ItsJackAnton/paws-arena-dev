@@ -1,0 +1,23 @@
+Current Version: 0.2.9
+======================
+> Version 0.2.8 Changes:
+
+- Fix: Now entity's outcomes of type text can be parsed as variables
+
+> Version 0.2.8 Changes:
+
+New Features:
+
+- Leaderboard Tutorial: https://docs.google.com/document/d/1ZRgaJ74KsEHUuX42ejtuLOMFxdJY-6hlqcDnk5JOrRk/edit
+
+> Version 0.2.6 & 0.2.7 Changes:
+
+Issue: Unable to NFID login on the builds
+
+Fix: added BypassedBlsCryptography.cs and used it instead of WebGlBlsCryptography.cs
+
+> Version 0.2.5 Changes:
+
+Issue: When there was an outcome of type delete entity, it would set the entity outcome's fields as null
+
+Fix: if fields was null, set it as a new object

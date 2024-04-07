@@ -1,10 +1,13 @@
 using UnityEngine;
 using UnityEngine.UI;
-using TMPro;
 using System;
+using System.Collections.Generic;
+using BoomDaoWrapper;
 
 public class LevelRewardDisplay : MonoBehaviour
 {
+
+    
     public static Action<LevelReward, Sprite> OnClaimed;
     [SerializeField] private Image rewardDisplay;
     [SerializeField] private Image background;
@@ -33,9 +36,11 @@ public class LevelRewardDisplay : MonoBehaviour
     private bool canClaim;
 
     public bool CanClaim => canClaim;
-
+    
     public void Setup(LevelReward _reward, int _level)
     {
+        claimButton.onClick.RemoveAllListeners();
+        claimButton.interactable = true;
         reward = _reward;
         level = _level;
         background.sprite = _reward.IsPremium ? premiumBackground : normalBackground;
@@ -46,7 +51,7 @@ public class LevelRewardDisplay : MonoBehaviour
         {
             claimedObject.SetActive(true);
         }
-        else if(DateTime.UtcNow<DataManager.Instance.GameData.SeasonEnds)
+        else if(DataManager.Instance.GameData.IsSeasonActive)
         {
             if (level <= DataManager.Instance.PlayerData.Level)
             {
@@ -78,57 +83,57 @@ public class LevelRewardDisplay : MonoBehaviour
         }
     }
 
+    public void ClaimReward()
+    {
+        claimButton.interactable = false;
+        string _actionId = reward.IsPremium ? GameData.CLAIM_PREMIUM_REWARD : GameData.CLAIM_NORMAL_REWARD;
+        _actionId += reward.Level;
+        BoomDaoUtility.Instance.ExecuteAction(_actionId, HandleClaimFinished);
+    }
+
+    private void HandleClaimFinished(List<ActionOutcome> _outcomes)
+    {
+        claimButton.interactable = true;
+        if (_outcomes==default || _outcomes.Count==0)
+        {
+            return;
+        }
+        
+        OnClaimed?.Invoke(reward,GetSpriteForReward(reward));
+        SetupEmpty();
+        Setup(reward,level);
+    }
+
     private Sprite GetSpriteForReward(LevelReward _reward)
     {
         switch (_reward.Type)
         {
-            case LevelRewardType.CommonShard:
+            case ItemType.CommonShard:
                 return shards[0];
-            case LevelRewardType.UncommonShard:
+            case ItemType.UncommonShard:
                 return shards[1];
-            case LevelRewardType.RareShard:
+            case ItemType.RareShard:
                 return shards[2];
-            case LevelRewardType.EpicShard:
+            case ItemType.EpicShard:
                 return shards[3];
-            case LevelRewardType.LegendaryShard:
+            case ItemType.LegendaryShard:
                 return shards[4];
-            case LevelRewardType.Snack:
+            case ItemType.Snack:
                 return snacks;
-            case LevelRewardType.JugOfMilk:
+            case ItemType.JugOfMilk:
                 return jugOfMilk;
-            case LevelRewardType.GlassOfMilk:
+            case ItemType.GlassOfMilk:
                 return glassOfMilk;
-            case LevelRewardType.Item:
+            case ItemType.Item:
                 return equipments.GetEquipmentData(_reward.Parameter1).Thumbnail;
-            case LevelRewardType.Emote:
+            case ItemType.Emote:
                 return EmojiSO.Get(_reward.Parameter1).Sprite;
-                break;
-            case LevelRewardType.WeaponSkin:
+            case ItemType.WeaponSkin:
                 break;
             default:
                 throw new Exception("Cant find sprite for reward type: " + _reward.Type);
         }
         return null;
-    }
-
-   public void ClaimReward()
-    {
-        reward.Claim();
-        OnClaimed?.Invoke(reward,GetSpriteForReward(reward));
-        ClaimedReward _claimedReward = new ClaimedReward()
-        {
-            IsPremium = reward.IsPremium,
-            Level = level,
-        };
-        DataManager.Instance.PlayerData.AddCollectedLevelReward(_claimedReward);
-        SetupEmpty();
-        Setup(reward,level);
-
-    }
-
-    private void OnDisable()
-    {
-        claimButton.onClick.RemoveAllListeners();
     }
 
     public void SetupEmpty()

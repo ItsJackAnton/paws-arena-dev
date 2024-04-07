@@ -1,10 +1,14 @@
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
-using System.Collections;
+using BoomDaoWrapper;
 
 public class BuyMilk : MonoBehaviour
 {
+    private const string BUY_MILK_BOTTLE = "buyMilkBottleIcp";
+    private const string BUY_MILK_GLASS = "buyMilkGlassIcp";
+    
     [SerializeField] private Button doneButton;
     [SerializeField] private Button buyJugOfMilkButton;
     [SerializeField] private Button buyGlassOfMilkButton;
@@ -18,6 +22,8 @@ public class BuyMilk : MonoBehaviour
     [SerializeField] private TextMeshProUGUI glassOfMilkPriceDisplay;
     [SerializeField] private TextMeshProUGUI jugOfMilkPriceDisplay;
 
+    [SerializeField] private GameObject insufficientFounds;
+
     public void Setup()
     {
         ShowGlassOfMilk();
@@ -27,8 +33,8 @@ public class BuyMilk : MonoBehaviour
         buyJugOfMilkButton.onClick.AddListener(BuyJugOfMilk);
         buyGlassOfMilkButton.onClick.AddListener(BuyGlassOfMIlk);
 
-        DataManager.Instance.PlayerData.UpdatedJugOfMilk += ShowJugOfMilk;
-        DataManager.Instance.PlayerData.UpdatedGlassOfMilk += ShowGlassOfMilk;
+        PlayerData.OnUpdatedJugOfMilk += ShowJugOfMilk;
+        PlayerData.OnUpdatedGlassOfMilk += ShowGlassOfMilk;
 
         glassOfMilkPriceDisplay.text = DataManager.Instance.GameData.GlassOfMilkPrice.ToString();
         jugOfMilkPriceDisplay.text = DataManager.Instance.GameData.JugOfMilkPrice.ToString();
@@ -42,8 +48,8 @@ public class BuyMilk : MonoBehaviour
         buyJugOfMilkButton.onClick.AddListener(BuyJugOfMilk);
         buyGlassOfMilkButton.onClick.AddListener(BuyGlassOfMIlk);
 
-        DataManager.Instance.PlayerData.UpdatedJugOfMilk -= ShowJugOfMilk;
-        DataManager.Instance.PlayerData.UpdatedGlassOfMilk -= ShowGlassOfMilk;
+        PlayerData.OnUpdatedJugOfMilk -= ShowJugOfMilk;
+        PlayerData.OnUpdatedGlassOfMilk -= ShowGlassOfMilk;
     }
 
     private void ShowJugOfMilk()
@@ -60,26 +66,25 @@ public class BuyMilk : MonoBehaviour
 
     private void BuyJugOfMilk()
     {
-        StartCoroutine(BuyCooldown());
-        if (DataManager.Instance.PlayerData.Snacks<DataManager.Instance.GameData.JugOfMilkPrice)
-        {
-            return;
-        }
-
-        DataManager.Instance.PlayerData.Snacks -= DataManager.Instance.GameData.JugOfMilkPrice;
-        DataManager.Instance.PlayerData.JugOfMilk++;
+        ManageInteractables(false);
+        BoomDaoUtility.Instance.ExecuteAction(BUY_MILK_BOTTLE, HandleBuyOutcome,ShowInsufficientFunds);
     }
 
     private void BuyGlassOfMIlk()
     {
-        StartCoroutine(BuyCooldown());
-        if (DataManager.Instance.PlayerData.Snacks< DataManager.Instance.GameData.GlassOfMilkPrice)
-        {
-            return;
-        }
+        ManageInteractables(false);
 
-        DataManager.Instance.PlayerData.Snacks -= DataManager.Instance.GameData.GlassOfMilkPrice;
-        DataManager.Instance.PlayerData.GlassOfMilk++;
+        BoomDaoUtility.Instance.ExecuteAction(BUY_MILK_GLASS, HandleBuyOutcome,ShowInsufficientFunds);
+    }
+
+    private void HandleBuyOutcome(List<ActionOutcome> _outcomes)
+    {
+        ManageInteractables(true);
+    }
+
+    private void ShowInsufficientFunds()
+    {
+        insufficientFounds.gameObject.SetActive(true);
     }
 
     private void Done()
@@ -87,12 +92,9 @@ public class BuyMilk : MonoBehaviour
         gameObject.SetActive(false);
     }
 
-    private IEnumerator BuyCooldown()
+    private void ManageInteractables(bool _status)
     {
-        buyJugOfMilkButton.interactable = false;
-        buyGlassOfMilkButton.interactable = false;
-        yield return new WaitForSeconds(1);
-        buyJugOfMilkButton.interactable = true;
-        buyGlassOfMilkButton.interactable = true;
+        buyJugOfMilkButton.interactable = _status;
+        buyGlassOfMilkButton.interactable = _status;
     }
 }

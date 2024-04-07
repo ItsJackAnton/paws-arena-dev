@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using BoomDaoWrapper;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
@@ -21,6 +23,7 @@ public class RecoveryDropDown : MonoBehaviour
     [SerializeField] private Button jugOfMilkButton;
     [SerializeField] private Button glassOfMilkButton;
     [SerializeField] private UserInfoDropDown userInfoDropDown;
+    [SerializeField] private RecoveryHandler recoveryHandler;
     
     private RecoveryOption recoveryOption;
 
@@ -123,37 +126,79 @@ public class RecoveryDropDown : MonoBehaviour
             return;
         }
 
+        healButton.interactable = false;
         if (recoveryOption == RecoveryOption.JugOfMilk)
         {
             if (DataManager.Instance.PlayerData.JugOfMilk > 0)
             {
-                EventsManager.OnHealedKitty?.Invoke();
-                EventsManager.OnUsedMilkBottle?.Invoke();
-                DataManager.Instance.PlayerData.JugOfMilk--;
-                GameState.selectedNFT.RecoveryEndDate = DateTime.UtcNow;
+                BoomDaoUtility.Instance.ExecuteActionWithParameter(PlayerData.USE_MILK_BOTTLE,
+                    new List<ActionParameter>()
+                    {
+                        new ()
+                        {
+                            Key = PlayerData.KITTY_KEY,
+                            Value = GameState.selectedNFT.imageUrl
+                        }
+                    },
+                    HandleBottleHealOutcome);
             }
             else
             {
                 healMessageHolder.SetActive(true);
+                return;
             }
         }
         else
         {
             if (DataManager.Instance.PlayerData.GlassOfMilk > 0)
             {
-                EventsManager.OnHealedKitty?.Invoke();
-                DataManager.Instance.PlayerData.GlassOfMilk--;
-                GameState.selectedNFT.RecoveryEndDate = GameState.selectedNFT.RecoveryEndDate.AddMinutes(-15);
-                //TODO tell server that player used glass of milk to recover kittie
+                BoomDaoUtility.Instance.ExecuteActionWithParameter(PlayerData.USE_MILK_GLASS,
+                    new List<ActionParameter>()
+                    {
+                        new ()
+                        {
+                            Key = PlayerData.KITTY_KEY,
+                            Value = GameState.selectedNFT.imageUrl
+                        }
+                    },
+                    HandleGlassHealOutcome);
             }
             else
             {
                 healMessageHolder.SetActive(true);
+                return;
             }
         }
 
 
         Close();
+    }
+
+    private void HandleBottleHealOutcome(List<ActionOutcome> _outcomes)
+    {
+        healButton.interactable = true;
+        if (_outcomes==default||_outcomes.Count==0)
+        {
+            healMessageHolder.SetActive(true);
+            return;
+        }
+        EventsManager.OnHealedKitty?.Invoke();
+        EventsManager.OnUsedMilkBottle?.Invoke();
+        GameState.selectedNFT.RecoveryEndDate = DateTime.UtcNow;
+    }
+
+    private void HandleGlassHealOutcome(List<ActionOutcome> _outcomes)
+    {
+        healButton.interactable = true;
+        if (_outcomes==default||_outcomes.Count==0)
+        {
+            healMessageHolder.SetActive(true);
+            return;
+        }
+        
+        EventsManager.OnHealedKitty?.Invoke();
+        GameState.selectedNFT.RecoveryEndDate = GameState.selectedNFT.RecoveryEndDate.AddMinutes(-15);
+        recoveryHandler.RestartRoutine(GameState.selectedNFT.RecoveryEndDate);
     }
 
     public void BuyMilk()

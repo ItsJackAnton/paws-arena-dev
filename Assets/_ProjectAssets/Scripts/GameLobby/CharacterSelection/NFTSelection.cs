@@ -1,9 +1,9 @@
 using Anura.ConfigurationModule.Managers;
 using Cysharp.Threading.Tasks;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using BoomDaoWrapper;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -21,6 +21,9 @@ public class NFTSelection : MonoBehaviour
 
     private List<GameObject> nftButtons = new List<GameObject>();
     private GameObject playerPlatform;
+    [SerializeField] private GameObject message;
+    [SerializeField] private Button reload;
+    [SerializeField] private Button reloadNoKitty;
 
     private int currentPage = 0;
     private int pageSize = 9;
@@ -29,19 +32,19 @@ public class NFTSelection : MonoBehaviour
 
     private void OnEnable()
     {
+        reload.onClick.AddListener(RequestReload);
+        reloadNoKitty.onClick.AddListener(RequestReload);
         InitNFTScreen();
         pages.OnClick += OnPageSelected;
+        BoomDaoUtility.OnUpdatedNftsData += ReloadNfts;
+        
     }
 
     private void OnDisable()
     {
-        foreach (NFT nfts in currentNFTs)
-        {
-            Destroy(nfts.imageTex);
-            nfts.imageTex = null;
-        }
-        currentNFTs.Clear();
-
+        reload.onClick.RemoveListener(RequestReload);
+        reloadNoKitty.onClick.RemoveListener(RequestReload);
+        ClearShownNfts();
         if (playerPlatform != null)
         {
             Destroy(playerPlatform);
@@ -50,6 +53,28 @@ public class NFTSelection : MonoBehaviour
 
 
         pages.OnClick -= OnPageSelected;
+        BoomDaoUtility.OnUpdatedNftsData -= ReloadNfts;
+    }
+
+    private void RequestReload()
+    {
+        BoomDaoUtility.Instance.ReloadNfts();
+    }
+
+    private void ReloadNfts()
+    {
+        ClearShownNfts();
+        InitNFTScreen();
+    }
+    
+    private void ClearShownNfts()
+    {
+        foreach (NFT nfts in currentNFTs)
+        {
+            Destroy(nfts.imageTex);
+            nfts.imageTex = null;
+        }
+        currentNFTs.Clear();
     }
 
     public async void InitNFTScreen()
@@ -58,7 +83,11 @@ public class NFTSelection : MonoBehaviour
         int maxPages = (int)Math.Floor((GameState.nfts.Count - 1) * 1.0 / pageSize);
         pages.SetNumberOfPages(maxPages + 1);
         await PopulateGridAsync();
-        SelectNFT(0);
+        if (GameState.nfts.Count>0)
+        {
+            SelectNFT(0);
+        }
+        message.SetActive(GameState.nfts.Count==0);
     }
 
     private async void OnPageSelected(int idx)
@@ -117,15 +146,13 @@ public class NFTSelection : MonoBehaviour
         foreach (NFT nft in currentNFTs)
         {
             nft.RecoveryEndDate = DateTime.MinValue;
-            foreach (var _recoveringKitty in DataManager.Instance.PlayerData.RecoveringKitties)
+            if (DataManager.Instance.PlayerData.IsKittyHurt(nft.imageUrl))
             {
-                if (_recoveringKitty.KittyImageUrl==nft.imageUrl)
-                {
-                    nft.RecoveryEndDate = _recoveringKitty.EndDate;
-                }
+                nft.RecoveryEndDate = DataManager.Instance.PlayerData.GetKittyRecoveryDate(nft.imageUrl);
             }
+            
             nftButtons[idx].GetComponent<NFTImageButton>().SetTexture(nft.imageTex);
-            nftButtons[idx].GetComponent<RecoveryHandler>().ShowRecovery(nft.RecoveryEndDate,nft.imageUrl);
+            nftButtons[idx].GetComponent<RecoveryHandler>().ShowRecovery(nft.RecoveryEndDate);
             nftButtons[idx].GetComponent<Button>().onClick.RemoveAllListeners();
 
             int crtIdx = idx;

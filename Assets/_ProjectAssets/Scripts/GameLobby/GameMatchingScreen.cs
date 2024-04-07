@@ -1,12 +1,13 @@
-using Anura.ConfigurationModule.Managers;
 using Photon.Pun;
 using Photon.Realtime;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using Random = UnityEngine.Random;
 
 [System.Serializable]
 public class SeatGameobject
@@ -73,7 +74,10 @@ public class GameMatchingScreen : MonoBehaviour
             }
         }
 
-        StartCoroutine(BringBotAfterSeconds(UnityEngine.Random.Range(10, 20)));
+        if (PhotonNetwork.CurrentRoom is {IsVisible: true})
+        {
+            StartCoroutine(BringBotAfterSeconds(15));
+        }
     }
 
     public void SetSeats()
@@ -106,26 +110,105 @@ public class GameMatchingScreen : MonoBehaviour
     }
 
     [ContextMenu("Bring Bot")]
-    public async void BringBot()
+    public void BringBot()
     {
-        var resp = await NetworkManager.GETRequestCoroutine(
-            "/user/player2",
-            (code, err) => { },
-            true
-        );
-
-        if (ConfigurationManager.Instance.GameConfig.enableDevLogs)
-        {
-            Debug.Log("[HTTP][Player2]" + resp);
-        }
-
-        BotInformation botInformation = JsonUtility.FromJson<BotInformation>(resp);
+        BotInformation botInformation = GetRandomBot();
 
         GameState.botInfo = botInformation;
         PhotonNetwork.CurrentRoom.MaxPlayers = 1;
         OccupySeat(seats[1], botInformation.nickname);
         syncPlatformsBehaviour.InstantiateBot();
         StartSinglePlayerGame();
+    }
+
+    private BotInformation GetRandomBot()
+    {
+        var _bots = new List<BotInformation>
+        {
+            new()
+            {
+                nickname = "Jack Sparrow",
+                l = 4,
+                kittyUrl = "https://rw7qm-eiaaa-aaaak-aaiqq-cai.raw.ic0.app/?type=thumbnail&tokenid=izapu-dakor-uwiaa-aaaaa-cqace-eaqca-aabmc-a"
+            },
+            new ()
+            {
+                nickname = "Cat Fairy",
+                l = 4,
+                kittyUrl = "https://rw7qm-eiaaa-aaaak-aaiqq-cai.raw.ic0.app/?type=thumbnail&tokenid=pjbr5-xikor-uwiaa-aaaaa-cqace-eaqca-aabmq-a"
+            },
+            new ()
+            {
+                nickname = "qrqhn",
+                l = 5,
+                kittyUrl = "https://rw7qm-eiaaa-aaaak-aaiqq-cai.raw.ic0.app/?type=thumbnail&tokenid=oeeh5-yikor-uwiaa-aaaaa-cqace-eaqca-aaar7-a"
+            },
+            new ()
+            {
+                nickname = "lazy_hunter",
+                l = 1,
+                kittyUrl = "https://rw7qm-eiaaa-aaaak-aaiqq-cai.raw.ic0.app/?type=thumbnail&tokenid=kgds5-oykor-uwiaa-aaaaa-cqace-eaqca-aabyk-q"
+            },
+            new ()
+            {
+                nickname = "Mr. Robot",
+                l = 5,
+                kittyUrl = "https://rw7qm-eiaaa-aaaak-aaiqq-cai.raw.ic0.app/?type=thumbnail&tokenid=te62f-xykor-uwiaa-aaaaa-cqace-eaqca-aadpg-a"
+            },
+            new ()
+            {
+                nickname = "filipo",
+                l = 5,
+                kittyUrl = "https://rw7qm-eiaaa-aaaak-aaiqq-cai.raw.ic0.app/?type=thumbnail&tokenid=qvghj-likor-uwiaa-aaaaa-cqace-eaqca-aabp4-q"
+            },
+            new ()
+            {
+                nickname = "Callie",
+                l = 3,
+                kittyUrl = "https://rw7qm-eiaaa-aaaak-aaiqq-cai.raw.ic0.app/?type=thumbnail&tokenid=ben3m-hykor-uwiaa-aaaaa-cqace-eaqca-aadb4-q"
+            },
+            new ()
+            {
+                nickname = "Strawberry",
+                l = 3,
+                kittyUrl = "https://rw7qm-eiaaa-aaaak-aaiqq-cai.raw.ic0.app/?type=thumbnail&tokenid=yil5q-5ykor-uwiaa-aaaaa-cqace-eaqca-aabur-a"
+            },
+            new ()
+            {
+                nickname = "Strawberry",
+                l = 1,
+                kittyUrl = "https://rw7qm-eiaaa-aaaak-aaiqq-cai.raw.ic0.app/?type=thumbnail&tokenid=dnmix-6qkor-uwiaa-aaaaa-cqace-eaqca-aabzy-q"
+            },
+            new ()
+            {
+                nickname = "xLilMonster",
+                l = 1,
+                kittyUrl = "https://rw7qm-eiaaa-aaaak-aaiqq-cai.raw.ic0.app/?type=thumbnail&tokenid=vrun7-takor-uwiaa-aaaaa-cqace-eaqca-aach5-a"
+            },
+            new ()
+            {
+                nickname = "airstrike22",
+                l = 1,
+                kittyUrl = "https://rw7qm-eiaaa-aaaak-aaiqq-cai.raw.ic0.app/?type=thumbnail&tokenid=c6bu2-jqkor-uwiaa-aaaaa-cqace-eaqca-aadni-q"
+            }
+        };
+
+        int _index = Random.Range(0, _bots.Count);
+        if (DataManager.Instance.PlayerData.ShouldBotBeEasy)
+        {
+            int _minLevel = int.MaxValue;
+            foreach (var _bot in _bots)
+            {
+                if (_bot.l<_minLevel)
+                {
+                    _minLevel = _bot.l;
+                }
+            }
+
+            var _botsWithMinLevel = _bots.FindAll(_bot => _bot.l == _minLevel).ToList();
+            return _botsWithMinLevel[Random.Range(0,_botsWithMinLevel.Count)];
+        }
+        return _bots[_index];
     }
 
     private void OccupySeat(SeatGameobject seat, string nickName)
