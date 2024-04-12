@@ -9,5 +9,16 @@ public static class Env
     {
         public const string ICP_LEDGER = "ryjl3-tyaaa-aaaaa-aaaba-cai";
         public const string BOOM_LEDGER = "vtrom-gqaaa-aaaaq-aabia-cai";
+
+        public static class WORLD_HUB
+        {
+            public const string STAGING = "c5moj-piaaa-aaaal-qdhoq-cai";
+            public const string PRODUCTION = "j362g-ziaaa-aaaap-abf6a-cai";
+        }
+        public static class WORLD_DEPLOYER
+        {
+            public const string STAGING = "na2jz-uqaaa-aaaal-qbtfq-cai";
+            public const string PRODUCTION = "js5r2-paaaa-aaaap-abf7q-cai";
+        }
     }
 }

@@ -175,9 +175,11 @@ namespace Boom
         }
 
         //ACTIONS
-        public static bool TryGetAction(string worldId, string actionId, out MainDataTypes.AllAction.Action outValue)
+        public static bool TryGetAction(string actionId, out MainDataTypes.AllAction.Action outValue, string worldId = "")
         {
             outValue = default;
+
+            if (string.IsNullOrEmpty(worldId)) worldId = BoomManager.Instance.WORLD_CANISTER_ID;
 
             var result = UserUtil.GetMainData<MainDataTypes.AllAction>();
 
@@ -204,17 +206,64 @@ namespace Boom
 
             return true;
         }
-        public static bool TryGetActionPart<T>(this string actionId, Func<MainDataTypes.AllAction.Action, T> func, out T outValue)
+
+
+        public static bool TryGetSubAction(this string actionId, out SubAction outValue, DataSourceType dataSourceType, string worldId = "")
         {
             outValue = default;
 
-            if (!ConfigUtil.TryGetAction(BoomManager.Instance.WORLD_CANISTER_ID, actionId, out var action))
+            if (!ConfigUtil.TryGetAction(actionId, out var action, worldId))
             {
                 Debug.LogError("Could not find action of id: " + actionId);
 
                 return false;
             }
 
+            try
+            {
+                outValue = dataSourceType switch
+                {
+                    DataSourceType.Caller => action.callerAction,
+                    DataSourceType.Target => action.targetAction,
+                    DataSourceType.World => action.worldAction,
+                    _ => throw new Exception("Unmatch")
+                };
+            }
+            catch(Exception e)
+            {
+                e.Message.Error();
+                return false;
+            }
+
+            return true;
+        }
+
+        public static bool TryGetActionOutcomeUpdateEntity(this string actionId, out List<Outcome> outValue, DataSourceType dataSourceType, string worldId = "")
+        {
+            outValue = default;
+
+            if (!ConfigUtil.TryGetSubAction(actionId, out var subAction, dataSourceType, worldId))
+            {
+                Debug.LogError("Could not find action of id: " + actionId);
+
+                return false;
+            }
+
+            outValue = subAction.Outcomes;
+
+            return true;
+        }
+
+        public static bool TryGetActionPart<T>(this string actionId, Func<MainDataTypes.AllAction.Action, T> func, out T outValue, string worldId = "")
+        {
+            outValue = default;
+
+            if (!ConfigUtil.TryGetAction(actionId, out var action, worldId))
+            {
+                Debug.LogError("Could not find action of id: " + actionId);
+
+                return false;
+            }
 
             try
             {
@@ -224,7 +273,6 @@ namespace Boom
             {
                 return false;
             }
-
 
             return true;
         }

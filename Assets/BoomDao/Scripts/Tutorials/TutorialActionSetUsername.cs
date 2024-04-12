@@ -29,7 +29,7 @@ namespace Boom.Tutorials
         private Coroutine logCoroutine;
 
         //The action ID
-        string actionId = "set_username";
+        [SerializeField] string actionId = "set_username";
 
         #endregion
 

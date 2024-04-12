@@ -10,6 +10,161 @@ namespace Boom
     using UnityEngine;
     using UnityEngine.Scripting;
 
+
+    public enum DataSourceType
+    {
+        Caller, Target, World
+    }
+
+    public static class EntityFieldEdit
+    {
+        public abstract class Base { }
+
+        public class DeleteField : Base
+        {
+            public DeleteField()
+            {
+            }
+        }
+
+
+        public class SetText : Base
+        {
+            public string Value { get; set; }
+
+            public SetText(string value)
+            {
+                Value = value;
+            }
+        }
+
+        public class AddToList : Base
+        {
+            public string Value { get; set; }
+
+            public AddToList(string value)
+            {
+                Value = value;
+            }
+        }
+        public class RemoveFromList : Base
+        {
+            public string Value { get; set; }
+
+            public RemoveFromList(string value)
+            {
+                Value = value;
+            }
+        }
+
+        public class Numeric : Base
+        {
+            public enum NumericType { Set, Increment, Decrement, RenewTimestamp }
+            public NumericType NumericType_ { get; set; }
+            public double Value { get; set; }
+            public LinkedList<(string formula, NumericType numericType)> FormulasToApply;
+            public bool HasFormulas;
+
+
+            public Numeric(double value, NumericType numericType)
+            {
+                NumericType_ = numericType;
+                Value = value;
+            }
+            public Numeric(string formula, NumericType numericType)
+            {
+                AddFormulaToApply(formula, numericType);
+            }
+
+            public void AddFormulaToApply(string formula, NumericType numericType)
+            {
+                FormulasToApply ??= new();
+
+                FormulasToApply.AddLast((formula, numericType));
+
+                HasFormulas = true;
+            }
+
+            public void EditNumericValue(double value, NumericType numericType)
+            {
+                if (numericType == NumericType.Set)
+                {
+                    NumericType_ = numericType;
+                    Value = value;
+                }
+                else if (numericType == NumericType.Increment)
+                {
+                    if (NumericType_ == NumericType.Set)
+                    {
+                        NumericType_ = numericType;
+                        Value = value;
+                    }
+                    else if (NumericType_ == NumericType.Increment)
+                    {
+                        Value += value;
+                    }
+                    else
+                    {
+                        Value -= value;
+
+                        if (Value < 0)
+                        {
+                            Value *= -1;
+                            NumericType_ = numericType;
+                        }
+                    }
+                }
+                else if (NumericType_ == NumericType.Decrement)
+                {
+                    if (NumericType_ == NumericType.Set)
+                    {
+                        NumericType_ = numericType;
+                        Value = value;
+                    }
+                    else if (NumericType_ == NumericType.Decrement)
+                    {
+                        Value += value;
+                    }
+                    else
+                    {
+                        Value -= value;
+
+                        if (Value < 0)
+                        {
+                            Value *= -1;
+                            NumericType_ = numericType;
+                        }
+                    }
+                }
+                else
+                {
+                    Value += value;
+                    NumericType_ = numericType;
+                }
+            }
+        }
+    }
+    [Preserve]
+    [Serializable]
+    public class EntityOutcome
+    {
+        [Preserve] public string wid;
+        [Preserve] public string eid;
+        [Preserve] public Dictionary<string, EntityFieldEdit.Base> fields;
+        [Preserve] public bool dispose;
+        public EntityOutcome(string wid, string eid, Dictionary<string, EntityFieldEdit.Base> fields)
+        {
+            this.wid = string.IsNullOrEmpty(wid) ? BoomManager.Instance.WORLD_CANISTER_ID : wid;
+            this.eid = eid;
+            this.fields = fields ?? new();
+            dispose = fields == null;
+        }
+        public string GetKey()
+        {
+            return $"{wid}{eid}";
+        }
+    }
+
     public class NftCollectionToFetch
     {
         public string collectionId;
@@ -487,6 +642,284 @@ namespace Boom
         public ActionTimeInterval actionTimeInterval { get; set; }
 
     }
+
+
+    public static class PossibleOutcomeTypes
+    {
+        public abstract class Base
+        {
+            public double weight;
+            public ActionOutcomeOption.OptionInfoTag possibleOutcomeType;
+
+            protected Base(double weight, ActionOutcomeOption.OptionInfoTag possibleOutcomeType)
+            {
+                this.weight = weight;
+                this.possibleOutcomeType = possibleOutcomeType;
+            }
+        }
+
+        public class TransferIcrc : Base
+        {
+            public TransferIcrc(double weight, ActionOutcomeOption.OptionInfoTag possibleOutcomeType, Candid.World.Models.TransferIcrc reference) : base(weight, possibleOutcomeType)
+            {
+                Canister = reference.Canister;
+                Quantity = reference.Quantity;
+            }
+
+            public string Canister { get; set; }
+
+            public double Quantity { get; set; }
+        }
+
+        public class MintNft : Base
+        {
+            public MintNft(double weight, ActionOutcomeOption.OptionInfoTag possibleOutcomeType, Candid.World.Models.MintNft reference) : base(weight, possibleOutcomeType)
+            {
+
+                this.AssetId = reference.AssetId;
+                this.Canister = reference.Canister;
+                this.Metadata = reference.Metadata;
+            }
+
+            public string AssetId { get; set; }
+
+            public string Canister { get; set; }
+
+            public string Metadata { get; set; }
+        }
+
+        public class UpdateEntity : Base
+        {
+            [Preserve] public string Wid;
+            [Preserve] public string Eid;
+            [Preserve] public Dictionary<string, EntityFieldEdit.Base> Fields;
+            [Preserve] public bool Dispose;
+
+            public LinkedList<EntityFieldEdit.SetText> QuerySetTextFields()
+            {
+                LinkedList<EntityFieldEdit.SetText> tempList = new();
+
+                foreach (var field in Fields)
+                {
+                    if (field.Value is EntityFieldEdit.SetText field_)
+                    {
+                        tempList.AddLast(field_);
+                    }
+                }
+
+                return tempList;
+            }
+
+            public LinkedList<EntityFieldEdit.Numeric> QueryNumericFields(EntityFieldEdit.Numeric.NumericType numericType)
+            {
+                LinkedList<EntityFieldEdit.Numeric> tempList = new();
+
+                foreach (var field in Fields)
+                {
+                    if(field.Value is EntityFieldEdit.Numeric field_)
+                    {
+                        if (field_.NumericType_ == numericType) tempList.AddLast(field_);
+                    }
+                }
+
+                return tempList;
+            }
+
+            public LinkedList<string> QueryFieldsToDelete()
+            {
+                LinkedList<string> tempList = new();
+
+                foreach (var field in Fields)
+                {
+                    if (field.Value is EntityFieldEdit.DeleteField)
+                    {
+                        tempList.AddLast(field.Key);
+                    }
+                }
+
+                return tempList;
+            }
+
+            public bool IsMarkedAsDispose()
+            {
+                return Dispose;
+            }
+
+            public UpdateEntity(double weight, ActionOutcomeOption.OptionInfoTag possibleOutcomeType, Candid.World.Models.UpdateEntity reference) : base(weight, possibleOutcomeType)
+            {
+                this.Wid = string.IsNullOrEmpty(reference.Wid.ValueOrDefault) ? BoomManager.Instance.WORLD_CANISTER_ID : reference.Wid.ValueOrDefault;
+                this.Eid = reference.Eid;
+
+                this.Fields = new();
+
+                foreach(var update in reference.Updates)
+                {
+                    switch (update.Tag)
+                    {
+                        case UpdateEntityTypeTag.SetText:
+
+                            var unwrap1 = update.AsSetText();
+
+                            Fields[unwrap1.FieldName] = new EntityFieldEdit.SetText(unwrap1.FieldValue);
+
+                            break;
+                        case UpdateEntityTypeTag.AddToList:
+
+                            var unwrap2 = update.AsAddToList();
+
+                            Fields[unwrap2.FieldName] = new EntityFieldEdit.AddToList(unwrap2.Value);
+
+                            break;
+                        case UpdateEntityTypeTag.RemoveFromList:
+
+                            var unwrap3 = update.AsRemoveFromList();
+
+                            Fields[unwrap3.FieldName] = new EntityFieldEdit.AddToList(unwrap3.Value);
+
+                            break;
+                        case UpdateEntityTypeTag.SetNumber:
+
+                            var unwrap4 = update.AsSetNumber();
+
+                            if(unwrap4.FieldValue.Tag == SetNumber.FieldValueInfoTag.Number)
+                            {
+                                Fields[unwrap4.FieldName] = new EntityFieldEdit.Numeric(
+                                unwrap4.FieldValue.AsNumber(),
+                                EntityFieldEdit.Numeric.NumericType.Set);
+                            }
+                            else
+                            {
+                                Fields[unwrap4.FieldName] = new EntityFieldEdit.Numeric(
+                                unwrap4.FieldValue.AsFormula(),
+                                EntityFieldEdit.Numeric.NumericType.Set);
+                            }
+
+                            break;
+                        case UpdateEntityTypeTag.IncrementNumber:
+
+                            var unwrap5 = update.AsIncrementNumber();
+
+                            if (unwrap5.FieldValue.Tag == IncrementNumber.FieldValueInfoTag.Number)
+                            {
+                                var value5 = unwrap5.FieldValue.AsNumber();
+
+                                if (Fields.TryAdd(unwrap5.FieldName, new EntityFieldEdit.Numeric(value5, EntityFieldEdit.Numeric.NumericType.Increment)) == false)
+                                {
+                                    (Fields[unwrap5.FieldName] as EntityFieldEdit.Numeric).EditNumericValue(value5,
+                                        EntityFieldEdit.Numeric.NumericType.Increment);
+                                }
+                            }
+                            else
+                            {
+                                var value5 = unwrap5.FieldValue.AsFormula();
+
+                                if (Fields.TryAdd(unwrap5.FieldName, new EntityFieldEdit.Numeric(value5, EntityFieldEdit.Numeric.NumericType.Increment)) == false)
+                                {
+                                    (Fields[unwrap5.FieldName] as EntityFieldEdit.Numeric).AddFormulaToApply(value5,
+                                        EntityFieldEdit.Numeric.NumericType.Increment);
+                                }
+                            }
+
+                            break;
+                        case UpdateEntityTypeTag.DecrementNumber:
+
+                            var unwrap6 = update.AsDecrementNumber();
+
+                            if (unwrap6.FieldValue.Tag == DecrementNumber.FieldValueInfoTag.Number)
+                            {
+                                var value6 = unwrap6.FieldValue.AsNumber();
+
+                                if (Fields.TryAdd(unwrap6.FieldName, new EntityFieldEdit.Numeric(value6, EntityFieldEdit.Numeric.NumericType.Decrement)) == false)
+                                {
+                                    (Fields[unwrap6.FieldName] as EntityFieldEdit.Numeric).EditNumericValue(value6,
+                                        EntityFieldEdit.Numeric.NumericType.Decrement);
+                                }
+                            }
+                            else
+                            {
+                                var value6 = unwrap6.FieldValue.AsFormula();
+
+                                if (Fields.TryAdd(unwrap6.FieldName, new EntityFieldEdit.Numeric(value6, EntityFieldEdit.Numeric.NumericType.Decrement)) == false)
+                                {
+                                    (Fields[unwrap6.FieldName] as EntityFieldEdit.Numeric).AddFormulaToApply(value6,
+                                        EntityFieldEdit.Numeric.NumericType.Decrement);
+                                }
+                            }
+                            break;
+                        case UpdateEntityTypeTag.RenewTimestamp:
+
+                            var unwrap7 = update.AsRenewTimestamp();
+
+                            if (unwrap7.FieldValue.Tag == RenewTimestamp.FieldValueInfoTag.Number)
+                            {
+                                var value7 = unwrap7.FieldValue.AsNumber();
+
+                                if (Fields.TryAdd(unwrap7.FieldName, new EntityFieldEdit.Numeric(value7, EntityFieldEdit.Numeric.NumericType.RenewTimestamp)) == false)
+                                {
+                                    (Fields[unwrap7.FieldName] as EntityFieldEdit.Numeric).EditNumericValue(value7,
+                                        EntityFieldEdit.Numeric.NumericType.RenewTimestamp);
+                                }
+                            }
+                            else
+                            {
+                                var value7 = unwrap7.FieldValue.AsFormula();
+
+                                if (Fields.TryAdd(unwrap7.FieldName, new EntityFieldEdit.Numeric(value7, EntityFieldEdit.Numeric.NumericType.RenewTimestamp)) == false)
+                                {
+                                    (Fields[unwrap7.FieldName] as EntityFieldEdit.Numeric).AddFormulaToApply(value7,
+                                        EntityFieldEdit.Numeric.NumericType.RenewTimestamp);
+                                }
+                            }
+
+                            break;
+                        case UpdateEntityTypeTag.DeleteField:
+                            var unwrap8 = update.AsDeleteField();
+                            Fields[unwrap8.FieldName] = new EntityFieldEdit.DeleteField();
+                            break;
+                        case UpdateEntityTypeTag.DeleteEntity:
+                            Dispose = true;
+                            break;
+
+                    }
+                }
+
+                Dispose = Fields == null;
+            }
+            public string GetKey()
+            {
+                return $"{Wid}{Eid}";
+            }
+        }
+    }
+
+
+    public class Outcome
+    {
+        public List<PossibleOutcomeTypes.Base> PossibleOutcomes;
+
+        public Outcome(Candid.World.Models.ActionOutcome outcome)
+        {
+            this.PossibleOutcomes = new();
+
+            foreach (var possibleOutcome in outcome.PossibleOutcomes)
+            {
+                switch (possibleOutcome.Option.Tag)
+                {
+                    case ActionOutcomeOption.OptionInfoTag.TransferIcrc:
+                        PossibleOutcomes.Add(new PossibleOutcomeTypes.TransferIcrc(possibleOutcome.Weight, possibleOutcome.Option.Tag, possibleOutcome.Option.AsTransferIcrc()));
+                        continue;
+                    case ActionOutcomeOption.OptionInfoTag.MintNft:
+                        PossibleOutcomes.Add(new PossibleOutcomeTypes.MintNft(possibleOutcome.Weight, possibleOutcome.Option.Tag, possibleOutcome.Option.AsMintNft()));
+                        continue;
+                    case ActionOutcomeOption.OptionInfoTag.UpdateEntity:
+                        PossibleOutcomes.Add(new PossibleOutcomeTypes.UpdateEntity(possibleOutcome.Weight, possibleOutcome.Option.Tag, possibleOutcome.Option.AsUpdateEntity()));
+                        continue;
+
+                }
+            }
+        }
+    }
+
     public class SubAction
     {
  
@@ -497,12 +930,21 @@ namespace Boom
         public List<IcrcTx> IcrcConstraint { get; set; }
         public List<NftTx> NftConstraint { get; set; }
 
-        public List<ActionOutcome> Outcomes { get; set; }
+        public List<Outcome> Outcomes { get; set; }
 
         public SubAction(Candid.World.Models.SubAction subAction)
         {
             HasConstraint = subAction.ActionConstraint.HasValue;
-            Outcomes = subAction.ActionResult == null? new() : subAction.ActionResult.Outcomes;
+
+            if(subAction.ActionResult != null)
+            {
+                Outcomes = new();
+
+                foreach (var outcome in subAction.ActionResult.Outcomes)
+                {
+                    Outcomes.Add(new Outcome(outcome));
+                }
+            }
 
             if (HasConstraint)
             {
@@ -596,143 +1038,6 @@ namespace Boom
     }
 
     //
-
-    public static class EntityFieldEdit
-    {
-        public abstract class Base { }
-
-        public class DeleteField : Base
-        {
-            public DeleteField()
-            {
-            }
-        }
-
-
-        public class SetText : Base
-        {
-            public string Value { get; set; }
-
-            public SetText(string value)
-            {
-                Value = value;
-            }
-        }
-
-        public class AddToList : Base
-        {
-            public string Value { get; set; }
-
-            public AddToList(string value)
-            {
-                Value = value;
-            }
-        }
-        public class RemoveFromList : Base
-        {
-            public string Value { get; set; }
-
-            public RemoveFromList(string value)
-            {
-                Value = value;
-            }
-        }
-
-        public class Numeric : Base
-        {
-            public enum NumericType { Set, Increment, Decrement }
-            public NumericType NumericType_ { get; set; }
-            public double Value { get; set; }
-
-            public Numeric(double value, NumericType numericType)
-            {
-                NumericType_ = numericType;
-                Value = value;
-            }
-            public void EditNumericValue(double value, NumericType numericType)
-            {
-                if (numericType == NumericType.Set)
-                {
-                    NumericType_ = numericType;
-                    Value = value;
-                }
-                else if (numericType == NumericType.Increment)
-                {
-                    if(NumericType_ == NumericType.Set)
-                    {
-                        NumericType_ = numericType;
-                        Value = value;
-                    }
-                    else if (NumericType_ == NumericType.Increment)
-                    {
-                        Value += value;
-                    }
-                    else
-                    {
-                        Value -= value;
-
-                        if(Value < 0)
-                        {
-                            Value *= -1;
-                            NumericType_ = numericType;
-                        }
-                    }
-                }
-                else
-                {
-                    if (NumericType_ == NumericType.Set)
-                    {
-                        NumericType_ = numericType;
-                        Value = value;
-                    }
-                    else if (NumericType_ == NumericType.Decrement)
-                    {
-                        Value += value;
-                    }
-                    else
-                    {
-                        Value -= value;
-
-                        if (Value < 0)
-                        {
-                            Value *= -1;
-                            NumericType_ = numericType;
-                        }
-                    }
-                }
-            }
-        }
-
-        public class RenewTimestamp : Base
-        {
-            public double Value { get; set; }
-
-            public RenewTimestamp(double value) 
-            {
-                Value = value;
-            }
-        }
-    }
-    [Preserve]
-    [Serializable]
-    public class EntityOutcome
-    {
-        [Preserve] public string wid;
-        [Preserve] public string eid;
-        [Preserve] public Dictionary<string, EntityFieldEdit.Base> fields;
-        [Preserve] public bool dispose;
-        public EntityOutcome(string wid, string eid, Dictionary<string, EntityFieldEdit.Base> fields)
-        {
-            this.wid = string.IsNullOrEmpty(wid) ? BoomManager.Instance.WORLD_CANISTER_ID : wid;
-            this.eid = eid;
-            this.fields = fields ?? new();
-            dispose = fields == null;
-        }
-        public string GetKey()
-        {
-            return $"{wid}{eid}";
-        }
-    }
 
     //
 

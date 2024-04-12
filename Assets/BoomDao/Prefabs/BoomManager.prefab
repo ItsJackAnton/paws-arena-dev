@@ -47,7 +47,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6a826ba9b8edac440a04bf58a01d1f94, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  url: https://ifxbl-nyaaa-aaaap-abroa-cai.icp0.io/
+  url: https://7p3gx-jaaaa-aaaal-acbda-cai.icp0.io
 --- !u!114 &2393423864867871020
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -61,8 +61,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   enableBoomLogs: 1
-  <WORLD_HUB_CANISTER_ID>k__BackingField: c5moj-piaaa-aaaal-qdhoq-cai
-  <WORLD_CANISTER_ID>k__BackingField: j4n55-giaaa-aaaap-qb3wq-cai
+  boomSettings: {fileID: 11400000, guid: c4016ee1ea51b934ab9168df14e83284, type: 2}
   <WORLD_COLLECTION_CANISTER_ID>k__BackingField: 6uvic-diaaa-aaaap-abgca-cai
   <BoomDaoGameType>k__BackingField: 0
   cachedAnonAgent:

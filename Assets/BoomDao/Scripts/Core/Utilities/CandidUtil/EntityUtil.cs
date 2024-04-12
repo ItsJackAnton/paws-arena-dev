@@ -2,14 +2,12 @@
 {
     using Boom.Utility;
     using Boom.Values;
-    using Candid;
     using Candid.World.Models;
     using System;
     using System.Collections.Generic;
     using System.Linq;
     using System.Text;
     using UnityEngine;
-    using static Boom.MainDataTypes.AllAction;
 
     // Ignore Spelling: Util
 
@@ -126,6 +124,19 @@
             }
 
             return true;
+        }
+        public static bool TryGetEntitiesSelf(out LinkedList<DataTypes.Entity> entities, string sourceWorldId = default)
+        {
+            entities = default;
+            var principalResult = UserUtil.GetPrincipal();
+
+            if (principalResult.IsErr)
+            {
+                $"{principalResult.AsErr()}".Error();
+                return false;
+            }
+
+            return TryGetEntities(principalResult.AsOk().Value, out entities, sourceWorldId);
         }
 
         public static bool TryQueryEntities(EntityFilter.Base entityFilter, out LinkedList<DataTypes.Entity> entities, string sourceWorldId = default)
@@ -594,6 +605,7 @@
         internal static void ApplyEntityEdits(ProcessedActionResponse.Outcomes outcomes)
         {
             var uid = outcomes.uid;
+            Debug.Log($"Apply outcomes to {uid}, outcomes: {outcomes.entityOutcomes}");
             var entityOutcomes = outcomes.entityOutcomes;
 
             Dictionary<string, DataTypes.Entity> editedEntities = new();
@@ -666,19 +678,31 @@
 
                                     currentEntityFields[fieldId] = (currentNumericValue + e.Value).ToString();
                                 }
-                                else
+                                else if (e.NumericType_ == EntityFieldEdit.Numeric.NumericType.Decrement)
                                 {
                                     if (currentEntityFields.TryGetValue(fieldId, out var numberAsText) == false) numberAsText = "0";
                                     numberAsText.TryParseValue(out double currentNumericValue);
 
                                     currentEntityFields[fieldId] = (currentNumericValue - e.Value).ToString();
                                 }
+                                else
+                                {
+                                    if(double.TryParse(currentEntityFields[fieldId], out var tempValue) == false)
+                                    {
+                                        Debug.LogError($"Issue parsing text as double: {currentEntityFields[fieldId]}");
+                                        return;
+                                    }
 
-                                break;
+                                    if(tempValue < MainUtil.Now())
+                                    {
+                                        currentEntityFields[fieldId] = (MainUtil.Now().MilliToNano() + e.Value).ToString();
+                                    }
+                                    else
+                                    {
+                                        currentEntityFields[fieldId] = (tempValue + e.Value).ToString();
+                                    }
 
-                            case EntityFieldEdit.RenewTimestamp e:
-
-                                currentEntityFields[fieldId] = (MainUtil.Now().MilliToNano() + e.Value).ToString();
+                                }
 
                                 break;
                         }

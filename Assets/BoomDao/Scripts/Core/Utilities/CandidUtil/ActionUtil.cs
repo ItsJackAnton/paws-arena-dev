@@ -185,7 +185,7 @@ namespace Boom
                                 {
                                     if (arg.FieldName == argFieldName)
                                     {
-                                        eid = arg.FieldValue;
+                                        eid = EntityUtil.ReplaceVariables(arg.FieldValue, worldEntities, callerEntities, targetEntities, configs, args);;
                                         break;
                                     }
                                 }
@@ -509,13 +509,11 @@ namespace Boom
                                             {
                                                 if (fieldValue5.Tag == Candid.World.Models.RenewTimestamp.FieldValueInfoTag.Number)
                                                 {
-                                                    var v = new EntityFieldEdit.RenewTimestamp(fieldValue5.AsNumber());
+                                                    var v = new EntityFieldEdit.Numeric(fieldValue5.AsNumber(), EntityFieldEdit.Numeric.NumericType.RenewTimestamp);
 
                                                     if (!allFieldsToEdit.TryAdd(fieldName, v))
                                                     {
-                                                        var currentValue = allFieldsToEdit[fieldName];
-
-                                                        allFieldsToEdit[fieldName] = new EntityFieldEdit.RenewTimestamp(v.Value + (currentValue as EntityFieldEdit.Numeric).Value);
+                                                        (allFieldsToEdit[fieldName] as EntityFieldEdit.Numeric).EditNumericValue(fieldValue5.AsNumber(), EntityFieldEdit.Numeric.NumericType.RenewTimestamp);
                                                     }
                                                 }
                                                 else
@@ -523,10 +521,11 @@ namespace Boom
                                                     var formula = fieldValue5.AsFormula();
                                                     //TODO: Parse formula
                                                     var formulaResult = EntityUtil.EvaluateFormula(formula, worldEntities, callerEntities, targetEntities, configs, args);
-                                                    var v = new EntityFieldEdit.RenewTimestamp(formulaResult);
+                                                    var v = new EntityFieldEdit.Numeric(formulaResult, EntityFieldEdit.Numeric.NumericType.RenewTimestamp);
+
                                                     if (!allFieldsToEdit.TryAdd(fieldName, v))
                                                     {
-                                                        allFieldsToEdit[fieldName] = v;
+                                                        (allFieldsToEdit[fieldName] as EntityFieldEdit.Numeric).EditNumericValue(formulaResult, EntityFieldEdit.Numeric.NumericType.RenewTimestamp);
                                                     }
                                                 }
                                             }
@@ -631,6 +630,7 @@ namespace Boom
                 $"Could not find world's actions of world id: {BoomManager.Instance.WORLD_CANISTER_ID}".Error();
                 return false;
             }
+
             if (worldActions.TryGetValue(actionId, out var action) == false)
             {
                 $"Could not find action of id: {actionId}".Error();
@@ -716,7 +716,7 @@ namespace Boom
             LinkedList<KeyValue<string, SubAction>> subActions = new();
 
 
-            if (!ConfigUtil.TryGetAction(BoomManager.Instance.WORLD_CANISTER_ID, actionId, out var action))
+            if (!ConfigUtil.TryGetAction(actionId, out var action, BoomManager.Instance.WORLD_CANISTER_ID))
             {
                 $"Could not find action of id: {actionId}".Error();
 

@@ -2,6 +2,7 @@ using EdjCase.ICP.Candid.Mapping;
 using System.Collections.Generic;
 using Candid.World.Models;
 using EdjCase.ICP.Candid.Models;
+using System;
 
 namespace Candid.World.Models
 {
@@ -36,17 +37,109 @@ namespace Candid.World.Models
 			[CandidName("actionExpirationTimestamp")]
 			public OptionalValue<UnboundedUInt> ActionExpirationTimestamp { get; set; }
 
+			[CandidName("actionHistory")]
+			public List<ActionConstraint.TimeConstraintValue.ActionHistoryItem> ActionHistory { get; set; }
+
+			[CandidName("actionStartTimestamp")]
+			public OptionalValue<UnboundedUInt> ActionStartTimestamp { get; set; }
+
 			[CandidName("actionTimeInterval")]
 			public OptionalValue<ActionConstraint.TimeConstraintValue.ActionTimeIntervalValue> ActionTimeInterval { get; set; }
 
-			public TimeConstraintValue(OptionalValue<UnboundedUInt> actionExpirationTimestamp, OptionalValue<ActionConstraint.TimeConstraintValue.ActionTimeIntervalValue> actionTimeInterval)
+			public TimeConstraintValue(OptionalValue<UnboundedUInt> actionExpirationTimestamp, List<ActionConstraint.TimeConstraintValue.ActionHistoryItem> actionHistory, OptionalValue<UnboundedUInt> actionStartTimestamp, OptionalValue<ActionConstraint.TimeConstraintValue.ActionTimeIntervalValue> actionTimeInterval)
 			{
 				this.ActionExpirationTimestamp = actionExpirationTimestamp;
+				this.ActionHistory = actionHistory;
+				this.ActionStartTimestamp = actionStartTimestamp;
 				this.ActionTimeInterval = actionTimeInterval;
 			}
 
 			public TimeConstraintValue()
 			{
+			}
+
+			[Variant]
+			public class ActionHistoryItem
+			{
+				[VariantTagProperty]
+				public ActionConstraint.TimeConstraintValue.ActionHistoryItemTag Tag { get; set; }
+
+				[VariantValueProperty]
+				public object? Value { get; set; }
+
+				public ActionHistoryItem(ActionConstraint.TimeConstraintValue.ActionHistoryItemTag tag, object? value)
+				{
+					this.Tag = tag;
+					this.Value = value;
+				}
+
+				protected ActionHistoryItem()
+				{
+				}
+
+				public static ActionConstraint.TimeConstraintValue.ActionHistoryItem MintNft(MintNft info)
+				{
+					return new ActionConstraint.TimeConstraintValue.ActionHistoryItem(ActionConstraint.TimeConstraintValue.ActionHistoryItemTag.MintNft, info);
+				}
+
+				public static ActionConstraint.TimeConstraintValue.ActionHistoryItem TransferIcrc(TransferIcrc info)
+				{
+					return new ActionConstraint.TimeConstraintValue.ActionHistoryItem(ActionConstraint.TimeConstraintValue.ActionHistoryItemTag.TransferIcrc, info);
+				}
+
+				public static ActionConstraint.TimeConstraintValue.ActionHistoryItem UpdateAction(UpdateAction info)
+				{
+					return new ActionConstraint.TimeConstraintValue.ActionHistoryItem(ActionConstraint.TimeConstraintValue.ActionHistoryItemTag.UpdateAction, info);
+				}
+
+				public static ActionConstraint.TimeConstraintValue.ActionHistoryItem UpdateEntity(UpdateEntity info)
+				{
+					return new ActionConstraint.TimeConstraintValue.ActionHistoryItem(ActionConstraint.TimeConstraintValue.ActionHistoryItemTag.UpdateEntity, info);
+				}
+
+				public MintNft AsMintNft()
+				{
+					this.ValidateTag(ActionConstraint.TimeConstraintValue.ActionHistoryItemTag.MintNft);
+					return (MintNft)this.Value!;
+				}
+
+				public TransferIcrc AsTransferIcrc()
+				{
+					this.ValidateTag(ActionConstraint.TimeConstraintValue.ActionHistoryItemTag.TransferIcrc);
+					return (TransferIcrc)this.Value!;
+				}
+
+				public UpdateAction AsUpdateAction()
+				{
+					this.ValidateTag(ActionConstraint.TimeConstraintValue.ActionHistoryItemTag.UpdateAction);
+					return (UpdateAction)this.Value!;
+				}
+
+				public UpdateEntity AsUpdateEntity()
+				{
+					this.ValidateTag(ActionConstraint.TimeConstraintValue.ActionHistoryItemTag.UpdateEntity);
+					return (UpdateEntity)this.Value!;
+				}
+
+				private void ValidateTag(ActionConstraint.TimeConstraintValue.ActionHistoryItemTag tag)
+				{
+					if (!this.Tag.Equals(tag))
+					{
+						throw new InvalidOperationException($"Cannot cast '{this.Tag}' to type '{tag}'");
+					}
+				}
+			}
+
+			public enum ActionHistoryItemTag
+			{
+				[CandidName("mintNft")]
+				MintNft,
+				[CandidName("transferIcrc")]
+				TransferIcrc,
+				[CandidName("updateAction")]
+				UpdateAction,
+				[CandidName("updateEntity")]
+				UpdateEntity
 			}
 
 			public class ActionTimeIntervalValue

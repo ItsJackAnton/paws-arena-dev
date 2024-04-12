@@ -21,58 +21,44 @@
     {
         public async static UniTask<UResult<Dictionary<string, Return>, string>> ProcessWorldCall<Return>(System.Func<WorldApiClient, string, UniTask<Return>> task, params string[] worldIds)
         {
-            try
+            var agentResult = UserUtil.GetAgent();
+            if (agentResult.IsErr) throw new(agentResult.AsErr());
+
+            Dictionary<string, Return> responses = new();
+
+            foreach (var wid in worldIds)
             {
-                var agentResult = UserUtil.GetAgent();
-                if (agentResult.IsErr) throw new(agentResult.AsErr());
+                WorldApiClient worldApiClient = new(agentResult.AsOk(), Principal.FromText(wid));
 
-                Dictionary<string, Return> responses = new();
+                var response = await task(worldApiClient, wid);
 
-                foreach (var wid in worldIds)
-                {
-                    WorldApiClient worldApiClient = new(agentResult.AsOk(), Principal.FromText(wid));
+                responses.TryAdd(wid, response);
 
-                    var response = await task(worldApiClient, wid);
-
-                    responses.TryAdd(wid, response);
-
-                }
-
-                return new(responses);
             }
-            catch (System.Exception e)
-            {
-                return new(e.Message);
-            }
+
+            return new(responses);
         }
 
         //ENTITY
         public async static UniTask<UResult<Dictionary<string, IEnumerable<DataTypes.Entity>>, string>> GetAllEntities(string worldId, params string[] uids)
         {
-            try
+            var agentResult = UserUtil.GetAgent();
+            if (agentResult.IsErr) throw new(agentResult.AsErr());
+
+            WorldApiClient worldApiClient = new(agentResult.AsOk(), Principal.FromText(worldId));
+
+            Dictionary<string, IEnumerable<DataTypes.Entity>> responses = new();
+            List<UniTask> asyncFunctions = new();
+
+            foreach (var principal in uids)
             {
-                var agentResult = UserUtil.GetAgent();
-                if (agentResult.IsErr) throw new(agentResult.AsErr());
-
-                WorldApiClient worldApiClient = new(agentResult.AsOk(), Principal.FromText(worldId));
-
-                Dictionary<string, IEnumerable<DataTypes.Entity>> responses = new();
-                List<UniTask> asyncFunctions = new();
-
-                foreach (var principal in uids)
-                {
-                    asyncFunctions.Add(FetchUserEntities(worldId, worldApiClient, responses, principal));
-                }
-
-                await UniTask.WhenAll(asyncFunctions);
-
-
-                return new(responses);
+                asyncFunctions.Add(FetchUserEntities(worldId, worldApiClient, responses, principal));
             }
-            catch (System.Exception e)
-            {
-                return new(e.Message);
-            }
+
+            await UniTask.WhenAll(asyncFunctions);
+
+
+            return new(responses);
         }
 
         private static async UniTask FetchUserEntities(string worldId, WorldApiClient worldApiClient, Dictionary<string, IEnumerable<DataTypes.Entity>> responses, string uid)
@@ -96,32 +82,25 @@
         //ACTION STATE
         public async static UniTask<UResult<Dictionary<string, IEnumerable<DataTypes.ActionState>>, string>> GetAllActionState(string worldId, params string[] uids)
         {
-            try
+            var agentResult = UserUtil.GetAgent();
+            if (agentResult.IsErr) throw new(agentResult.AsErr());
+
+            WorldApiClient worldApiClient = new(agentResult.AsOk(), Principal.FromText(worldId));
+
+            Dictionary<string, IEnumerable<DataTypes.ActionState>> responses = new();
+            List<UniTask> asyncFunctions = new();
+
+            foreach (var principal in uids)
             {
-                var agentResult = UserUtil.GetAgent();
-                if (agentResult.IsErr) throw new(agentResult.AsErr());
+                //Debug.Log("Load actionState from user of id: " + principal);
 
-                WorldApiClient worldApiClient = new(agentResult.AsOk(), Principal.FromText(worldId));
-
-                Dictionary<string, IEnumerable<DataTypes.ActionState>> responses = new();
-                List<UniTask> asyncFunctions = new();
-
-                foreach (var principal in uids)
-                {
-                    //Debug.Log("Load actionState from user of id: " + principal);
-
-                    asyncFunctions.Add(FetchUserActionStates(worldApiClient, responses, principal));
-                }
-
-                await UniTask.WhenAll(asyncFunctions);
-
-
-                return new(responses);
+                asyncFunctions.Add(FetchUserActionStates(worldApiClient, responses, principal));
             }
-            catch (System.Exception e)
-            {
-                return new(e.Message);
-            }
+
+            await UniTask.WhenAll(asyncFunctions);
+
+
+            return new(responses);
         }
 
         private static async UniTask FetchUserActionStates(WorldApiClient worldApiClient, Dictionary<string, IEnumerable<DataTypes.ActionState>> responses, string uid)
@@ -144,46 +123,39 @@
         //TOKEN
         public static async UniTask<UResult<Dictionary<string, Dictionary<string, ulong>>, string>> GetAllTokens(string[] canisterIds, params string[] uids)
         {
-            try
+            var agentResult = UserUtil.GetAgent();
+            if (agentResult.IsErr) throw new(agentResult.AsErr());
+            var agent = agentResult.AsOk();
+
+            Dictionary<string, Dictionary<string, ulong>> responses = new(); //uid -> tokenCanisterId -> amount
+            Dictionary<string, string> userAddresses = new(); //uid -> address
+
+            List<UniTask> asyncFunctions = new();
+
+            foreach (var uid in uids)
             {
-                var agentResult = UserUtil.GetAgent();
-                if (agentResult.IsErr) throw new(agentResult.AsErr());
-                var agent = agentResult.AsOk();
-
-                Dictionary<string, Dictionary<string, ulong>> responses = new(); //uid -> tokenCanisterId -> amount
-                Dictionary<string, string> userAddresses = new(); //uid -> address
-
-                List<UniTask> asyncFunctions = new();
-
-                foreach (var uid in uids)
-                {
-                    asyncFunctions.Add(GetUserAddress(uid, userAddresses));
-                }
-
-                await UniTask.WhenAll(asyncFunctions);
-
-                asyncFunctions = new();
-
-                foreach (var uid in uids)
-                {
-                    var tokens = new Dictionary<string, ulong>();
-                    responses.Add(uid, tokens);
-
-                    foreach (var canisterId in canisterIds)
-                    {
-                        asyncFunctions.Add(GetToken(uid, canisterId, userAddresses, tokens, agent));
-                    }
-                }
-
-                await UniTask.WhenAll(asyncFunctions);
-
-
-                return new(responses);
+                asyncFunctions.Add(GetUserAddress(uid, userAddresses));
             }
-            catch (System.Exception e)
+
+            await UniTask.WhenAll(asyncFunctions);
+
+            asyncFunctions = new();
+
+            foreach (var uid in uids)
             {
-                return new(e.Message);
+                var tokens = new Dictionary<string, ulong>();
+                responses.Add(uid, tokens);
+
+                foreach (var canisterId in canisterIds)
+                {
+                    asyncFunctions.Add(GetToken(uid, canisterId, userAddresses, tokens, agent));
+                }
             }
+
+            await UniTask.WhenAll(asyncFunctions);
+
+
+            return new(responses);
         }
 
         private static async UniTask GetToken(string uid, string canisterId, Dictionary<string, string> userAddresses, Dictionary<string, ulong> tokens, IAgent agent)
@@ -216,52 +188,45 @@
 
         public static async UniTask<UResult<Dictionary<string, LinkedList<DataTypes.NftCollection>>, string>> GetAllNfts(string[] canisterIds, params string[] uids)
         {
-            try
+            var agentResult = UserUtil.GetAgent();
+            if (agentResult.IsErr) throw new(agentResult.AsErr());
+            var agent = agentResult.AsOk();
+
+            Dictionary<string, LinkedList<DataTypes.NftCollection>> responses = new(); //uid -> nftCanisterId -> Collection
+            Dictionary<string, string> userAddresses = new(); //uid -> address
+
+            List<UniTask> asyncFunctions = new();
+
+            foreach (var uid in uids)
             {
-                var agentResult = UserUtil.GetAgent();
-                if (agentResult.IsErr) throw new(agentResult.AsErr());
-                var agent = agentResult.AsOk();
+                asyncFunctions.Add(GetUserAddress(uid, userAddresses));
+            }
 
-                Dictionary<string, LinkedList<DataTypes.NftCollection>> responses = new(); //uid -> nftCanisterId -> Collection
-                Dictionary<string, string> userAddresses = new(); //uid -> address
+            await UniTask.WhenAll(asyncFunctions);
 
-                List<UniTask> asyncFunctions = new();
+            asyncFunctions = new();
 
-                foreach (var uid in uids)
+            foreach (var uid in uids)
+            {
+                var collections = new LinkedList<DataTypes.NftCollection>();
+                responses.Add(uid, collections);
+
+                foreach (var canisterId in canisterIds)
                 {
-                    asyncFunctions.Add(GetUserAddress(uid, userAddresses));
-                }
-
-                await UniTask.WhenAll(asyncFunctions);
-
-                asyncFunctions = new();
-
-                foreach (var uid in uids)
-                {
-                    var collections = new LinkedList<DataTypes.NftCollection>();
-                    responses.Add(uid, collections);
-
-                    foreach (var canisterId in canisterIds)
+                    if (ConfigUtil.TryGetNftCollectionConfig(canisterId, out var collectionConfig) == false)
                     {
-                        if (ConfigUtil.TryGetNftCollectionConfig(canisterId, out var collectionConfig) == false)
-                        {
-                            return new($"Issue finding nft collection config of id: {canisterId}");
-                        }
-
-                        if (collectionConfig.isBoomDaoStandard) asyncFunctions.Add(FetchBoomDaoNfts(userAddresses[uid], agent, canisterId, collections));
-                        else asyncFunctions.Add(FetchNfts(userAddresses[uid], agent, canisterId, collections));
+                        return new($"Issue finding nft collection config of id: {canisterId}");
                     }
+
+                    if (collectionConfig.isBoomDaoStandard) asyncFunctions.Add(FetchBoomDaoNfts(userAddresses[uid], agent, canisterId, collections));
+                    else asyncFunctions.Add(FetchNfts(userAddresses[uid], agent, canisterId, collections));
                 }
-
-                await UniTask.WhenAll(asyncFunctions);
-
-
-                return new(responses);
             }
-            catch (System.Exception e)
-            {
-                return new(e.Message);
-            }
+
+            await UniTask.WhenAll(asyncFunctions);
+
+
+            return new(responses);
         }
 
 

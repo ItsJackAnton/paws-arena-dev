@@ -965,6 +965,10 @@ PrefabInstance:
     m_TransformParent: {fileID: 0}
     m_Modifications:
     - target: {fileID: 2393423864867871020, guid: bb357f1634528a149871a2f38d213b8b, type: 3}
+      propertyPath: boomSettings
+      value: 
+      objectReference: {fileID: 11400000, guid: f922e6742e5194632aea2d31c472258f, type: 2}
+    - target: {fileID: 2393423864867871020, guid: bb357f1634528a149871a2f38d213b8b, type: 3}
       propertyPath: enableBoomLogs
       value: 1
       objectReference: {fileID: 0}

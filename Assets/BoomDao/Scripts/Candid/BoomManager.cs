@@ -22,8 +22,10 @@ namespace Boom
     public class BoomManager : Singleton<BoomManager>
     {
         [SerializeField] bool enableBoomLogs = true;
-        [field: SerializeField] public string WORLD_HUB_CANISTER_ID { private set; get; } = "fgpem-ziaaa-aaaag-abi2q-cai";
-        [field: SerializeField] public string WORLD_CANISTER_ID { private set; get; } = "j4n55-giaaa-aaaap-qb3wq-cai";
+
+        [SerializeField] BoomSettings boomSettings;
+        [field: SerializeField] public string WORLD_HUB_CANISTER_ID { get => boomSettings.WorldHubId; } 
+        [field: SerializeField] public string WORLD_CANISTER_ID { get => boomSettings.WorldId; }
         [field: SerializeField] public string WORLD_COLLECTION_CANISTER_ID { private set; get; } = "6uvic-diaaa-aaaap-abgca-cai";
 
         public enum GameType { SinglePlayer, Multiplayer, WebsocketMultiplayer }
@@ -59,7 +61,7 @@ namespace Boom
         [SerializeField, ShowOnly] MainDataTypes.LoginData.State loginState;
         [SerializeField, ShowOnly] bool loginCompleted;
 
-        protected override void _Awake()
+        protected override void Awake_()
         {
             BroadcastState.Invoke(new WaitingForResponse(true));
 
@@ -168,7 +170,7 @@ namespace Boom
 
 
 
-        protected override void _OnDestroy()
+        protected override void OnDestroy_()
         {
             Broadcast.Unregister<UserLoginRequest>(FetchHandler);
 
@@ -399,68 +401,61 @@ namespace Boom
 
         private async UniTask FetchConfigs()
         {
-            try
+            //HERE: You can specify all World's Ids you want to fetch entity configs from
+            string[] worlds = new string[] { WORLD_CANISTER_ID };
+
+
+            //Set Configs
+            var configsResult =
+                await FetchUtil.ProcessWorldCall<Dictionary<string, MainDataTypes.AllConfigs.Config>>(
+                    async (worldInterface, wid) =>
+                    {
+                        var stableConfigs = await worldInterface.GetAllConfigs();
+
+                        return stableConfigs.Map(e => new MainDataTypes.AllConfigs.Config(e)).ToDictionary(e => e.cid);
+                    },
+                    worlds
+                );
+
+            if (configsResult.IsOk)
             {
-                //HERE: You can specify all World's Ids you want to fetch entity configs from
-                string[] worlds = new string[] { WORLD_CANISTER_ID };
+                var asOk = configsResult.AsOk();
 
-
-                //Set Configs
-                var configsResult =
-                    await FetchUtil.ProcessWorldCall<Dictionary<string, MainDataTypes.AllConfigs.Config>>(
-                        async (worldInterface, wid) =>
-                        {
-                            var stableConfigs = await worldInterface.GetAllConfigs();
-
-                            return stableConfigs.Map(e => new MainDataTypes.AllConfigs.Config(e)).ToDictionary(e => e.cid);
-                        },
-                        worlds
-                    );
-
-                if (configsResult.IsOk)
-                {
-                    var asOk = configsResult.AsOk();
-
-                    UserUtil.UpdateMainData(new MainDataTypes.AllConfigs(asOk));
-                }
-                else
-                {
-                    throw new(configsResult.AsErr());
-                }
-
-                //Set Tokens & Nft Configs
-                FetchTokenConfig().Forget();
-                FetchNftConfig().Forget();
-
-                //Set Actions
-                var actionsResult =
-                    await FetchUtil.ProcessWorldCall<Dictionary<string, MainDataTypes.AllAction.Action>>(
-                        async (worldInterface, wid) =>
-                        {
-                            var stableConfigs = await worldInterface.GetAllActions();
-
-                            return stableConfigs.Map(e => new MainDataTypes.AllAction.Action(e)).ToDictionary(e => e.aid);
-                        },
-                        worlds
-                    );
-
-                if (actionsResult.IsOk)
-                {
-                    var asOk = actionsResult.AsOk();
-
-                    UserUtil.UpdateMainData(new MainDataTypes.AllAction(asOk));
-                }
-                else
-                {
-                    throw new(actionsResult.AsErr());
-                }
-
-                BroadcastState.Invoke(new WaitingForResponse(false));
+                UserUtil.UpdateMainData(new MainDataTypes.AllConfigs(asOk));
             }
-            catch (Exception ex)
+            else
             {
-                ex.Message.Error();
+                throw new(configsResult.AsErr());
             }
+
+            //Set Tokens & Nft Configs
+            FetchTokenConfig().Forget();
+            FetchNftConfig().Forget();
+
+            //Set Actions
+            var actionsResult =
+                await FetchUtil.ProcessWorldCall<Dictionary<string, MainDataTypes.AllAction.Action>>(
+                    async (worldInterface, wid) =>
+                    {
+                        var stableConfigs = await worldInterface.GetAllActions();
+
+                        return stableConfigs.Map(e => new MainDataTypes.AllAction.Action(e)).ToDictionary(e => e.aid);
+                    },
+                    worlds
+                );
+
+            if (actionsResult.IsOk)
+            {
+                var asOk = actionsResult.AsOk();
+
+                UserUtil.UpdateMainData(new MainDataTypes.AllAction(asOk));
+            }
+            else
+            {
+                actionsResult.AsErr().Error(GetType().Name);
+            }
+
+            BroadcastState.Invoke(new WaitingForResponse(false));
         }
 
         //

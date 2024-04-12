@@ -8,27 +8,43 @@
       content="width=device-width, initial-scale=1.0, user-scalable=no"
     />
     <title>{{{ PRODUCT_NAME }}}</title>
-    <link rel="shortcut icon" href="TemplateData/favicon.ico" />
-    <link rel="stylesheet" href="TemplateData/style.css" />
-    <script src="TemplateData/noble-curves.js"></script>
+    <link rel="shortcut icon" href="./TemplateData/favicon.ico" />
+    <link rel="stylesheet" href="./TemplateData/style.css" />
+    <script src="../TemplateData/noble-curves.js"></script>
   </head>
   <body class="{{{ SPLASH_SCREEN_STYLE.toLowerCase() }}}">
     <div id="unity-container" class="unity-desktop">
       <canvas id="unity-canvas"></canvas>
       <iframe id="loginIframe" src="{{{ LOGIN_WEBPAGE_URL }}}"></iframe>
     </div>
-    <div id="loading-cover" style="display: none">
+    <div id="loading-cover">
       <div id="unity-loading-bar">
-        <div id="unity-logo"><img src="logo.png" /></div>
-        <div id="unity-progress-bar-empty" style="display: none">
-          <div id="unity-progress-bar-full"></div>
+        <div id="unity-title">
+          <img id="unity-title-img" src="./TemplateData/game_name.svg" />
         </div>
-        <div class="spinner"></div>
+        <div id="unity-logo">
+          <img id="unity-logo-img" src="./TemplateData/game_logo.svg" />
+        </div>
+
+        <div class="loader-wrapper">
+          <div id="loading-container">
+            <div id="unity-loader-circle-base"></div>
+          </div>
+          <div id="loader-over-images">
+            <img src="./TemplateData/boom_char_left.png" class="boom-char" />
+            <img
+              src="./TemplateData/powered_by_image.svg"
+              style="padding-top: 50px"
+            />
+            <img src="./TemplateData/boom_char_right.png" class="boom-char" />
+          </div>
+        </div>
       </div>
     </div>
     <div id="unity-fullscreen-button" style="display: none"></div>
     <script>
             var gameInstance = null;
+
             const hideFullScreenButton = "{{{ HIDE_FULL_SCREEN_BUTTON }}}";
             const buildUrl = "Build";
             const loaderUrl = buildUrl + "/{{{ LOADER_FILENAME }}}";
@@ -51,68 +67,106 @@
             const container = document.querySelector("#unity-container");
             const canvas = document.querySelector("#unity-canvas");
             const loadingCover = document.querySelector("#loading-cover");
-            const progressBarEmpty = document.querySelector("#unity-progress-bar-empty");
-            const progressBarFull = document.querySelector("#unity-progress-bar-full");
             const fullscreenButton = document.querySelector("#unity-fullscreen-button");
-            const spinner = document.querySelector('.spinner');
+            const loader = document.getElementById('unity-loader-circle-base');
 
-            const canFullscreen = (function() {
+            const unityLogo = document.getElementById('unity-title-img');
+            const unityImage = document.getElementById('unity-logo-img');
+
+            const playerSettingsUnityLogo = "{{{GAME_TITLE_IMAGE_URL}}}";
+            const playerSettingsUnityImage = "{{{GAME_LOGO_IMAGE_URL}}}";
+
+            if (
+                  playerSettingsUnityLogo !== "" &&
+                  playerSettingsUnityLogo.includes("{") == false
+                ) {
+                  console.log(`Override Unity Logo \"${playerSettingsUnityLogo}\"`);
+                  unityLogo.src = playerSettingsUnityLogo;
+                }
+                if (
+                  playerSettingsUnityImage !== "" &&
+                  playerSettingsUnityImage.includes("{") == false
+                ) {
+                  console.log(`Override Unity Image \"${playerSettingsUnityImage}\"`);
+
+                  unityImage.src = playerSettingsUnityImage;
+                }
+
+
+            const canFullscreen = (function () {
               for (const key of [
-                  'exitFullscreen',
-                  'webkitExitFullscreen',
-                  'webkitCancelFullScreen',
-                  'mozCancelFullScreen',
-                  'msExitFullscreen',
-                ]) {
+                "exitFullscreen",
+                "webkitExitFullscreen",
+                "webkitCancelFullScreen",
+                "mozCancelFullScreen",
+                "msExitFullscreen",
+              ]) {
                 if (key in document) {
                   return true;
                 }
               }
               return false;
-            }());
+            })();
 
             if (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
               container.className = "unity-mobile";
               config.devicePixelRatio = 1;
             }
       #if BACKGROUND_FILENAME
-            canvas.style.background = "url('" + buildUrl + "/{{{ BACKGROUND_FILENAME.replace(/'/g, '%27') }}}') center / cover";
+          canvas.style.background = "url('" + buildUrl + "/{{{ BACKGROUND_FILENAME.replace(/'/g, '%27') }}}') center / cover";
       #endif
-            loadingCover.style.display = "";
+          loadingCover.style.display = "block";
 
-            const script = document.createElement("script");
-            script.src = loaderUrl;
-            script.onload = () => {
-              createUnityInstance(canvas, config, (progress) => {
-                spinner.style.display = "none";
-                progressBarEmpty.style.display = "";
-                progressBarFull.style.width = `${100 * progress}%`;
-              }).then((unityInstance) => {
+          const script = document.createElement("script");
+          script.src = loaderUrl;
+
+          script.onload = () => {
+            createUnityInstance(canvas, config, (progress) => {
+              let x = Math.max(10, Math.ceil(progress * 100));
+              console.log("progress : " + x);
+              let rotation = "0";
+              if (x < 100) {
+                rotation = "rotate(-" + (100 - x) + "deg)";
+              } else {
+                rotation = "rotate(" + 50 + "deg)";
+              }
+              loader.style.transform = rotation;
+            })
+              .then((unityInstance) => {
                 gameInstance = unityInstance;
                 loadingCover.style.display = "none";
                 if (canFullscreen) {
                   if (!hideFullScreenButton) {
-                    fullscreenButton.style.display = "";
+                    fullscreenButton.style.display = "block";
                   }
                   fullscreenButton.onclick = () => {
                     unityInstance.SetFullscreen(1);
                   };
                 }
-              }).catch((message) => {
+              })
+              .catch((message) => {
                 alert(message);
               });
-            };
-            document.body.appendChild(script);
+          };
 
-      window.addEventListener('message', function(e) {
-          // Make sure to check the origin property for security reasons
-          var loginWebpageUrl = "{{{ LOGIN_WEBPAGE_URL }}}";
-          var sanitizedUrl = loginWebpageUrl.replace(/\/+$/, '');
-          if (e.origin !== sanitizedUrl)
-              return;
+          document.body.appendChild(script);
 
-          gameInstance.SendMessage('BoomManager', 'CreateIdentityWithJson', e.data);
-      }, false);
+          window.addEventListener(
+            "message",
+            function (e) {
+              // Make sure to check the origin property for security reasons
+              var loginWebpageUrl = "https://7p3gx-jaaaa-aaaal-acbda-cai.icp0.io";
+              var sanitizedUrl = loginWebpageUrl.replace(/\/+$/, "");
+              if (e.origin !== sanitizedUrl) return;
+
+              gameInstance.SendMessage(
+                "BoomManager",
+                "CreateIdentityWithJson",
+                e.data
+              );
+            },
+            false
+          );
     </script>
   </body>
 </html>

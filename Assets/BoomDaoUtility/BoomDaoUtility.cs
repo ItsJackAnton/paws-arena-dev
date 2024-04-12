@@ -284,7 +284,7 @@ namespace BoomDaoWrapper
 
         public List<ActionOutcome> GetActionOutcomes(string _actionId)
         {
-            bool _hasConfig = ConfigUtil.TryGetAction(BoomManager.Instance.WORLD_CANISTER_ID, _actionId, out MainDataTypes.AllAction.Action _action);
+            bool _hasConfig = ConfigUtil.TryGetAction(_actionId, out MainDataTypes.AllAction.Action _action);
             if (!_hasConfig)
             {
                 return default;
@@ -293,18 +293,15 @@ namespace BoomDaoWrapper
             List<ActionOutcome> _actionOutcomes = new();
             foreach (var _outcome in _action.callerAction.Outcomes)
             {
-                foreach (var _possibleOutcome in _outcome.PossibleOutcomes)
+                foreach (PossibleOutcomeTypes.Base _possibleOutcome in _outcome.PossibleOutcomes)
                 {
-                    var _outcomeOption = _possibleOutcome.Option;
-                    if (_outcomeOption.Tag == ActionOutcomeOption.OptionInfoTag.UpdateEntity)
+                    if (_possibleOutcome.possibleOutcomeType == ActionOutcomeOption.OptionInfoTag.UpdateEntity)
                     {
-                        var _entityOutcome = _outcomeOption.AsUpdateEntity();
-                        foreach (var _update in _entityOutcome.Updates)
+                        var _entityOutcome = _possibleOutcome as PossibleOutcomeTypes.UpdateEntity;
+                        foreach (EntityFieldEdit.Numeric _update in _entityOutcome.QueryNumericFields(EntityFieldEdit.Numeric
+                        .NumericType.Increment).ToList())
                         {
-                            if (_update.Value is IncrementNumber _increment)
-                            {
-                                _actionOutcomes.Add(new ActionOutcome { Name = _entityOutcome.Eid, Value = _increment.FieldValue.AsNumber() });
-                            }
+                            _actionOutcomes.Add(new ActionOutcome { Name = _entityOutcome.Eid, Value = _update.Value });
                         }
                     }
                 }

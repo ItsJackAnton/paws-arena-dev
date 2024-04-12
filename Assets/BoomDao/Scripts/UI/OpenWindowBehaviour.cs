@@ -5,6 +5,7 @@ public class OpenWindowBehaviour : MonoBehaviour
 {
     [SerializeField] string windowName;
     [SerializeField] int sortingOrder = 0;
+    [SerializeField] bool noParent;
     [SerializeField] bool onpenOnStart;
     [SerializeField, ShowOnly] Window window;
 
@@ -26,7 +27,7 @@ public class OpenWindowBehaviour : MonoBehaviour
     public void Open()
     {
         if (window) return;
-        window = WindowManager.Instance.OpenWindow(windowName, null, sortingOrder);
+        window = WindowManager.Instance.OpenWindow(windowName, null, sortingOrder, noParent);
     }
     public void Close()
     {

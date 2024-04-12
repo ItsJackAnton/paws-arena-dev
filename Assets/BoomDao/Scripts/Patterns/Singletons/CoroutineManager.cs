@@ -190,12 +190,12 @@ public class CoroutineManager : Singleton<CoroutineManager>
         }
     }
 
-    protected override void _Awake()
+    protected override void Awake_()
     {
 
     }
 
-    protected override void _OnDestroy()
+    protected override void OnDestroy_()
     {
 
     }

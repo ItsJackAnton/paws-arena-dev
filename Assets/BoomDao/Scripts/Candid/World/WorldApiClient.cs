@@ -7,6 +7,7 @@ using EdjCase.ICP.Agent.Responses;
 using System.Collections.Generic;
 using EdjCase.ICP.Candid.Mapping;
 using WorldId = System.String;
+using UserId = System.String;
 using EntityId = System.String;
 using ActionId = System.String;
 
@@ -60,6 +61,13 @@ namespace Candid.World
 			return reply.ToObjects<Models.Result4>(this.Converter);
 		}
 
+		public async Task<Models.Result4> CreateMinigameWinAction()
+		{
+			CandidArg arg = CandidArg.FromCandid();
+			CandidArg reply = await this.Agent.CallAndWaitAsync(this.CanisterId, "createMinigameWinAction", arg);
+			return reply.ToObjects<Models.Result4>(this.Converter);
+		}
+
 		public async Task<UnboundedUInt> CycleBalance()
 		{
 			CandidArg arg = CandidArg.FromCandid();
@@ -75,10 +83,30 @@ namespace Candid.World
 			return reply.ToObjects<Models.Result4>(this.Converter);
 		}
 
+		public async Task DeleteActionHistoryForUser(WorldApiClient.DeleteActionHistoryForUserArg0 arg0)
+		{
+			CandidArg arg = CandidArg.FromCandid(CandidTypedValue.FromObject(arg0, this.Converter));
+			await this.Agent.CallAndWaitAsync(this.CanisterId, "deleteActionHistoryForUser", arg);
+		}
+
 		public async Task DeleteActionLockState(Models.ActionLockStateArgs arg0)
 		{
 			CandidArg arg = CandidArg.FromCandid(CandidTypedValue.FromObject(arg0, this.Converter));
 			await this.Agent.CallAndWaitAsync(this.CanisterId, "deleteActionLockState", arg);
+		}
+
+		public async Task<Models.Result2> DeleteActionStateForAllUsers(WorldApiClient.DeleteActionStateForAllUsersArg0 arg0)
+		{
+			CandidArg arg = CandidArg.FromCandid(CandidTypedValue.FromObject(arg0, this.Converter));
+			CandidArg reply = await this.Agent.CallAndWaitAsync(this.CanisterId, "deleteActionStateForAllUsers", arg);
+			return reply.ToObjects<Models.Result2>(this.Converter);
+		}
+
+		public async Task<Models.Result9> DeleteActionStateForUser(WorldApiClient.DeleteActionStateForUserArg0 arg0)
+		{
+			CandidArg arg = CandidArg.FromCandid(CandidTypedValue.FromObject(arg0, this.Converter));
+			CandidArg reply = await this.Agent.CallAndWaitAsync(this.CanisterId, "deleteActionStateForUser", arg);
+			return reply.ToObjects<Models.Result9>(this.Converter);
 		}
 
 		public async Task DeleteAllActionLockStates()
@@ -121,6 +149,12 @@ namespace Candid.World
 			return reply.ToObjects<Models.Result4>(this.Converter);
 		}
 
+		public async Task DeleteUser(WorldApiClient.DeleteUserArg0 arg0)
+		{
+			CandidArg arg = CandidArg.FromCandid(CandidTypedValue.FromObject(arg0, this.Converter));
+			await this.Agent.CallAndWaitAsync(this.CanisterId, "deleteUser", arg);
+		}
+
 		public async Task<Models.Action> EditAction(WorldApiClient.EditActionArg0 arg0)
 		{
 			CandidArg arg = CandidArg.FromCandid(CandidTypedValue.FromObject(arg0, this.Converter));
@@ -156,12 +190,35 @@ namespace Candid.World
 			return reply.ToObjects<List<Models.StableConfig>>(this.Converter);
 		}
 
+		public async Task<Models.Result8> GetActionHistory(WorldApiClient.GetActionHistoryArg0 arg0)
+		{
+			CandidArg arg = CandidArg.FromCandid(CandidTypedValue.FromObject(arg0, this.Converter));
+			CandidArg reply = await this.Agent.CallAndWaitAsync(this.CanisterId, "getActionHistory", arg);
+			return reply.ToObjects<Models.Result8>(this.Converter);
+		}
+
+		public async Task<Models.Result8> GetActionHistoryComposite(WorldApiClient.GetActionHistoryCompositeArg0 arg0)
+		{
+			CandidArg arg = CandidArg.FromCandid(CandidTypedValue.FromObject(arg0, this.Converter));
+			QueryResponse response = await this.Agent.QueryAsync(this.CanisterId, "getActionHistoryComposite", arg);
+			CandidArg reply = response.ThrowOrGetReply();
+			return reply.ToObjects<Models.Result8>(this.Converter);
+		}
+
 		public async Task<bool> GetActionLockState(Models.ActionLockStateArgs arg0)
 		{
 			CandidArg arg = CandidArg.FromCandid(CandidTypedValue.FromObject(arg0, this.Converter));
 			QueryResponse response = await this.Agent.QueryAsync(this.CanisterId, "getActionLockState", arg);
 			CandidArg reply = response.ThrowOrGetReply();
 			return reply.ToObjects<bool>(this.Converter);
+		}
+
+		public async Task<Models.Result7> GetActionStatusComposite(WorldApiClient.GetActionStatusCompositeArg0 arg0)
+		{
+			CandidArg arg = CandidArg.FromCandid(CandidTypedValue.FromObject(arg0, this.Converter));
+			QueryResponse response = await this.Agent.QueryAsync(this.CanisterId, "getActionStatusComposite", arg);
+			CandidArg reply = response.ThrowOrGetReply();
+			return reply.ToObjects<Models.Result7>(this.Converter);
 		}
 
 		public async Task<List<Models.Action>> GetAllActions()
@@ -187,10 +244,26 @@ namespace Candid.World
 			return reply.ToObjects<Models.Result6>(this.Converter);
 		}
 
+		public async Task<Models.Result6> GetAllUserActionStatesComposite(WorldApiClient.GetAllUserActionStatesCompositeArg0 arg0)
+		{
+			CandidArg arg = CandidArg.FromCandid(CandidTypedValue.FromObject(arg0, this.Converter));
+			QueryResponse response = await this.Agent.QueryAsync(this.CanisterId, "getAllUserActionStatesComposite", arg);
+			CandidArg reply = response.ThrowOrGetReply();
+			return reply.ToObjects<Models.Result6>(this.Converter);
+		}
+
 		public async Task<Models.Result5> GetAllUserEntities(WorldApiClient.GetAllUserEntitiesArg0 arg0)
 		{
 			CandidArg arg = CandidArg.FromCandid(CandidTypedValue.FromObject(arg0, this.Converter));
 			CandidArg reply = await this.Agent.CallAndWaitAsync(this.CanisterId, "getAllUserEntities", arg);
+			return reply.ToObjects<Models.Result5>(this.Converter);
+		}
+
+		public async Task<Models.Result5> GetAllUserEntitiesComposite(WorldApiClient.GetAllUserEntitiesCompositeArg0 arg0)
+		{
+			CandidArg arg = CandidArg.FromCandid(CandidTypedValue.FromObject(arg0, this.Converter));
+			QueryResponse response = await this.Agent.QueryAsync(this.CanisterId, "getAllUserEntitiesComposite", arg);
+			CandidArg reply = response.ThrowOrGetReply();
 			return reply.ToObjects<Models.Result5>(this.Converter);
 		}
 
@@ -222,6 +295,14 @@ namespace Candid.World
 			QueryResponse response = await this.Agent.QueryAsync(this.CanisterId, "getProcessActionCount", arg);
 			CandidArg reply = response.ThrowOrGetReply();
 			return reply.ToObjects<UnboundedUInt>(this.Converter);
+		}
+
+		public async Task<Models.Result5> GetUserEntitiesFromWorldNodeComposite(WorldApiClient.GetUserEntitiesFromWorldNodeCompositeArg0 arg0)
+		{
+			CandidArg arg = CandidArg.FromCandid(CandidTypedValue.FromObject(arg0, this.Converter));
+			QueryResponse response = await this.Agent.QueryAsync(this.CanisterId, "getUserEntitiesFromWorldNodeComposite", arg);
+			CandidArg reply = response.ThrowOrGetReply();
+			return reply.ToObjects<Models.Result5>(this.Converter);
 		}
 
 		public async Task<List<string>> GetTrustedOrigins()
@@ -300,6 +381,13 @@ namespace Candid.World
 			return reply.ToObjects<Models.Result3>(this.Converter);
 		}
 
+		public async Task<Models.Result3> ProcessActionAwait(Models.ActionArg arg0)
+		{
+			CandidArg arg = CandidArg.FromCandid(CandidTypedValue.FromObject(arg0, this.Converter));
+			CandidArg reply = await this.Agent.CallAndWaitAsync(this.CanisterId, "processActionAwait", arg);
+			return reply.ToObjects<Models.Result3>(this.Converter);
+		}
+
 		public async Task RemoveAdmin(WorldApiClient.RemoveAdminArg0 arg0)
 		{
 			CandidArg arg = CandidArg.FromCandid(CandidTypedValue.FromObject(arg0, this.Converter));
@@ -337,11 +425,11 @@ namespace Candid.World
 			return reply.ToObjects<Models.Result2>(this.Converter);
 		}
 
-		public async Task<bool> ValidateConstraints(string arg0, List<Models.StableEntity> arg1, ActionId arg2, OptionalValue<Models.ActionConstraint> arg3)
+		public async Task<WorldApiClient.ValidateConstraintsReturnArg0> ValidateConstraints(string arg0, ActionId arg1, OptionalValue<Models.ActionConstraint> arg2)
 		{
-			CandidArg arg = CandidArg.FromCandid(CandidTypedValue.FromObject(arg0, this.Converter), CandidTypedValue.FromObject(arg1, this.Converter), CandidTypedValue.FromObject(arg2, this.Converter), CandidTypedValue.FromObject(arg3, this.Converter));
+			CandidArg arg = CandidArg.FromCandid(CandidTypedValue.FromObject(arg0, this.Converter), CandidTypedValue.FromObject(arg1, this.Converter), CandidTypedValue.FromObject(arg2, this.Converter));
 			CandidArg reply = await this.Agent.CallAndWaitAsync(this.CanisterId, "validateConstraints", arg);
-			return reply.ToObjects<bool>(this.Converter);
+			return reply.ToObjects<WorldApiClient.ValidateConstraintsReturnArg0>(this.Converter);
 		}
 
 		public async Task<bool> ValidateEntityConstraints(string arg0, List<Models.StableEntity> arg1, List<Models.EntityConstraint> arg2)
@@ -411,6 +499,55 @@ namespace Candid.World
 			}
 		}
 
+		public class DeleteActionHistoryForUserArg0
+		{
+			[CandidName("uid")]
+			public UserId Uid { get; set; }
+
+			public DeleteActionHistoryForUserArg0(UserId uid)
+			{
+				this.Uid = uid;
+			}
+
+			public DeleteActionHistoryForUserArg0()
+			{
+			}
+		}
+
+		public class DeleteActionStateForAllUsersArg0
+		{
+			[CandidName("aid")]
+			public string Aid { get; set; }
+
+			public DeleteActionStateForAllUsersArg0(string aid)
+			{
+				this.Aid = aid;
+			}
+
+			public DeleteActionStateForAllUsersArg0()
+			{
+			}
+		}
+
+		public class DeleteActionStateForUserArg0
+		{
+			[CandidName("aid")]
+			public string Aid { get; set; }
+
+			[CandidName("uid")]
+			public string Uid { get; set; }
+
+			public DeleteActionStateForUserArg0(string aid, string uid)
+			{
+				this.Aid = aid;
+				this.Uid = uid;
+			}
+
+			public DeleteActionStateForUserArg0()
+			{
+			}
+		}
+
 		public class DeleteConfigArg0
 		{
 			[CandidName("cid")]
@@ -441,6 +578,21 @@ namespace Candid.World
 			}
 
 			public DeleteEntityArg0()
+			{
+			}
+		}
+
+		public class DeleteUserArg0
+		{
+			[CandidName("uid")]
+			public UserId Uid { get; set; }
+
+			public DeleteUserArg0(UserId uid)
+			{
+				this.Uid = uid;
+			}
+
+			public DeleteUserArg0()
 			{
 			}
 		}
@@ -494,6 +646,55 @@ namespace Candid.World
 			}
 		}
 
+		public class GetActionHistoryArg0
+		{
+			[CandidName("uid")]
+			public UserId Uid { get; set; }
+
+			public GetActionHistoryArg0(UserId uid)
+			{
+				this.Uid = uid;
+			}
+
+			public GetActionHistoryArg0()
+			{
+			}
+		}
+
+		public class GetActionHistoryCompositeArg0
+		{
+			[CandidName("uid")]
+			public UserId Uid { get; set; }
+
+			public GetActionHistoryCompositeArg0(UserId uid)
+			{
+				this.Uid = uid;
+			}
+
+			public GetActionHistoryCompositeArg0()
+			{
+			}
+		}
+
+		public class GetActionStatusCompositeArg0
+		{
+			[CandidName("aid")]
+			public ActionId Aid { get; set; }
+
+			[CandidName("uid")]
+			public string Uid { get; set; }
+
+			public GetActionStatusCompositeArg0(ActionId aid, string uid)
+			{
+				this.Aid = aid;
+				this.Uid = uid;
+			}
+
+			public GetActionStatusCompositeArg0()
+			{
+			}
+		}
+
 		public class GetAllUserActionStatesArg0
 		{
 			[CandidName("uid")]
@@ -505,6 +706,21 @@ namespace Candid.World
 			}
 
 			public GetAllUserActionStatesArg0()
+			{
+			}
+		}
+
+		public class GetAllUserActionStatesCompositeArg0
+		{
+			[CandidName("uid")]
+			public string Uid { get; set; }
+
+			public GetAllUserActionStatesCompositeArg0(string uid)
+			{
+				this.Uid = uid;
+			}
+
+			public GetAllUserActionStatesCompositeArg0()
 			{
 			}
 		}
@@ -528,9 +744,47 @@ namespace Candid.World
 			}
 		}
 
+		public class GetAllUserEntitiesCompositeArg0
+		{
+			[CandidName("page")]
+			public OptionalValue<UnboundedUInt> Page { get; set; }
+
+			[CandidName("uid")]
+			public string Uid { get; set; }
+
+			public GetAllUserEntitiesCompositeArg0(OptionalValue<UnboundedUInt> page, string uid)
+			{
+				this.Page = page;
+				this.Uid = uid;
+			}
+
+			public GetAllUserEntitiesCompositeArg0()
+			{
+			}
+		}
+
 		public class GetGlobalPermissionsOfWorldReturnArg0 : List<WorldId>
 		{
 			public GetGlobalPermissionsOfWorldReturnArg0()
+			{
+			}
+		}
+
+		public class GetUserEntitiesFromWorldNodeCompositeArg0
+		{
+			[CandidName("page")]
+			public OptionalValue<UnboundedUInt> Page { get; set; }
+
+			[CandidName("uid")]
+			public string Uid { get; set; }
+
+			public GetUserEntitiesFromWorldNodeCompositeArg0(OptionalValue<UnboundedUInt> page, string uid)
+			{
+				this.Page = page;
+				this.Uid = uid;
+			}
+
+			public GetUserEntitiesFromWorldNodeCompositeArg0()
 			{
 			}
 		}
@@ -621,6 +875,25 @@ namespace Candid.World
 			}
 
 			public RemoveTrustedOriginsArg0()
+			{
+			}
+		}
+
+		public class ValidateConstraintsReturnArg0
+		{
+			[CandidName("aid")]
+			public string Aid { get; set; }
+
+			[CandidName("status")]
+			public bool Status { get; set; }
+
+			public ValidateConstraintsReturnArg0(string aid, bool status)
+			{
+				this.Aid = aid;
+				this.Status = status;
+			}
+
+			public ValidateConstraintsReturnArg0()
 			{
 			}
 		}

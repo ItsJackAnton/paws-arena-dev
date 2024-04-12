@@ -40,16 +40,16 @@ public abstract class Singleton<T> : MonoBehaviour where T : MonoBehaviour
             }
         }
 
-        _Awake();
+        Awake_();
     }
 
     protected void OnDestroy()
     {
         if (instance != this) return;
 
-        _OnDestroy();
+        OnDestroy_();
     }
 
-    protected abstract void _Awake();
-    protected abstract void _OnDestroy();
+    protected abstract void Awake_();
+    protected abstract void OnDestroy_();
 }

@@ -51,6 +51,11 @@ namespace Candid.World.Models
 				return new ActionOutcomeOption.OptionInfo(ActionOutcomeOption.OptionInfoTag.TransferIcrc, info);
 			}
 
+			public static ActionOutcomeOption.OptionInfo UpdateAction(UpdateAction info)
+			{
+				return new ActionOutcomeOption.OptionInfo(ActionOutcomeOption.OptionInfoTag.UpdateAction, info);
+			}
+
 			public static ActionOutcomeOption.OptionInfo UpdateEntity(UpdateEntity info)
 			{
 				return new ActionOutcomeOption.OptionInfo(ActionOutcomeOption.OptionInfoTag.UpdateEntity, info);
@@ -66,6 +71,12 @@ namespace Candid.World.Models
 			{
 				this.ValidateTag(ActionOutcomeOption.OptionInfoTag.TransferIcrc);
 				return (TransferIcrc)this.Value!;
+			}
+
+			public UpdateAction AsUpdateAction()
+			{
+				this.ValidateTag(ActionOutcomeOption.OptionInfoTag.UpdateAction);
+				return (UpdateAction)this.Value!;
 			}
 
 			public UpdateEntity AsUpdateEntity()
@@ -89,6 +100,8 @@ namespace Candid.World.Models
 			MintNft,
 			[CandidName("transferIcrc")]
 			TransferIcrc,
+			[CandidName("updateAction")]
+			UpdateAction,
 			[CandidName("updateEntity")]
 			UpdateEntity
 		}

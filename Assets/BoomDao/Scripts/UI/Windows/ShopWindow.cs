@@ -103,7 +103,7 @@ public class ShopWindow : Window
             actionConfig.fields.TryGetValue("description", out string description);
             actionConfig.fields.TryGetValue("imageUrl", out string imageUrl);
 
-            if (!ConfigUtil.TryGetAction(BoomManager.Instance.WORLD_CANISTER_ID, actionId, out var action))
+            if (!ConfigUtil.TryGetAction(actionId, out var action, BoomManager.Instance.WORLD_CANISTER_ID))
             {
                 ("Could not find action of id: " + actionId).Error();
 
@@ -234,22 +234,31 @@ public class ShopWindow : Window
 
                 string possibleOutcoemsContent = possibleOutcomes.Filter(e =>
                 {
-                    if(e.Option.Tag != ActionOutcomeOption.OptionInfoTag.UpdateEntity)
+                    PossibleOutcomeTypes.UpdateEntity update = e switch
                     {
-                        return false;
-                    }
+                        PossibleOutcomeTypes.UpdateEntity r => r,
+                        _ => null
+                    };
 
-                    var asUpdateEntity = e.Option.AsUpdateEntity();
+                    if (update == null) return false;
 
-                    return asUpdateEntity.Updates.Has(e=> e.Tag == UpdateEntityTypeTag.IncrementNumber);
+                    var numericUpdates = update.QueryNumericFields(EntityFieldEdit.Numeric.NumericType.Increment);
+
+                    return numericUpdates.Count > 0;
                 }).Reduce(k =>
                 {
-                    var asUpdateEntity = k.Option.AsUpdateEntity();
-                    var asIncrementNumber = asUpdateEntity.Updates.First(e => e.Tag == UpdateEntityTypeTag.IncrementNumber);
+                    PossibleOutcomeTypes.UpdateEntity update = k switch
+                    {
+                        PossibleOutcomeTypes.UpdateEntity r => r,
+                        _ => null
+                    };
+                    var numericUpdates = update.QueryNumericFields(EntityFieldEdit.Numeric.NumericType.Increment);
 
-                    ConfigUtil.TryGetConfigFieldAs<string>(BoomManager.Instance.WORLD_CANISTER_ID, asUpdateEntity.Eid, "name", out var configName, asUpdateEntity.Eid);
+                    var asIncrementNumber = numericUpdates.First();
 
-                    return $"{configName} x {(asIncrementNumber.AsIncrementNumber().FieldValue.Tag == IncrementNumber.FieldValueInfoTag.Number? asIncrementNumber.AsIncrementNumber().FieldValue.Value : "some formula")}";
+                    ConfigUtil.TryGetConfigFieldAs<string>(BoomManager.Instance.WORLD_CANISTER_ID, update.Eid, "name", out var configName, update.Eid);
+
+                    return $"{configName} x {(asIncrementNumber.HasFormulas == false? asIncrementNumber.Value : "some formula")}";
                 });
 
 
@@ -291,22 +300,31 @@ public class ShopWindow : Window
 
                 string possibleOutcoemsContent = possibleOutcomes.Filter(e =>
                 {
-                    if (e.Option.Tag != ActionOutcomeOption.OptionInfoTag.UpdateEntity)
+                    PossibleOutcomeTypes.UpdateEntity update = e switch
                     {
-                        return false;
-                    }
+                        PossibleOutcomeTypes.UpdateEntity r => r,
+                        _ => null
+                    };
 
-                    var asUpdateEntity = e.Option.AsUpdateEntity();
+                    if (update == null) return false;
 
-                    return asUpdateEntity.Updates.Has(e => e.Tag == UpdateEntityTypeTag.IncrementNumber);
+                    var numericUpdates = update.QueryNumericFields(EntityFieldEdit.Numeric.NumericType.Increment);
+
+                    return numericUpdates.Count > 0;
                 }).Reduce(k =>
                 {
-                    var asUpdateEntity = k.Option.AsUpdateEntity();
-                    var asIncrementNumber = asUpdateEntity.Updates.First(e => e.Tag == UpdateEntityTypeTag.IncrementNumber);
+                    PossibleOutcomeTypes.UpdateEntity update = k switch
+                    {
+                        PossibleOutcomeTypes.UpdateEntity r => r,
+                        _ => null
+                    };
+                    var numericUpdates = update.QueryNumericFields(EntityFieldEdit.Numeric.NumericType.Increment);
 
-                    ConfigUtil.TryGetConfigFieldAs<string>(BoomManager.Instance.WORLD_CANISTER_ID, asUpdateEntity.Eid, "name", out var configName, asUpdateEntity.Eid);
+                    var asIncrementNumber = numericUpdates.First();
 
-                    return $"{configName} x {(asIncrementNumber.AsIncrementNumber().FieldValue.Tag == IncrementNumber.FieldValueInfoTag.Number ? asIncrementNumber.AsIncrementNumber().FieldValue.Value : "some formula")}";
+                    ConfigUtil.TryGetConfigFieldAs<string>(BoomManager.Instance.WORLD_CANISTER_ID, update.Eid, "name", out var configName, update.Eid);
+
+                    return $"{configName} x {(asIncrementNumber.HasFormulas == false ? asIncrementNumber.Value : "some formula")}";
                 });
 
 

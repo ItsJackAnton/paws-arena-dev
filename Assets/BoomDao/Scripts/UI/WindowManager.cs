@@ -8,6 +8,8 @@ namespace Boom.UI
 
     public class WindowManager : Singleton<WindowManager>
     {
+        public static bool EnableTemplateWindows { get; set; }
+
         readonly Dictionary<string, Window> openedWindows = new();
         [SerializeField, ShowOnly] private int unlockCursorWindowCount;
         public UnityEvent OnCloseAllWindows { get; private set; } = new();
@@ -86,15 +88,15 @@ namespace Boom.UI
             openedWindows.TryGetValue(typeName, out Window baseWindow);
             return baseWindow != null;
         }
-        public T OpenWindow<T>(int? orderLayer = null) where T : Window
+        public T OpenWindow<T>(int? orderLayer = null, bool noParent = false) where T : Window
         {
-            return (T)OpenWindow(typeof(T).Name, null, orderLayer);
+            return (T)OpenWindow(typeof(T).Name, null, orderLayer, noParent);
         }
-        public T OpenWindow<T>(object data, int? orderLayer = null) where T : Window
+        public T OpenWindow<T>(object data, int? orderLayer = null, bool noParent = false) where T : Window
         {
-            return (T)OpenWindow(typeof(T).Name, data, orderLayer);
+            return (T)OpenWindow(typeof(T).Name, data, orderLayer, noParent);
         }
-        public Window OpenWindow(string WindowName, object data, int? orderLayer = null)
+        public Window OpenWindow(string windowName, object data, int? orderLayer = null, bool noParent = false)
         {
             void CheckIfCursorUnlockRequired(bool unlockCursor, bool countIfWindowFirstTime)
             {
@@ -120,8 +122,8 @@ namespace Boom.UI
                 }
             }
 
-            string typeName = WindowName;
-            //Debug.Log($"Try Open Window of Type: {typeName}");
+            string typeName = EnableTemplateWindows == false ? windowName : $"{windowName}Template";
+            //Debug.Log($"Try Open Window of Type: {typeName");
 
             if (openedWindows.TryGetValue(typeName, out Window baseWindow) == false)
             {
@@ -134,14 +136,33 @@ namespace Boom.UI
                 }
 
                 //Instantiate
-                baseWindow = Instantiate(baseWindow, transform);
+                baseWindow = Instantiate(baseWindow, noParent ? null : transform);
                 baseWindow.transform.localPosition = Vector3.zero;
             }
 
             if (baseWindow == null)
             {
-                $"Something went wrong trying to open window of type: {typeName}".Log<WindowManager>();
-                return null;
+                if (EnableTemplateWindows == false)
+                {
+                    $"Something went wrong trying to open window of type: {typeName}".Log<WindowManager>();
+                    return null;
+                }
+
+                typeName = windowName;
+                if (openedWindows.TryGetValue(typeName, out baseWindow) == false)
+                {
+                    baseWindow = Resources.Load<Window>($"Windows/{typeName}");
+
+                    if (baseWindow == null)
+                    {
+                        $"Tried to open a window of name '{typeName}' but doesn't lives on Assets/Resources/Windows".Log<WindowManager>();
+                        return null;
+                    }
+
+                    //Instantiate
+                    baseWindow = Instantiate(baseWindow, noParent ? null : transform);
+                    baseWindow.transform.localPosition = Vector3.zero;
+                }
             }
 
             var window = baseWindow;
@@ -171,20 +192,33 @@ namespace Boom.UI
         }
         public T AddWidgets<T>(object data, Transform parent, Vector3 offset = default) where T : Window
         {
-            string typeNape = typeof(T).Name;
+            string typeName = EnableTemplateWindows == false ? typeof(T).Name : $"{typeof(T).Name}Template";
 
             if (parent == null)
             {
-                $"Tried to add a widget of name '{typeNape}' but has no parent specified".Log<WindowManager>();
+                $"Tried to add a widget of name '{typeName}' but has no parent specified".Log<WindowManager>();
                 return null;
             }
 
-            T window = Resources.Load<T>($"Widgets/{typeNape}");
+            T window = Resources.Load<T>($"Widgets/{typeName}");
 
             if (window == null)
             {
-                $"Tried to add a widget of name '{typeNape}' but doesn't lives on Assets/Resources/Widgets".Log<WindowManager>();
-                return null;
+                if (EnableTemplateWindows == false)
+                {
+                    $"Tried to add a widget of name '{typeName}' but doesn't lives on Assets/Resources/Widgets".Log<WindowManager>();
+                    return null;
+                }
+
+                typeName = typeof(T).Name;
+
+                window = Resources.Load<T>($"Widgets/{typeName}");
+
+                if (window == null)
+                {
+                    $"Tried to add a widget of name '{typeName}' but doesn't lives on Assets/Resources/Widgets".Log<WindowManager>();
+                    return null;
+                }
             }
 
             T objInstance = Instantiate(window, parent);
@@ -210,8 +244,6 @@ namespace Boom.UI
 
                 if (objInstance.RequireUnlockCursor()) --unlockCursorWindowCount;
                 if (objInstance != null) Destroy(objInstance.gameObject);
-
-                //OnWindowClose.Invoke(objInstance.GetType().FullName.ToHash16());
 
                 if (unlockCursorWindowCount == 0)
                 {
@@ -245,12 +277,12 @@ namespace Boom.UI
             CursorUnlockByDefault = false;
         }
 
-        protected override void _Awake()
+        protected override void Awake_()
         {
 
         }
 
-        protected override void _OnDestroy()
+        protected override void OnDestroy_()
         {
 
         }
