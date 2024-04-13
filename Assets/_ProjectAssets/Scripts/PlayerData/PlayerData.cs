@@ -306,7 +306,7 @@ public class PlayerData
                 OnUpdatedCraftingProcess?.Invoke();
                 break;
             default:
-                 Debug.Log($"--- {_key} got updated!, add handler?");
+                 // Debug.Log($"--- {_key} got updated!, add handler?");
                 break;
         }
     }

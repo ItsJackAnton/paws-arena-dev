@@ -85,6 +85,7 @@ namespace Boom.Tutorials
             List<Field> fields = new()
             {
                 new("username", newUsername),
+                new("animal", newUsername),
             };
 
             //SECTION B: Action execution

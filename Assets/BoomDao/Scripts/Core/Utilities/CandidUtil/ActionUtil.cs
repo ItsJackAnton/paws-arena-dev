@@ -179,13 +179,13 @@ namespace Boom
                                     return;
                                 }
 
-                                var argFieldName = splitedUid[1];
+                                var argFieldName = splitedUid[1].TrimEnd('}');
 
                                 foreach (var arg in args)
                                 {
                                     if (arg.FieldName == argFieldName)
                                     {
-                                        eid = EntityUtil.ReplaceVariables(arg.FieldValue, worldEntities, callerEntities, targetEntities, configs, args);;
+                                        eid = EntityUtil.ReplaceVariables(arg.FieldValue, worldEntities, callerEntities, targetEntities, configs, args);
                                         break;
                                     }
                                 }

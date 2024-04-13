@@ -18,7 +18,6 @@ public class ChallengeProgress
         get
         {
             ChallengeData _challengeData = DataManager.Instance.GameData.GetChallengeByIdentifier(Identifier);
-            Debug.Log(_challengeData.AmountNeeded);
             return _challengeData.AmountNeeded - Value <= 0;
         }
     }
