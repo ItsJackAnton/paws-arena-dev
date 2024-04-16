@@ -103,6 +103,7 @@ namespace com.colorfulcoding.GameScene
                 reqJson,
                 (resp) =>
                 {
+                    Debug.Log("----- Got result of the match: "+resp);
                     LeaderboardPostResponseEntity response = JsonUtility.FromJson<LeaderboardPostResponseEntity>(resp);
                     Debug.Log(
                         $"[HTTP]Match ending registered! You won {response.oldPoints + response.points} points."

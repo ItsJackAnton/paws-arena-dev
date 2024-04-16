@@ -105,7 +105,9 @@ public class NftSelection : MonoBehaviour
         currentPage = 0;
         int _maxPages = (int)Math.Floor((GameState.nfts.Count - 1) * 1.0 / pageSize);
         pages.SetNumberOfPages(_maxPages + 1);
+        Debug.Log(1);
         await PopulateGridAsync();
+        Debug.Log(2);
         if (GameState.nfts.Count>0)
         {
             SelectNft(0);

@@ -145,6 +145,7 @@ public class RecoveryDropDown : MonoBehaviour
             else
             {
                 healMessageHolder.SetActive(true);
+                healButton.interactable = true;
                 return;
             }
         }
@@ -166,6 +167,7 @@ public class RecoveryDropDown : MonoBehaviour
             else
             {
                 healMessageHolder.SetActive(true);
+                healButton.interactable = true;
                 return;
             }
         }

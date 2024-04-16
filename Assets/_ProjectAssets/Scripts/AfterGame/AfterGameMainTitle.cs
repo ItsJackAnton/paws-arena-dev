@@ -51,6 +51,8 @@ namespace com.colorfulcoding.AfterGame
             {
                 checkIfIWon = GameResolveStateUtils.CheckIfIWon(GameState.gameResolveState);
             }
+            
+            Debug.Log("----- After all resolving the outcome of the match is: "+ checkIfIWon);
 
             if (checkIfIWon > 0)
             {
