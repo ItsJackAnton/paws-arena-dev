@@ -75,6 +75,7 @@ public class NftSelection : MonoBehaviour
 
     private void RequestReload()
     {
+        ConnectingToServer.ReloadNfts();
         BoomDaoUtility.Instance.ReloadNfts();
     }
     
@@ -105,9 +106,7 @@ public class NftSelection : MonoBehaviour
         currentPage = 0;
         int _maxPages = (int)Math.Floor((GameState.nfts.Count - 1) * 1.0 / pageSize);
         pages.SetNumberOfPages(_maxPages + 1);
-        Debug.Log(1);
         await PopulateGridAsync();
-        Debug.Log(2);
         if (GameState.nfts.Count>0)
         {
             SelectNft(0);
@@ -161,9 +160,10 @@ public class NftSelection : MonoBehaviour
         foreach (NFT _nft in currentNfts)
         {
             _nft.RecoveryEndDate = DateTime.MinValue;
-            if (DataManager.Instance.PlayerData.IsKittyHurt(_nft.imageUrl))
+            DateTime _endRecovery = DataManager.Instance.GameData.GetKittyRecoveryDate(_nft.imageUrl);
+            if (_endRecovery!=default)
             {
-                _nft.RecoveryEndDate = DataManager.Instance.PlayerData.GetKittyRecoveryDate(_nft.imageUrl);
+                _nft.RecoveryEndDate = _endRecovery;
             }
             
             nftButtons[_idx].GetComponent<NFTImageButton>().SetTexture(_nft.imageTex);

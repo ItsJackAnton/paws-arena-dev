@@ -1,4 +1,3 @@
-using System;
 using Photon.Pun;
 using TMPro;
 using UnityEngine;
@@ -66,7 +65,7 @@ public class GameplayPVPLevelBar : MonoBehaviour
         photonView.RPC(nameof(TellOpponentMyExp),RpcTarget.Others,_experience);
     }
 
-    private void ShowProgress(int _experience)
+    private void ShowProgress(double _experience)
     {
         int _level;
         int _expForNextLevel;
@@ -79,8 +78,9 @@ public class GameplayPVPLevelBar : MonoBehaviour
     }
 
     [PunRPC]
-    private void TellOpponentMyExp(int _experience)
+    private void TellOpponentMyExp(double _experience)
     {
+        Debug.Log("Opponents experience: "+_experience);
         ShowProgress(_experience);
     }
 }

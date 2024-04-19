@@ -41,15 +41,7 @@ public class ConnectingToServer : MonoBehaviour
     
     private void SetupNftData()
     {
-        //MockNfts();
         UpdateNfts();
-        if (GameState.nfts.Count==0)
-        {
-            GameState.nfts.Add(new NFT()
-            {
-                imageUrl = "https://rw7qm-eiaaa-aaaak-aaiqq-cai.raw.icp0.io/?&tokenid=cad6v-gqkor-uwiaa-aaaaa-cqace-eaqca-aadvq-a"
-            });
-        }
     }
 
     private void MockNfts()
@@ -67,7 +59,13 @@ public class ConnectingToServer : MonoBehaviour
         }
     }
 
-    public static void UpdateNfts()
+    public static void ReloadNfts()
+    {
+        GameState.nfts.Clear();
+        UpdateNfts();
+    }
+
+    private static void UpdateNfts()
     {
         var _nftCollectionsResult = BoomDaoUtility.Instance.GetNftData;
         if (_nftCollectionsResult.IsErr)
@@ -92,6 +90,14 @@ public class ConnectingToServer : MonoBehaviour
                 GameState.nfts.Add(new NFT { imageUrl = _token.url });
             }
             break;
+        }
+        
+        if (GameState.nfts.Count==0)
+        {
+            GameState.nfts.Add(new NFT()
+            {
+                imageUrl = "https://rw7qm-eiaaa-aaaak-aaiqq-cai.raw.icp0.io/?&tokenid=cad6v-gqkor-uwiaa-aaaaa-cqace-eaqca-aadvq-a"
+            });
         }
     }
 }

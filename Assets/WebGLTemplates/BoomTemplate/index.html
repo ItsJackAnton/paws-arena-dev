@@ -155,7 +155,7 @@
             "message",
             function (e) {
               // Make sure to check the origin property for security reasons
-              var loginWebpageUrl = "https://7p3gx-jaaaa-aaaal-acbda-cai.icp0.io";
+              var loginWebpageUrl = "{{{ LOGIN_WEBPAGE_URL }}}";
               var sanitizedUrl = loginWebpageUrl.replace(/\/+$/, "");
               if (e.origin !== sanitizedUrl) return;
 

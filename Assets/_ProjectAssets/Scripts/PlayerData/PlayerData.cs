@@ -164,10 +164,8 @@ public class PlayerData
     public const string SNACKS = "snack";
     
     public const string NAME_KEY = "username";
-    public const string KITTY_RECOVERY_KEY = "recoveryDate";
-    public const string KITTY_KEY = "kitty_id";
-    public const string USE_MILK_BOTTLE = "useMilkBottle";
-    public const string USE_MILK_GLASS = "useMilkGlass";
+    public const string USE_MILK_BOTTLE = "useMilkBottle2";
+    public const string USE_MILK_GLASS = "useMilkGlass2";
 
     public const string COMMON_SHARD = "commonShard";
     public const string UNCOMMON_SHARD = "uncommonShard";
@@ -328,23 +326,6 @@ public class PlayerData
         }
 
         throw new Exception("Unsupported type of shards: " + _type);
-    }
-
-    public bool IsKittyHurt(string _kittyId)
-    {
-        return BoomDaoUtility.Instance.DoesEntityExist(_kittyId);
-    }
-
-    public DateTime GetKittyRecoveryDate(string _kittyId)
-    {
-        double _recoveryTimeSpan = BoomDaoUtility.Instance.GetDouble(_kittyId, KITTY_RECOVERY_KEY);
-        DateTime _recoveryDate = Utilities.NanosecondsToDateTime(_recoveryTimeSpan);
-        if (_recoveryDate <= DateTime.UtcNow)
-        {
-            _recoveryDate = default;
-        }
-
-        return _recoveryDate;
     }
 
     private void CalculateLevel()

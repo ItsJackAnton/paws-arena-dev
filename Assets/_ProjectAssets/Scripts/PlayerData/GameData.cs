@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using BoomDaoWrapper;
+using Newtonsoft.Json;
 using UnityEngine;
 
 [Serializable]
@@ -62,6 +63,9 @@ public class GameData
     private const string AMOUNT_OF_REWARDS = "amountOfRewards";
     private const string TYPE = "type";
     private const string AMOUNT = "amount";
+    
+    public const string KITTY_KEY = "kittyId";
+    public const string KITTY_RECOVERY_KEY = "kittyRecovery";
 
     private List<LevelReward> seasonRewards;
 
@@ -145,6 +149,36 @@ public class GameData
             _leaderboardData.FinishSetup(3);
             return _leaderboardData;
         }
+    }
+
+
+    public DateTime GetKittyRecoveryDate(string _kittyId)
+    {
+        Debug.Log(_kittyId);
+        List<WorldDataEntry> _entries = BoomDaoUtility.Instance.GetWorldData(_kittyId);
+        double _lastRecoveryNote = double.MinValue;
+        foreach (var _worldEntry in _entries)
+        {
+            if (_worldEntry.Data == null || _worldEntry.Data.Count == 0)
+            {
+                continue;
+            }
+
+            string _recoveryEndsString = _worldEntry.GetProperty(_kittyId);
+            Debug.Log(_recoveryEndsString);
+            double _recoveryEnds = Convert.ToInt32(_recoveryEndsString.Contains('.') ? _recoveryEndsString.Split('.')[0] : _recoveryEndsString);
+            if (_recoveryEnds > _lastRecoveryNote)
+            {
+                _lastRecoveryNote = _recoveryEnds;
+            }
+        }
+
+        if (Math.Abs(_lastRecoveryNote - double.MinValue) < 1)
+        {
+            return default;
+        }
+
+        return Utilities.NanosecondsToDateTime(_lastRecoveryNote);
     }
 
     public DailyChallenges DailyChallenges

@@ -26,6 +26,7 @@ namespace BoomDaoWrapper
         private bool canLogin;
 
         public bool CanLogin => canLogin;
+        public double IcpAmount => 0;
 
         private void Awake()
         {

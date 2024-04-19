@@ -782,7 +782,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3245743282429210067, guid: bb357f1634528a149871a2f38d213b8b, type: 3}
       propertyPath: url
-      value: https://7p3gx-jaaaa-aaaal-acbda-cai.icp0.io
+      value: https://ifxbl-nyaaa-aaaap-abroa-cai.icp0.io/
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: bb357f1634528a149871a2f38d213b8b, type: 3}

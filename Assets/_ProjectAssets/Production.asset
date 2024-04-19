@@ -12,6 +12,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f9f2f0c392c5d4cdeb7956d13b49ebdd, type: 3}
   m_Name: Production
   m_EditorClassIdentifier: 
-  <DeploymentEnv_>k__BackingField: 0
+  <DeploymentEnv_>k__BackingField: 1
   WorldId: hjdu4-kiaaa-aaaap-abxuq-cai
-  WorldEnv_: 0
+  WorldEnv_: 1

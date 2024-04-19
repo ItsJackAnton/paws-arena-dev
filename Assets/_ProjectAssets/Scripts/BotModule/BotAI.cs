@@ -128,6 +128,11 @@ public class BotAI : MonoBehaviour
 
     public void Play()
     {
+        if (PlayerManager.Instance.otherPlayerHealth<=0)
+        {
+            return;
+        }
+        Debug.Log(PlayerManager.Instance.otherPlayerHealth);
         playing = true;
         foreach (var g in debugGOs) Destroy(g);
         debugGOs.Clear();
@@ -152,6 +157,11 @@ public class BotAI : MonoBehaviour
 
     private IEnumerator PlayTurn()
     {
+        if (PlayerManager.Instance.otherPlayerHealth<=0)
+        {
+            yield break;
+        }
+        
         chosenLocation = null;
 
         List<bool> moveDirs = new List<bool> { true, true };
@@ -162,6 +172,10 @@ public class BotAI : MonoBehaviour
 
         do
         {
+            if (PlayerManager.Instance.otherPlayerHealth<=0)
+            {
+                yield break;
+            }
             List<Location> potentialLocations = GetPotentialLocations(moveDirs[0], moveDirs[1], steps, stepFactor);
             
             float startThinkingTime = Time.time;
@@ -198,6 +212,11 @@ public class BotAI : MonoBehaviour
         } while (repeatMoveTo && TimeLeft > Configuration.ActionTimeTotal);
         
 
+        if (PlayerManager.Instance.otherPlayerHealth<=0)
+        {
+            yield break;
+        }
+        
         yield return StartCoroutine(Shoot());
 
         previousHP = BotManager.Instance.GetHP();
@@ -384,6 +403,10 @@ public class BotAI : MonoBehaviour
     private IEnumerator Shoot()
     {
         if (chosenLocation == null) yield break;
+        if (PlayerManager.Instance.otherPlayerHealth<=0)
+        {
+            yield break;
+        }
 
         // Weapon selection
         yield return null;
