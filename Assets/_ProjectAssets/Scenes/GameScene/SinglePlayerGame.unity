@@ -810,7 +810,8 @@ PrefabInstance:
       propertyPath: m_Name
       value: GameViewCommonUI
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 633220175, guid: 382174298f228e442aa19910d18bcf3c, type: 3}
   m_SourcePrefab: {fileID: 100100000, guid: 382174298f228e442aa19910d18bcf3c, type: 3}
 --- !u!224 &466216670 stripped
 RectTransform:
@@ -828,6 +829,47 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 14a450e44e68e7c47ae6bf3860842ad9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &466216672 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 4959308334080864501, guid: 382174298f228e442aa19910d18bcf3c, type: 3}
+  m_PrefabInstance: {fileID: 466216669}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &466216673 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 83316342888801083, guid: 382174298f228e442aa19910d18bcf3c, type: 3}
+  m_PrefabInstance: {fileID: 466216669}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!1 &466216674 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1222981535529419567, guid: 382174298f228e442aa19910d18bcf3c, type: 3}
+  m_PrefabInstance: {fileID: 466216669}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &466216675
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 466216674}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5e293e0fbe6ac6040bfbdeddc3f62a4f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  levelDisplay: {fileID: 466216672}
+  levelBar: {fileID: 466216673}
 --- !u!1 &485704608
 GameObject:
   m_ObjectHideFlags: 0
@@ -1868,7 +1910,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0.000061035156, y: 0}
+  m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &920054550

@@ -11,6 +11,7 @@ public class ChallengeDisplay : MonoBehaviour
     [SerializeField] private Image rewardDisplay;
     [SerializeField] private TextMeshProUGUI descDisplay;
     [SerializeField] private TextMeshProUGUI progressDisplay;
+    [SerializeField] private TextMeshProUGUI amountDisplay;
     [SerializeField] private GameObject completed;
 
     private ChallengeProgress challengeProgress;
@@ -21,6 +22,12 @@ public class ChallengeDisplay : MonoBehaviour
         claimHolder.SetActive(false);
         challengeProgress = _progress;
         ChallengeData _challengeData = DataManager.Instance.GameData.GetChallengeByIdentifier(_progress.Identifier);
+        if (_challengeData==null)
+        {
+            Destroy(gameObject);
+            return;
+        }
+        amountDisplay.text = "x" + _challengeData.RewardAmount;
         if (_progress.Completed)
         {
             if (_progress.Claimed || _progress.IsClaiming)
@@ -40,7 +47,7 @@ public class ChallengeDisplay : MonoBehaviour
             progressDisplay.text = $"{_progress.Value}/{_challengeData.AmountNeeded}";
         }
 
-        rewardDisplay.sprite = AssetsManager.Instance.GetItemSprite(_challengeData.RewardType);
+        rewardDisplay.sprite = AssetsManager.Instance.GetChallengeReward(_challengeData.RewardType);
     }
 
     private void OnEnable()

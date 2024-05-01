@@ -185,7 +185,7 @@ public class PlayerCustomization : MonoBehaviour
     private List<SpriteEquipment> groundEquipment;
 
     [HideInInspector]
-    public Dictionary<EquipmentType, Equipment> playerEquipmentConfig;
+    public Dictionary<EquipmentType, Equipment> playerEquipmentConfig = new Dictionary<EquipmentType, Equipment>();
 
     private string url;
 
@@ -528,7 +528,7 @@ public class PlayerCustomization : MonoBehaviour
         return KittiesCustomizationService.SaveOriginalConfig(url, playerEquipmentConfig);
     }
 
-    private bool FindBySprite(Sprite sprite, List<SpriteEquipment> equipment, Action<string> callback)
+    public bool FindBySprite(Sprite sprite, List<SpriteEquipment> equipment, Action<string> callback)
     {
         int idx = equipment.FindIndex(el => el.sprite == sprite);
         if (idx != -1)

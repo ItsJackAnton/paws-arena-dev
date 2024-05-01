@@ -1,12 +1,9 @@
 using Photon.Pun;
-using TMPro;
 using UnityEngine;
-using UnityEngine.UI;
 
-public class GameplayPVPLevelBar : MonoBehaviour
+public class GameplayPVPLevelBar : GameplayLevelBarBase
 {
-    [SerializeField] private TextMeshProUGUI levelDisplay;
-    [SerializeField] private Image levelBar;
+   
     [SerializeField] private bool isForMasterClient;
 
     private PhotonView photonView;
@@ -64,18 +61,7 @@ public class GameplayPVPLevelBar : MonoBehaviour
         }
         photonView.RPC(nameof(TellOpponentMyExp),RpcTarget.Others,_experience);
     }
-
-    private void ShowProgress(double _experience)
-    {
-        int _level;
-        int _expForNextLevel;
-        int _expOnCurrentLevel;
-
-        PlayerData.CalculateLevel(_experience, out _level, out _expForNextLevel, out _expOnCurrentLevel);
-
-        levelDisplay.text = _level.ToString();
-        levelBar.fillAmount = (float)_expOnCurrentLevel / _expForNextLevel;
-    }
+    
 
     [PunRPC]
     private void TellOpponentMyExp(double _experience)

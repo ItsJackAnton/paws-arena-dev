@@ -132,7 +132,7 @@ public class BotAI : MonoBehaviour
         {
             return;
         }
-        Debug.Log(PlayerManager.Instance.otherPlayerHealth);
+        
         playing = true;
         foreach (var g in debugGOs) Destroy(g);
         debugGOs.Clear();

@@ -21,12 +21,13 @@ namespace BoomDaoWrapper
 
         public const string AMOUNT_KEY = "amount";
         public const string VALUE_KEY = "value";
+        public const string ICP_KEY = "ICP";
 
         private Action loginCallback;
         private bool canLogin;
+        private Dictionary<string, double> balances = new ();
 
         public bool CanLogin => canLogin;
-        public double IcpAmount => 0;
 
         private void Awake()
         {
@@ -45,12 +46,14 @@ namespace BoomDaoWrapper
         {
             BroadcastState.Register<WaitingForResponse>(AllowLogin);
             UserUtil.AddListenerDataChangeSelf<DataTypes.Entity>(OnEntityDataChangeHandler);
+            UserUtil.AddListenerDataChangeSelf<DataTypes.Token>(TokenDataChangeHandler);
         }
 
         private void OnDisable()
         {
             BroadcastState.Unregister<WaitingForResponse>(AllowLogin);
             UserUtil.RemoveListenerDataChangeSelf<DataTypes.Entity>(OnEntityDataChangeHandler);
+            UserUtil.RemoveListenerDataChangeSelf<DataTypes.Token>(TokenDataChangeHandler);
         }
 
 
@@ -64,20 +67,48 @@ namespace BoomDaoWrapper
 
         public void Login(Action _callBack)
         {
+            Debug.Log(1);
             loginCallback = _callBack;
+            Debug.Log(2);
             Broadcast.Invoke<UserLoginRequest>();
+            Debug.Log(3);
             UserUtil.AddListenerMainDataChange<MainDataTypes.LoginData>(LoginDataChangeHandler);
+            Debug.Log(4);
         }
 
         private void LoginDataChangeHandler(MainDataTypes.LoginData _data)
         {
+            Debug.Log(5);
             if (_data.state != MainDataTypes.LoginData.State.LoggedIn)
             {
+                Debug.Log(6);
                 return;
             }
 
+            Debug.Log(7);
             UserUtil.RemoveListenerMainDataChange<MainDataTypes.LoginData>(LoginDataChangeHandler);
+            Debug.Log(8);
             loginCallback?.Invoke();
+            Debug.Log(9);
+            
+            //Update Inventory UI with Entities
+            var _allUserDataResult = UserUtil.GetAllDataSelf();
+            Debug.Log(10);
+            var _allUserDataAsOk = _allUserDataResult.AsOk();
+            Debug.Log(11);
+            TokenDataChangeHandler(_allUserDataAsOk.tokenData);
+        }
+
+        public void Logout(Action _callBack)
+        {
+            Broadcast.Register<UserLogout>(UserLogoutHandler);
+            Broadcast.Invoke<UserLogout>();
+
+            void UserLogoutHandler(UserLogout _obj)
+            {
+                Broadcast.Unregister<UserLogout>(UserLogoutHandler);
+                _callBack?.Invoke();
+            }
         }
 
         #endregion
@@ -90,7 +121,7 @@ namespace BoomDaoWrapper
             if (_actionResult.IsErr)
             {
                 string _errorMessage = _actionResult.AsErr().content;
-                Debug.LogError(_errorMessage);
+                Debug.Log("Failed: "+_errorMessage);
                 _callBack?.Invoke(default);
                 _onError?.Invoke();
                 return;
@@ -129,7 +160,7 @@ namespace BoomDaoWrapper
                 bool _fieldAmountFound = _entityEdit.TryGetOutcomeFieldAsDouble(AMOUNT_KEY, out var _amount);
                 if (_fieldAmountFound == false)
                 {
-                    break;
+                    continue;
                 }
 
                 _incrementalOutcomes.Add(new ActionOutcome { Name = _entityId, Value = _amount.Value });
@@ -364,6 +395,49 @@ namespace BoomDaoWrapper
         {
             UserUtil.RemoveListenerDataChange<DataTypes.NftCollection>(HandleNftsReloaded, UserUtil.GetPrincipal());
             OnUpdatedNftsData?.Invoke();
+        }
+        
+        private void TokenDataChangeHandler(Data<DataTypes.Token> data)
+        {
+            //Update action button
+
+            foreach (var _element in data.elements)
+            {
+                var _balance = _element.Value;
+
+                if (_balance.TryGetTokenConfig(out var _tokenConfig) == false)
+                {
+                    continue;
+                }
+
+                string _key = _tokenConfig.symbol;
+                double _value = _balance.baseUnitAmount.ConvertToDecimal(_tokenConfig.decimals);
+                if (balances.ContainsKey(_key))
+                {
+                    bool _shouldInvoke = balances[_key] != _value;
+                    
+                    balances[_key] = _value;
+                    if (_shouldInvoke)
+                    {
+                        PlayerData.OnUpdatedToken?.Invoke();
+                    }
+                }
+                else
+                {
+                    balances.Add(_key, _value);
+                    PlayerData.OnUpdatedToken?.Invoke();
+                }
+            }
+        }
+
+        public double GetTokenBalance(string _key)
+        {
+            if (balances.ContainsKey(_key))
+            {
+                return balances[_key];
+            }
+
+            return 0;
         }
 
         #endregion

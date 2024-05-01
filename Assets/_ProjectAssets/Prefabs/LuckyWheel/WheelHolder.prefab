@@ -2114,7 +2114,7 @@ GameObject:
   - component: {fileID: 4324128802254971313}
   - component: {fileID: 4324128802254971318}
   m_Layer: 5
-  m_Name: GiftReward
+  m_Name: MilkBottle
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2157,7 +2157,7 @@ MonoBehaviour:
   shakingScale: {x: 1.4, y: 1.4, z: 1.4}
   shadowHolder: {fileID: 4324128802386977835}
   cristalHolder: {fileID: 4324128803100018621}
-  rewardType: 12
+  rewardType: 6
 --- !u!1 &4324128802302725505
 GameObject:
   m_ObjectHideFlags: 0
@@ -3099,7 +3099,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 4, y: -267.45}
-  m_SizeDelta: {x: 135.66, y: 173.69}
+  m_SizeDelta: {x: 166.75, y: 184}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &4324128803100018563
 CanvasRenderer:
@@ -3129,7 +3129,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: b64b7454034913441b043f88d7827f29, type: 3}
+  m_Sprite: {fileID: 21300000, guid: d8767927beb3c1946bcf5cc014a51898, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1

@@ -8,6 +8,7 @@ using UnityEngine;
 public class ChallengesManager : MonoBehaviour
 {
     public static Action OnChallengeClaimed;
+    public static Action OnCreatedNewChallenges;
     public const int AMOUNT_OF_CHALLENGES = 3;
     
     public const string GENERATE_DAILY_CHALLENGE = "generateDailyChallenge";
@@ -71,6 +72,7 @@ public class ChallengesManager : MonoBehaviour
                 return;
             }
         }
+        
         challengesToClaim.Add(_challengeProgress);
         TryClaim();
     }
@@ -233,12 +235,14 @@ public class ChallengesManager : MonoBehaviour
                 long _nextResetTime = Utilities.DateTimeToNanoseconds(DateTime.UtcNow.AddDays(1));
                 List<ActionParameter> _parameters = new List<ActionParameter> { new() { Key = NEXT_RESET, Value = _nextResetTime.ToString() } };
                 BoomDaoUtility.Instance.ExecuteActionWithParameter(SET_RESET_TIME,_parameters, Finish);
+                Debug.Log("Finished");
             }
         }
 
         void Finish(List<ActionOutcome> _)
         {
             SubscribeEvents();
+            OnCreatedNewChallenges?.Invoke();
             _callBack?.Invoke();
         }
     }

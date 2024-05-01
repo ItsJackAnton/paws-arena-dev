@@ -74,7 +74,6 @@ public class NetworkManager : MonoBehaviour
             www.SetRequestHeader("Authorization", "Basic aWNraXR0aWVzXzE5MDk5MjAzOjJXWi1FM31Xb3dwaGxzIzQyMyNAMSVncnI=");
 
         }
-        Debug.Log(GameState.principalId);
         await www.SendWebRequest();
 
         if (www.error != null)

@@ -9,7 +9,6 @@ public class LuckyWheelRewardSO : ScriptableObject
     [field: SerializeField] public ItemType Type { get; private set; }
     [field: SerializeField] public float Amount { get; private set; }
     [field: SerializeField] public Sprite Sprite { get; private set; }
-    [field: SerializeField] public int Chances { get; private set; }
     [field: SerializeField] public string Name { get; private set; }
     [field: SerializeField] public string Key { get; private set; }
     [field: SerializeField] public float MinRotation { get; private set; }
@@ -23,23 +22,6 @@ public class LuckyWheelRewardSO : ScriptableObject
         return allRewards.ToList();
     }
 
-    public static LuckyWheelRewardSO GetReward()
-    {
-        LoadAllRewards();
-
-        List<int> _listOfRewardIds = new List<int>();
-        foreach (var _reward in allRewards)
-        {
-            for (int i = 0; i < _reward.Chances; i++)
-            {
-                _listOfRewardIds.Add(_reward.Id);
-            }
-        }
-        _listOfRewardIds = _listOfRewardIds.OrderBy(element => System.Guid.NewGuid()).ToList();
-        int _randomId = _listOfRewardIds[Random.Range(0, _listOfRewardIds.Count)];
-        return Get(_randomId);
-    }
-
     public static LuckyWheelRewardSO Get(int _id)
     {
         LoadAllRewards();
@@ -50,7 +32,7 @@ public class LuckyWheelRewardSO : ScriptableObject
     {
         LoadAllRewards();
         return allRewards.First(element => 
-            Utilities.RemoveWhitespacesUsingRegex(element.Name).ToLower() == Utilities.RemoveWhitespacesUsingRegex
+            Utilities.RemoveWhitespacesUsingRegex(element.Key).ToLower() == Utilities.RemoveWhitespacesUsingRegex
         (_key).ToLower());
     }
     private static void LoadAllRewards()

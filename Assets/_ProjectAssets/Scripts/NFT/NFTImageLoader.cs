@@ -91,7 +91,15 @@ public class NFTImageLoader
         {
             var id = image.Attributes["id"];
             if (id == null) continue;
-
+            if (id.Value == "Background")
+            {
+                string _href = image.Attributes["href"].Value;
+                string _hrefLast6 = _href.Substring(_href.Length - 6);
+                if ("Jggg==" == _hrefLast6)
+                {
+                    id.Value = "bg2";
+                }
+            }
             Sprite sprite = Resources.Load<Sprite>("KittiesParts/" + id.Value);
             if (sprite == null)
             {

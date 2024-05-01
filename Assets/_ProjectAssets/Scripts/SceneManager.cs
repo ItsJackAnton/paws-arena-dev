@@ -7,7 +7,9 @@ public class SceneManager : MonoBehaviour
     private const string LEADERBOARD = "Leaderboard";
     private const string TUTORIAL = "Tutorial";
     private const string AFTER_GAME = "AfterGame";
+    private const string LOGIN_SCENE = "Login";
     public const string GAME_ROOM = "GameRoom";
+    public const string GAME_ROOM_SPECTATOR = "GameRoomSpectator";
     public const string SINGLE_PLAYER = "SinglePlayerGameRoom";
     public const string GAME_SCENE = "GameScene";
     public const string SINGLE_PLAYER_GAME = "SinglePlayerGame";
@@ -29,6 +31,11 @@ public class SceneManager : MonoBehaviour
     public void LoadNftSelection()
     {
         LoadScene(NFT_SELECTION);
+    }    
+    
+    public void LoadLoginScene()
+    {
+        LoadScene(LOGIN_SCENE);
     }
 
     public void LoadLeaderboard()

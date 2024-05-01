@@ -127,8 +127,6 @@ public static class Utilities
                 return "Weapon skin";
             case ItemType.SeasonExperience:
                 return "Season experience";
-            case ItemType.Present:
-                return "Present";
             default:
                 throw new Exception($"Dont know how to convert {_type} to a name");
         }

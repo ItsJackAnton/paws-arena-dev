@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using UnityEngine;
 
@@ -8,12 +9,18 @@ public class ChallengeAlert : MonoBehaviour
     private void OnEnable()
     {
         ChallengesPanel.OnClosed += CheckForAlert;
-        CheckForAlert();
+        ChallengesManager.OnCreatedNewChallenges += CheckForAlert;
     }
 
     private void OnDisable()
     {
         ChallengesPanel.OnClosed -= CheckForAlert;
+        ChallengesManager.OnCreatedNewChallenges -= CheckForAlert;
+    }
+
+    private void Start()
+    {
+        CheckForAlert();
     }
 
     private void CheckForAlert()

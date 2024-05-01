@@ -136,7 +136,7 @@ public class RecoveryDropDown : MonoBehaviour
                     {
                         new ()
                         {
-                            Key = GameData.KITTY_KEY,
+                            Key = PlayerData.KITTY_KEY,
                             Value = GameState.selectedNFT.imageUrl
                         }
                     },
@@ -158,7 +158,7 @@ public class RecoveryDropDown : MonoBehaviour
                     {
                         new ()
                         {
-                            Key = GameData.KITTY_KEY,
+                            Key = PlayerData.KITTY_KEY,
                             Value = GameState.selectedNFT.imageUrl
                         }
                     },

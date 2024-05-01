@@ -15,5 +15,4 @@ public enum ItemType
     Emote = 9,
     WeaponSkin = 10,
     SeasonExperience = 11,
-    Present = 12
 }

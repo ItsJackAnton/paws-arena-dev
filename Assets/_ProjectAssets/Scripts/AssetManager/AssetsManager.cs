@@ -6,6 +6,7 @@ public class AssetsManager : MonoBehaviour
 {
     public static AssetsManager Instance;
     [SerializeField] private List<ItemSprite> items;
+    [SerializeField] private List<ItemSprite> rewardsForChallenges;
     
     private void Awake()
     {
@@ -20,8 +21,13 @@ public class AssetsManager : MonoBehaviour
         }
     }
 
-    public Sprite GetItemSprite(ItemType _type)
+    public Sprite GetChallengeReward(ItemType _type)
     {
-        return items.Find(_item => _item.Type == _type).Sprite;
+        var _itemSprite = rewardsForChallenges.Find(_item => _item.Type == _type);
+        if (_itemSprite==null)
+        {
+            throw new Exception("Not found: " + _type.ToString());
+        }
+        return _itemSprite.Sprite;
     }
 }

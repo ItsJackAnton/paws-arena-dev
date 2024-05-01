@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using BoomDaoWrapper;
+using Newtonsoft.Json;
 using UnityEngine;
 
 [Serializable]
@@ -18,6 +19,10 @@ public class ChallengeProgress
         get
         {
             ChallengeData _challengeData = DataManager.Instance.GameData.GetChallengeByIdentifier(Identifier);
+            if (_challengeData == null)
+            {
+                return false;
+            }
             return _challengeData.AmountNeeded - Value <= 0;
         }
     }

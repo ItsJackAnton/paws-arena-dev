@@ -97,6 +97,8 @@ namespace com.colorfulcoding.GameScene
                 Debug.Log("Registering match end");
                 Debug.Log(reqJson);
             }
+            
+            Debug.Log("Registering match ended: "+reqJson+ " my principal: "+GameState.principalId);
 
             await NetworkManager.POSTRequest(
                 "/leaderboard/match",

@@ -11,7 +11,7 @@ namespace com.colorfulcoding.AfterGame
     public class AfterGameMainTitle : MonoBehaviour
     {
         private const string BATTLE_LOST_ACTION_KEY = "battle_outcome_lost";
-        private const string HURT_KITTY = "setHurtKitty";
+        private const string HURT_KITTY = "hurtKitty";
         
         private const string SET_LEADERBOARD_POINTS = "setLeaderboardPoints";
         
@@ -155,8 +155,8 @@ namespace com.colorfulcoding.AfterGame
             BoomDaoUtility.Instance.ExecuteActionWithParameter(HURT_KITTY,
                 new List<ActionParameter>
                 {
-                    new() { Key = GameData.KITTY_KEY, Value = GameState.selectedNFT.imageUrl },
-                    new() { Key = GameData.KITTY_RECOVERY_KEY, Value = Utilities.DateTimeToNanoseconds(_recoveryEnds).ToString() },
+                    new() { Key = PlayerData.KITTY_RECOVERY_KEY, Value = Utilities.DateTimeToNanoseconds(_recoveryEnds).ToString() },
+                    new() { Key = PlayerData.KITTY_KEY, Value = GameState.selectedNFT.imageUrl }
                 }, null);
 
         }

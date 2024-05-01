@@ -41,10 +41,6 @@ public class GameState
     public static void SetSelectedNFT(NFT nft)
     {
         selectedNFT = nft;
-        if (selectedNFT!=default && selectedNFT!=null)
-        {
-            Debug.Log(nft.imageUrl);
-        }
         onSelectedNFT?.Invoke(nft);
     }
 

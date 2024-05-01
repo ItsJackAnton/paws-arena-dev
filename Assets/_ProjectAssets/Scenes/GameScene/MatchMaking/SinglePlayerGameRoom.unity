@@ -183,8 +183,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: Start
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: f4d58a291f8cbba40ba86d0ac4c0a0fb, type: 2}
-  m_sharedMaterial: {fileID: 6169304860602608294, guid: f4d58a291f8cbba40ba86d0ac4c0a0fb, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -460,35 +460,67 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 3002715104751845745, guid: 3ddbb28528722d14da313ecf3c217c44, type: 3}
       propertyPath: m_LocalRotation.w
-      value: 0.53286225
+      value: 0.52297866
+      objectReference: {fileID: 0}
+    - target: {fileID: 3002715104751845745, guid: 3ddbb28528722d14da313ecf3c217c44, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0.00000004111811
+      objectReference: {fileID: 0}
+    - target: {fileID: 3002715104751845745, guid: 3ddbb28528722d14da313ecf3c217c44, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: -0.00000002636698
       objectReference: {fileID: 0}
     - target: {fileID: 3002715104751845745, guid: 3ddbb28528722d14da313ecf3c217c44, type: 3}
       propertyPath: m_LocalRotation.z
-      value: 0.8462021
+      value: 0.8523458
       objectReference: {fileID: 0}
     - target: {fileID: 3002715104931479554, guid: 3ddbb28528722d14da313ecf3c217c44, type: 3}
       propertyPath: m_LocalRotation.w
-      value: 0.97436565
+      value: 0.9675406
+      objectReference: {fileID: 0}
+    - target: {fileID: 3002715104931479554, guid: 3ddbb28528722d14da313ecf3c217c44, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0.000000011743779
+      objectReference: {fileID: 0}
+    - target: {fileID: 3002715104931479554, guid: 3ddbb28528722d14da313ecf3c217c44, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0.000000039125112
       objectReference: {fileID: 0}
     - target: {fileID: 3002715104931479554, guid: 3ddbb28528722d14da313ecf3c217c44, type: 3}
       propertyPath: m_LocalRotation.z
-      value: 0.22497027
+      value: 0.25271568
       objectReference: {fileID: 0}
     - target: {fileID: 3002715104983581971, guid: 3ddbb28528722d14da313ecf3c217c44, type: 3}
       propertyPath: m_LocalRotation.w
-      value: 0.9959376
+      value: 0.99969244
+      objectReference: {fileID: 0}
+    - target: {fileID: 3002715104983581971, guid: 3ddbb28528722d14da313ecf3c217c44, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0.000000025912966
+      objectReference: {fileID: 0}
+    - target: {fileID: 3002715104983581971, guid: 3ddbb28528722d14da313ecf3c217c44, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 6.429531e-10
       objectReference: {fileID: 0}
     - target: {fileID: 3002715104983581971, guid: 3ddbb28528722d14da313ecf3c217c44, type: 3}
       propertyPath: m_LocalRotation.z
-      value: 0.09004683
+      value: -0.024802739
       objectReference: {fileID: 0}
     - target: {fileID: 3002715106646535731, guid: 3ddbb28528722d14da313ecf3c217c44, type: 3}
       propertyPath: m_LocalRotation.w
-      value: 0.9997727
+      value: 0.9953872
+      objectReference: {fileID: 0}
+    - target: {fileID: 3002715106646535731, guid: 3ddbb28528722d14da313ecf3c217c44, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 4.0579196e-10
+      objectReference: {fileID: 0}
+    - target: {fileID: 3002715106646535731, guid: 3ddbb28528722d14da313ecf3c217c44, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: -0.0000000037057488
       objectReference: {fileID: 0}
     - target: {fileID: 3002715106646535731, guid: 3ddbb28528722d14da313ecf3c217c44, type: 3}
       propertyPath: m_LocalRotation.z
-      value: 0.021322798
+      value: 0.0959399
       objectReference: {fileID: 0}
     - target: {fileID: 9122209185718362652, guid: 3ddbb28528722d14da313ecf3c217c44, type: 3}
       propertyPath: m_RootOrder
@@ -1010,11 +1042,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   punRoomUtils: {fileID: 99993738}
+  syncPlatformsBehaviour: {fileID: 0}
   notices: {fileID: 1892852136}
   seats:
   - occupierNickname: {fileID: 2039981638}
   - occupierNickname: {fileID: 865860924}
   countdown: {fileID: 82973068}
+  wheelHolder: {fileID: 0}
 --- !u!114 &594010647
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2086,6 +2120,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4f231c4fb786f3946a6b90b886c48677, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  m_SendPointerHoverToParent: 1
   m_HorizontalAxis: Horizontal
   m_VerticalAxis: Vertical
   m_SubmitButton: Submit

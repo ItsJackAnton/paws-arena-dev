@@ -9,17 +9,17 @@ public class IcpDisplay : MonoBehaviour
 
     private void OnEnable()
     {
-        PlayerData.OnUpdatedSnacks += ShowSnacks;
-        ShowSnacks();
+        PlayerData.OnUpdatedToken += ShowIcp;
+        ShowIcp();
     }
 
     private void OnDisable()
     {
-        PlayerData.OnUpdatedSnacks -= ShowSnacks;
+        PlayerData.OnUpdatedToken -= ShowIcp;
     }
 
-    private void ShowSnacks()
+    private void ShowIcp()
     {
-        icpAmountDisplay.text = BoomDaoUtility.Instance.IcpAmount.ToString(CultureInfo.InvariantCulture);
+        icpAmountDisplay.text = BoomDaoUtility.Instance.GetTokenBalance(BoomDaoUtility.ICP_KEY).ToString(CultureInfo.InvariantCulture);
     }
 }

@@ -1,13 +1,17 @@
+using System;
 using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using System.Collections.Generic;
 using BoomDaoWrapper;
+using Newtonsoft.Json;
 
 public class LuckyWheelUI : MonoBehaviour
 {
     private const string BATTLE_WON_ACTION_KEY = "battle_outcome_won";
+
+    public static Action OnClaimed;
     
     [SerializeField] private GameObject playerPlatform;
     [SerializeField] private LuckyWheel luckyWheel;
@@ -55,11 +59,8 @@ public class LuckyWheelUI : MonoBehaviour
                 case PlayerData.RARE_SHARD:
                 case PlayerData.EPIC_SHARD:
                 case PlayerData.LEGENDARY_SHARD:
+                case PlayerData.MILK_BOTTLE:
                     choosenReward = LuckyWheelRewardSO.Get(_reward.Name);
-                    break;
-                case "gift":
-                    Debug.Log("Received gift");
-                    choosenReward = LuckyWheelRewardSO.Get(1);
                     break;
                 default:
                     Debug.Log($"Don't know how to handle {_reward.Value} of {_reward.Name}");
@@ -118,32 +119,6 @@ public class LuckyWheelUI : MonoBehaviour
 
     private void Claim(LuckyWheelRewardSO _reward)
     {
-        //todo increase amount of crystals
-        switch (_reward.Type)
-        {
-            case ItemType.CommonShard:
-                // DataManager.Instance.PlayerData.Crystals.CommonCrystal++;
-                break;
-            case ItemType.UncommonShard:
-                // DataManager.Instance.PlayerData.Crystals.UncommonCrystal++;
-                break;
-            case ItemType.RareShard:
-                // DataManager.Instance.PlayerData.Crystals.RareCrystal++;
-                break;
-            case ItemType.EpicShard:
-                // DataManager.Instance.PlayerData.Crystals.EpicCrystal++;
-                break;
-            case ItemType.LegendaryShard:
-                // DataManager.Instance.PlayerData.Crystals.LegendaryCrystal++;
-                break;
-            case ItemType.GlassOfMilk:
-                EquipmentData = equipments.CraftItem();
-                DataManager.Instance.PlayerData.AddOwnedEquipment(EquipmentData.Id);
-                break;
-            default:
-                throw new System.Exception("Dont know how to reward reward type: " + _reward.Type);
-        }
-
         rewardDisplay.Setup(_reward,CloseAfterClaim);
     }
 
@@ -153,6 +128,8 @@ public class LuckyWheelUI : MonoBehaviour
         {
             gameObject.SetActive(false);
         }
+        
+        OnClaimed?.Invoke();
     }
 
     private void Respin()

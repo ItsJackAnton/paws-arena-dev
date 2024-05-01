@@ -37,7 +37,7 @@ public class LuckyWheelClaimDisplay : MonoBehaviour
     private void Close()
     {
         closeButton.interactable = false;
-        PUNRoomUtils _roomUtilities= GameObject.FindObjectOfType<PUNRoomUtils>();
+        PUNRoomUtils _roomUtilities= FindObjectOfType<PUNRoomUtils>();
         if (_roomUtilities!=null)
         {
             _roomUtilities.TryLeaveRoom();

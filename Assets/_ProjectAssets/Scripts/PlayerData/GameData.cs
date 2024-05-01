@@ -64,9 +64,6 @@ public class GameData
     private const string TYPE = "type";
     private const string AMOUNT = "amount";
     
-    public const string KITTY_KEY = "kittyId";
-    public const string KITTY_RECOVERY_KEY = "kittyRecovery";
-
     private List<LevelReward> seasonRewards;
 
     public int SeasonNumber => BoomDaoUtility.Instance.GetConfigDataAsInt(SEASON_KEY, SEASON_NUMBER);
@@ -75,7 +72,6 @@ public class GameData
     public bool HasSeasonEnded => DateTime.UtcNow > SeasonEnds;
     public bool HasSeasonStarted => DateTime.UtcNow > SeasonStarts;
     public bool IsSeasonActive => HasSeasonStarted && !HasSeasonEnded;
-    
     public double GlassOfMilkPrice => BoomDaoUtility.Instance.GetConfigDataAsDouble(GLASS_MILK_PRICE, PRICE_TAG);
 
     public double JugOfMilkPrice => BoomDaoUtility.Instance.GetConfigDataAsDouble(BOTTLE_MILK_PRICE, PRICE_TAG);
@@ -136,6 +132,10 @@ public class GameData
             foreach (var _worldEntry in _entries)
             {
                 string _pointsString = _worldEntry.GetProperty(LEADERBOARD_POINTS);
+                if (_worldEntry.GetProperty(LEADERBOARD_NICK_NAME)== null)
+                {
+                    continue;
+                }
                 int _points = Convert.ToInt32(_pointsString.Contains('.') ? _pointsString.Split('.')[0] : _pointsString);
                 _leaderboardData.Entries.Add(new LeaderboardEntries
                 {
@@ -149,36 +149,6 @@ public class GameData
             _leaderboardData.FinishSetup(3);
             return _leaderboardData;
         }
-    }
-
-
-    public DateTime GetKittyRecoveryDate(string _kittyId)
-    {
-        Debug.Log(_kittyId);
-        List<WorldDataEntry> _entries = BoomDaoUtility.Instance.GetWorldData(_kittyId);
-        double _lastRecoveryNote = double.MinValue;
-        foreach (var _worldEntry in _entries)
-        {
-            if (_worldEntry.Data == null || _worldEntry.Data.Count == 0)
-            {
-                continue;
-            }
-
-            string _recoveryEndsString = _worldEntry.GetProperty(_kittyId);
-            Debug.Log(_recoveryEndsString);
-            double _recoveryEnds = Convert.ToInt32(_recoveryEndsString.Contains('.') ? _recoveryEndsString.Split('.')[0] : _recoveryEndsString);
-            if (_recoveryEnds > _lastRecoveryNote)
-            {
-                _lastRecoveryNote = _recoveryEnds;
-            }
-        }
-
-        if (Math.Abs(_lastRecoveryNote - double.MinValue) < 1)
-        {
-            return default;
-        }
-
-        return Utilities.NanosecondsToDateTime(_lastRecoveryNote);
     }
 
     public DailyChallenges DailyChallenges
@@ -231,7 +201,20 @@ public class GameData
         return _challengeData;
     }
 
-    public ChallengeData GetChallengeByIdentifier(string _identifier)=>DataManager.Instance.GameData.DailyChallenges.Challenges.Find(_challenge => _challenge.Identifier == _identifier);
+    public ChallengeData GetChallengeByIdentifier(string _identifier)
+    {
+        if (DataManager.Instance.GameData.DailyChallenges==null)
+        {
+            return null;
+        }
+        
+        if (DataManager.Instance.GameData.DailyChallenges.Challenges==null)
+        {
+            return null;
+        }
+        
+        return DataManager.Instance.GameData.DailyChallenges.Challenges.Find(_challenge => _challenge.Identifier == _identifier);
+    }
 
     public int GetChallengeIndex(ChallengeProgress _challengeProgress)
     {

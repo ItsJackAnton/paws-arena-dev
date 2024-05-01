@@ -21,6 +21,7 @@ public class NftSelection : MonoBehaviour
     [SerializeField] private Button reloadNoKitty;
     [SerializeField] private GameObject noNftsMessage;
     [SerializeField] private Button enterArena;
+    [SerializeField] private Button signOut;
     
     private List<GameObject> nftButtons = new();
     private GameObject playerPlatform;
@@ -36,6 +37,7 @@ public class NftSelection : MonoBehaviour
         reload.onClick.AddListener(RequestReload);
         reloadNoKitty.onClick.AddListener(RequestReload);
         pages.OnClick += OnPageSelected;
+        signOut.onClick.AddListener(SignOut);
         BoomDaoUtility.OnUpdatedNftsData += ReloadNfts;
         GameState.SetSelectedNFT(null);
         
@@ -47,6 +49,7 @@ public class NftSelection : MonoBehaviour
         enterArena.onClick.RemoveListener(EnterArena);
         reload.onClick.RemoveListener(RequestReload);
         reloadNoKitty.onClick.RemoveListener(RequestReload);
+        signOut.onClick.RemoveListener(SignOut);
         ClearShownNfts();
         if (playerPlatform != null)
         {
@@ -57,6 +60,16 @@ public class NftSelection : MonoBehaviour
 
         pages.OnClick -= OnPageSelected;
         BoomDaoUtility.OnUpdatedNftsData -= ReloadNfts;
+    }
+
+    private void SignOut()
+    {
+        BoomDaoUtility.Instance.Logout(ShowLoginScene);
+    }
+
+    private void ShowLoginScene()
+    {
+        SceneManager.Instance.LoadLoginScene();
     }
 
     private void EnterArena()
@@ -160,10 +173,9 @@ public class NftSelection : MonoBehaviour
         foreach (NFT _nft in currentNfts)
         {
             _nft.RecoveryEndDate = DateTime.MinValue;
-            DateTime _endRecovery = DataManager.Instance.GameData.GetKittyRecoveryDate(_nft.imageUrl);
-            if (_endRecovery!=default)
+            if (DataManager.Instance.PlayerData.IsKittyHurt(_nft.imageUrl))
             {
-                _nft.RecoveryEndDate = _endRecovery;
+                _nft.RecoveryEndDate = DataManager.Instance.PlayerData.GetKittyRecoveryDate(_nft.imageUrl);
             }
             
             nftButtons[_idx].GetComponent<NFTImageButton>().SetTexture(_nft.imageTex);

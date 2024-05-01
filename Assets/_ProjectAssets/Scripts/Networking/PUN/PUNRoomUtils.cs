@@ -46,7 +46,7 @@ public class PUNRoomUtils : MonoBehaviourPunCallbacks
     {
         return PhotonNetwork.CurrentRoom.Players.Select(kvp => kvp.Value).Where(player => !player.IsLocal).ToList();
     }
-
+    
     public override void OnPlayerEnteredRoom(Player newPlayer)
     {
         Debug.Log($"Player Joined room {newPlayer.NickName}");

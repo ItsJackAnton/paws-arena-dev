@@ -146,24 +146,6 @@ public class LobbyUIManager : MonoBehaviour
         photonManager.Connect();
     }
 
-    public void TryConnectToFriendlyRoom(string _name)
-    {
-        if (!GameState.selectedNFT.CanFight)
-        {
-            RecoveryMessageDisplay.Instance.ShowMessage();
-            OpenNFTSelectionScreen();
-            return;
-        }
-
-        photonManager.OnConnectedServer += () =>
-        {
-            connectingToRoomText.text = "Connected succeeded!";
-            lobbyPhotonConnection.photonManager.JoinFriendlyRoom(_name);;
-        };
-
-        photonManager.Connect();
-    }
-
     public void GoToConnecting()
     {
         CloseGameMenu();

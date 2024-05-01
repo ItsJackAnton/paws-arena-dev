@@ -108,7 +108,7 @@ public class MainMenuUI : MonoBehaviour
         connectingToRoomText.text = "Connecting to Multiplayer Server(" + PhotonNetwork.CloudRegion + ")...";
     }
     
-    public void TryConnectToFriendlyRoom(string _name)
+    public void TryConnectToFriendlyRoom(string _name,bool _allowSpectators)
     {
         if (!GameState.selectedNFT.CanFight)
         {
@@ -120,7 +120,7 @@ public class MainMenuUI : MonoBehaviour
         photonManager.OnConnectedServer += () =>
         {
             connectingToRoomText.text = "Connected succeeded!";
-            lobbyPhotonConnection.photonManager.JoinFriendlyRoom(_name);;
+            lobbyPhotonConnection.photonManager.JoinFriendlyRoom(_name,_allowSpectators);
         };
 
         photonManager.Connect();

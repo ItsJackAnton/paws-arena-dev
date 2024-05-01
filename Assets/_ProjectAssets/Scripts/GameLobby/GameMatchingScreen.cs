@@ -28,6 +28,7 @@ public class GameMatchingScreen : MonoBehaviour
     public Countdown countdown;
 
     [SerializeField] private GameObject wheelHolder;
+    [SerializeField] private GameObject searchingForOpponent;
 
     private void OnEnable()
     {
@@ -58,6 +59,7 @@ public class GameMatchingScreen : MonoBehaviour
             {
                 StartGame();
             }
+            searchingForOpponent.SetActive(true);
         }
         else
         {
@@ -107,6 +109,7 @@ public class GameMatchingScreen : MonoBehaviour
         {
             BringBot();
         }
+        searchingForOpponent.SetActive(false);
     }
 
     [ContextMenu("Bring Bot")]
@@ -129,67 +132,78 @@ public class GameMatchingScreen : MonoBehaviour
             {
                 nickname = "Jack Sparrow",
                 l = 4,
-                kittyUrl = "https://rw7qm-eiaaa-aaaak-aaiqq-cai.raw.ic0.app/?type=thumbnail&tokenid=izapu-dakor-uwiaa-aaaaa-cqace-eaqca-aabmc-a"
+                kittyUrl = "https://rw7qm-eiaaa-aaaak-aaiqq-cai.raw.ic0.app/?type=thumbnail&tokenid=izapu-dakor-uwiaa-aaaaa-cqace-eaqca-aabmc-a",
+                SeasonProgressMultiplayer = 1.2f
             },
             new ()
             {
                 nickname = "Cat Fairy",
                 l = 4,
-                kittyUrl = "https://rw7qm-eiaaa-aaaak-aaiqq-cai.raw.ic0.app/?type=thumbnail&tokenid=pjbr5-xikor-uwiaa-aaaaa-cqace-eaqca-aabmq-a"
+                kittyUrl = "https://rw7qm-eiaaa-aaaak-aaiqq-cai.raw.ic0.app/?type=thumbnail&tokenid=pjbr5-xikor-uwiaa-aaaaa-cqace-eaqca-aabmq-a",
+                SeasonProgressMultiplayer = 1.25f
             },
             new ()
             {
                 nickname = "qrqhn",
                 l = 5,
-                kittyUrl = "https://rw7qm-eiaaa-aaaak-aaiqq-cai.raw.ic0.app/?type=thumbnail&tokenid=oeeh5-yikor-uwiaa-aaaaa-cqace-eaqca-aaar7-a"
+                kittyUrl = "https://rw7qm-eiaaa-aaaak-aaiqq-cai.raw.ic0.app/?type=thumbnail&tokenid=oeeh5-yikor-uwiaa-aaaaa-cqace-eaqca-aaar7-a",
+                SeasonProgressMultiplayer = 1.4f
             },
             new ()
             {
                 nickname = "lazy_hunter",
                 l = 1,
-                kittyUrl = "https://rw7qm-eiaaa-aaaak-aaiqq-cai.raw.ic0.app/?type=thumbnail&tokenid=kgds5-oykor-uwiaa-aaaaa-cqace-eaqca-aabyk-q"
+                kittyUrl = "https://rw7qm-eiaaa-aaaak-aaiqq-cai.raw.ic0.app/?type=thumbnail&tokenid=kgds5-oykor-uwiaa-aaaaa-cqace-eaqca-aabyk-q",
+                SeasonProgressMultiplayer = 0.5f
             },
             new ()
             {
                 nickname = "Mr. Robot",
                 l = 5,
-                kittyUrl = "https://rw7qm-eiaaa-aaaak-aaiqq-cai.raw.ic0.app/?type=thumbnail&tokenid=te62f-xykor-uwiaa-aaaaa-cqace-eaqca-aadpg-a"
+                kittyUrl = "https://rw7qm-eiaaa-aaaak-aaiqq-cai.raw.ic0.app/?type=thumbnail&tokenid=te62f-xykor-uwiaa-aaaaa-cqace-eaqca-aadpg-a",
+                SeasonProgressMultiplayer = 2
             },
             new ()
             {
                 nickname = "filipo",
                 l = 5,
-                kittyUrl = "https://rw7qm-eiaaa-aaaak-aaiqq-cai.raw.ic0.app/?type=thumbnail&tokenid=qvghj-likor-uwiaa-aaaaa-cqace-eaqca-aabp4-q"
+                kittyUrl = "https://rw7qm-eiaaa-aaaak-aaiqq-cai.raw.ic0.app/?type=thumbnail&tokenid=qvghj-likor-uwiaa-aaaaa-cqace-eaqca-aabp4-q",
+                SeasonProgressMultiplayer = 1.8f
             },
             new ()
             {
                 nickname = "Callie",
                 l = 3,
-                kittyUrl = "https://rw7qm-eiaaa-aaaak-aaiqq-cai.raw.ic0.app/?type=thumbnail&tokenid=ben3m-hykor-uwiaa-aaaaa-cqace-eaqca-aadb4-q"
+                kittyUrl = "https://rw7qm-eiaaa-aaaak-aaiqq-cai.raw.ic0.app/?type=thumbnail&tokenid=ben3m-hykor-uwiaa-aaaaa-cqace-eaqca-aadb4-q",
+                SeasonProgressMultiplayer = 1f
             },
             new ()
             {
                 nickname = "Strawberry",
                 l = 3,
-                kittyUrl = "https://rw7qm-eiaaa-aaaak-aaiqq-cai.raw.ic0.app/?type=thumbnail&tokenid=yil5q-5ykor-uwiaa-aaaaa-cqace-eaqca-aabur-a"
+                kittyUrl = "https://rw7qm-eiaaa-aaaak-aaiqq-cai.raw.ic0.app/?type=thumbnail&tokenid=yil5q-5ykor-uwiaa-aaaaa-cqace-eaqca-aabur-a",
+                SeasonProgressMultiplayer = 1.2f
             },
             new ()
             {
                 nickname = "Strawberry",
                 l = 1,
-                kittyUrl = "https://rw7qm-eiaaa-aaaak-aaiqq-cai.raw.ic0.app/?type=thumbnail&tokenid=dnmix-6qkor-uwiaa-aaaaa-cqace-eaqca-aabzy-q"
+                kittyUrl = "https://rw7qm-eiaaa-aaaak-aaiqq-cai.raw.ic0.app/?type=thumbnail&tokenid=dnmix-6qkor-uwiaa-aaaaa-cqace-eaqca-aabzy-q",
+                SeasonProgressMultiplayer = 0.6f
             },
             new ()
             {
                 nickname = "xLilMonster",
                 l = 1,
-                kittyUrl = "https://rw7qm-eiaaa-aaaak-aaiqq-cai.raw.ic0.app/?type=thumbnail&tokenid=vrun7-takor-uwiaa-aaaaa-cqace-eaqca-aach5-a"
+                kittyUrl = "https://rw7qm-eiaaa-aaaak-aaiqq-cai.raw.ic0.app/?type=thumbnail&tokenid=vrun7-takor-uwiaa-aaaaa-cqace-eaqca-aach5-a",
+                SeasonProgressMultiplayer = 0.7f
             },
             new ()
             {
                 nickname = "airstrike22",
                 l = 1,
-                kittyUrl = "https://rw7qm-eiaaa-aaaak-aaiqq-cai.raw.ic0.app/?type=thumbnail&tokenid=c6bu2-jqkor-uwiaa-aaaaa-cqace-eaqca-aadni-q"
+                kittyUrl = "https://rw7qm-eiaaa-aaaak-aaiqq-cai.raw.ic0.app/?type=thumbnail&tokenid=c6bu2-jqkor-uwiaa-aaaaa-cqace-eaqca-aadni-q",
+                SeasonProgressMultiplayer = 0.8f
             }
         };
 
@@ -229,7 +243,7 @@ public class GameMatchingScreen : MonoBehaviour
         if (PhotonNetwork.CurrentRoom.PlayerCount == 2)
         {
             CheckPlayersAreDifferent();
-
+            searchingForOpponent.SetActive(false);
             notices.SetActive(true);
 
             if (PhotonNetwork.LocalPlayer.IsMasterClient)
@@ -271,6 +285,7 @@ public class GameMatchingScreen : MonoBehaviour
         notices.SetActive(false);
         FreeSeat(seats[otherSeat]);
         MakeRoomVisible();
+        searchingForOpponent.SetActive(true);
     }
 
     private IEnumerator TryExitRoomAfterSeconds(float seconds)
@@ -307,6 +322,7 @@ public class GameMatchingScreen : MonoBehaviour
     [PunRPC]
     public void StartGameRoutine()
     {
+        searchingForOpponent.SetActive(false);
         StartCountdown(SceneManager.GAME_SCENE);
     }
     
@@ -318,6 +334,7 @@ public class GameMatchingScreen : MonoBehaviour
 
     private void StartCountdown(string _sceneName)
     {
+        searchingForOpponent.SetActive(false);
         wheelHolder.SetActive(true);
         countdown.StartCountDown(() =>
         {

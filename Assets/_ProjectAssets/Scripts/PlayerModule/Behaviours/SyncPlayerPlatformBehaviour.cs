@@ -14,6 +14,8 @@ public class SyncPlayerPlatformBehaviour : MonoBehaviour
     [HideInInspector]
     public PUNRoomUtils punRoomUtils;
 
+    [SerializeField] private GameObject lights;
+
     private PhotonView photonView;
 
     private void Awake()
@@ -73,6 +75,15 @@ public class SyncPlayerPlatformBehaviour : MonoBehaviour
         {
             punRoomUtils.AddPlayerCustomProperty("seat", "" + pose.seatIdx);
         }
+
+        if (pose.seatIdx>1)
+        {
+            TurnOffLights();
+        }
+        else
+        {
+            TurnOnLights();
+        }
     }
 
     private void OnPlayerJoined(string nickname, string userId)
@@ -80,6 +91,28 @@ public class SyncPlayerPlatformBehaviour : MonoBehaviour
         Player player = PhotonNetwork.PlayerList.First(player => player.UserId == userId);
         string serializedConfig = JsonUtility.ToJson(KittiesCustomizationService.GetCustomization(GameState.selectedNFT.imageUrl).GetSerializableObject());
         photonView.RPC("SetCatStyle", player, GameState.selectedNFT.imageUrl, serializedConfig);
+    }
+
+    private void TurnOffLights()
+    {
+        photonView.RPC(nameof(DoTurnOffLights), RpcTarget.All);
+    }
+    
+    private void TurnOnLights()
+    {
+        photonView.RPC(nameof(DoTurnOnLights), RpcTarget.All);
+    }
+
+    [PunRPC]
+    private void DoTurnOffLights()
+    {
+        lights.SetActive(false);
+    }    
+    
+    [PunRPC]
+    private void DoTurnOnLights()
+    {
+        lights.SetActive(true);
     }
 
     [PunRPC]

@@ -10,6 +10,7 @@ public class CreateFriendlyMatch : MonoBehaviour
     [SerializeField] private Button continueButton;
     [SerializeField] private Button closeButton;
     [SerializeField] private MainMenuUI mainMenuUI;
+    [SerializeField] private Toggle allowSpectators;
 
     private void OnEnable()
     {
@@ -18,6 +19,8 @@ public class CreateFriendlyMatch : MonoBehaviour
         continueButton.onClick.AddListener(JoinRoom);
         PhotonManager.OnFailedToCreateRoom += EnableNewRoomCreation;
         PhotonManager.OnJoinedFriendlyRoom += ShowConnecting;
+
+        allowSpectators.isOn = false;
     }
 
     private void OnDisable()
@@ -49,7 +52,7 @@ public class CreateFriendlyMatch : MonoBehaviour
         }
         
         ManageInteractables(false);
-        mainMenuUI.TryConnectToFriendlyRoom(_roomName);
+        mainMenuUI.TryConnectToFriendlyRoom(_roomName, allowSpectators.isOn);
     }
 
     private bool ValidateName(string _roomName)
