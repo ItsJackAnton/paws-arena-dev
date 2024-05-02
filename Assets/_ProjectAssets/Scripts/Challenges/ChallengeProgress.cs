@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using BoomDaoWrapper;
 using Newtonsoft.Json;
+using Photon.Pun;
 using UnityEngine;
 
 [Serializable]
@@ -29,7 +30,7 @@ public class ChallengeProgress
 
     public void IncreaseAmount()
     {
-        if (Completed)
+        if (!CanIncreaseValue())
         {
             return;
         }
@@ -41,7 +42,7 @@ public class ChallengeProgress
 
     public void IncreaseAmount(int _amount)
     {
-        if (Completed)
+        if (!CanIncreaseValue())
         {
             return;
         }
@@ -49,6 +50,21 @@ public class ChallengeProgress
         Value+=_amount;
         IncreaseChallengeProgress(_amount);
         UpdatedProgress?.Invoke(Identifier);
+    }
+
+    private bool CanIncreaseValue()
+    {
+        if (Completed)
+        {
+            return false;
+        }
+
+        if (CreateFriendlyMatch.IsFriendly)
+        {
+            return false;
+        }
+
+        return true;
     }
 
     private void IncreaseChallengeProgress(int _amount)

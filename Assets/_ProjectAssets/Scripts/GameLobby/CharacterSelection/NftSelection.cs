@@ -69,6 +69,7 @@ public class NftSelection : MonoBehaviour
 
     private void ShowLoginScene()
     {
+        GameState.nfts.Clear();
         SceneManager.Instance.LoadLoginScene();
     }
 

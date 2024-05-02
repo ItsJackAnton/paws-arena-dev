@@ -191,7 +191,7 @@ public class ChallengesManager : MonoBehaviour
 
     private IEnumerator CheckForReset()
     {
-        while (true)
+        while (BoomDaoUtility.Instance.IsLoggedIn)
         {
             if (DateTime.UtcNow > DataManager.Instance.GameData.DailyChallenges.NextReset)
             {

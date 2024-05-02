@@ -15,3 +15,4 @@ MonoBehaviour:
   Id: 3
   Name: Angry
   Sprite: {fileID: 21300000, guid: 20959320731ca9b4db4fea77b3fe1c25, type: 3}
+  Key: emoji_angry_3

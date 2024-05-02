@@ -1,9 +1,12 @@
 using System;
 using System.Text.RegularExpressions;
-using NUnit.Framework.Internal.Execution;
+using System.Runtime.InteropServices;
+using UnityEngine;
 
 public static class Utilities
 {
+    [DllImport("__Internal")]
+    public static extern void CopyToClipboard(string _text);
     
     private static readonly DateTime UNIX_EPOCH = new (2020, 1, 1, 0, 0, 0, DateTimeKind.Utc);
 
@@ -168,5 +171,17 @@ public static class Utilities
         }
 
         return _newString;
+    }
+
+    public static void DoCopyToClipboard(string _string)
+    {
+        if (Application.platform == RuntimePlatform.WebGLPlayer)
+        {
+            CopyToClipboard(_string);
+        }
+        else
+        {
+            GUIUtility.systemCopyBuffer = _string;
+        }
     }
 }

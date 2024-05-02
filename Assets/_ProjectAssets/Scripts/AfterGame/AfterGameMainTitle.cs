@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using BoomDaoWrapper;
-using Newtonsoft.Json;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -52,8 +51,6 @@ namespace com.colorfulcoding.AfterGame
                 checkIfIWon = GameResolveStateUtils.CheckIfIWon(GameState.gameResolveState);
             }
             
-            Debug.Log("----- After all resolving the outcome of the match is: "+ checkIfIWon);
-
             if (checkIfIWon > 0)
             {
                 if (GameState.selectedNFT.CanFight)
@@ -76,18 +73,28 @@ namespace com.colorfulcoding.AfterGame
                 
                 EventsManager.OnWonGame?.Invoke();
                 leaveButton.gameObject.SetActive(false);
-                luckyWheelUI.RequestReward();
+                if (CreateFriendlyMatch.IsFriendly)
+                {
+                    leaveButton.gameObject.SetActive(true);
+                }
+                else
+                {
+                    luckyWheelUI.RequestReward();
+                }
                 winTitle.SetActive(true);
                 bg.GetComponent<Image>().color = winColor;
                 standGlow.color = winColor;
             }
             else if (checkIfIWon < 0)
             {
-                List<ActionParameter> _parameters = new()
+                if (!CreateFriendlyMatch.IsFriendly)
                 {
-                    new ActionParameter { Key = PlayerData.EARNED_XP_KEY, Value = DamageDealingDisplay.XpEarned.ToString()}
-                };
-                BoomDaoUtility.Instance.ExecuteActionWithParameter(BATTLE_LOST_ACTION_KEY,_parameters,null);
+                    List<ActionParameter> _parameters = new()
+                    {
+                        new ActionParameter { Key = PlayerData.EARNED_XP_KEY, Value = DamageDealingDisplay.XpEarned.ToString()}
+                    };
+                    BoomDaoUtility.Instance.ExecuteActionWithParameter(BATTLE_LOST_ACTION_KEY,_parameters,null);
+                }
                 EventsManager.OnLostGame?.Invoke();
                 loseTitle.SetActive(true);
                 bg.GetComponent<Image>().color = loseColor;
@@ -116,7 +123,6 @@ namespace com.colorfulcoding.AfterGame
                     new ActionParameter { Key = GameData.LEADERBOARD_KITTY_URL, Value = GameState.selectedNFT.imageUrl},
                     new ActionParameter { Key = GameData.LEADERBOARD_POINTS, Value = (GameState.pointsChange.oldPoints+GameState.pointsChange.points).ToString()}
                 };
-                Debug.Log(JsonConvert.SerializeObject(_parameters));
                 BoomDaoUtility.Instance.ExecuteActionWithParameter(SET_LEADERBOARD_POINTS, _parameters,null);
                 LeanTween.value(gameObject, 0, GameState.pointsChange.points, 2f).setOnUpdate(val =>
                 {
@@ -141,6 +147,11 @@ namespace com.colorfulcoding.AfterGame
 
         private void SaveKittyHealth()
         {
+            if (CreateFriendlyMatch.IsFriendly)
+            {
+                return;
+            }
+            
             float _maxHp = 100;
             float _minutesItWillTakeToRecover = (RecoveryHandler.RecoveryInMinutes / _maxHp) * (_maxHp - PlayerManager.HealthAtEnd);
             if (_minutesItWillTakeToRecover <= 1)

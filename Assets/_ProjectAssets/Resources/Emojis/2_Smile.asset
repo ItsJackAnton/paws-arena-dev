@@ -15,3 +15,4 @@ MonoBehaviour:
   Id: 2
   Name: Smile
   Sprite: {fileID: 21300000, guid: ddb0d51d841d2fc49aafbdb67299e1df, type: 3}
+  Key: emoji_smile_2

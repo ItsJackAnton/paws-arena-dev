@@ -87,16 +87,14 @@ namespace com.colorfulcoding.GameScene
                                 ? GameResult.Player1
                                 : GameResult.Player2
                         )
-                )
+                ),
+                isFriendly =  PhotonNetwork.CurrentRoom is { IsVisible: false }
             };
 
             string reqJson = JsonUtility.ToJson(req);
 
-            if (ConfigurationManager.Instance.GameConfig.enableDevLogs)
-            {
-                Debug.Log("Registering match end");
-                Debug.Log(reqJson);
-            }
+            Debug.Log("Registering match end");
+            Debug.Log(reqJson);
             
             Debug.Log("Registering match ended: "+reqJson+ " my principal: "+GameState.principalId);
 
@@ -107,6 +105,7 @@ namespace com.colorfulcoding.GameScene
                 {
                     Debug.Log("----- Got result of the match: "+resp);
                     LeaderboardPostResponseEntity response = JsonUtility.FromJson<LeaderboardPostResponseEntity>(resp);
+                    Debug.Log(resp);
                     Debug.Log(
                         $"[HTTP]Match ending registered! You won {response.oldPoints + response.points} points."
                     );

@@ -224,18 +224,14 @@ namespace Boom
 
         void OnLoginCompleted(string json)
         {
-            Debug.Log(10);
             var isLoggedIn = UserUtil.IsLoggedIn();
-            Debug.Log(11);
 
             if (isLoggedIn == false)
             {
-                Debug.Log(12);
                 CreateAgentUsingIdentityJson(json, false).Forget();
                 return;
             }
 
-            Debug.Log(13);
             "You already have an Agent created".Log();
         }
         public async UniTaskVoid CreateAgentUsingIdentityJson(string json, bool useLocalHost = false)
@@ -796,31 +792,21 @@ namespace Boom
         {
             if (UserUtil.IsLoginRequestedPending() || UserUtil.IsLoggedIn())
             {
-                Debug.Log(1);
                 return;
             }
 
-            Debug.Log(2);
-
             UserUtil.SetAsLoginIn();
-            Debug.Log(3);
             BroadcastState.Invoke(new WaitingForResponse(true));
-            Debug.Log(4);
 
 
-            Debug.Log(5);
             PlayerPrefs.SetString("walletType", "II");
-            Debug.Log(6);
 
 #if UNITY_WEBGL && !UNITY_EDITOR
             LoginManager.Instance.StartLoginFlowWebGl(OnLoginCompleted);
             return;
 #endif
-            Debug.Log(7);
             isLoginIn = true;
-            Debug.Log(8);
             LoginManager.Instance.StartLoginFlow(OnLoginCompleted);
-            Debug.Log(9);
         }
 
         private void FetchHandler(FetchDataReq<DataTypeRequestArgs.Entity> req)

@@ -15,3 +15,4 @@ MonoBehaviour:
   Id: 4
   Name: Happy
   Sprite: {fileID: 21300000, guid: 29cc89403bf0c1742bdb3bf8a2fa1cc8, type: 3}
+  Key: 'emoji_happy_4 '

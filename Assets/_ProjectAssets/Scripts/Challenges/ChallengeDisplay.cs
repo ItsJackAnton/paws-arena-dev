@@ -27,7 +27,15 @@ public class ChallengeDisplay : MonoBehaviour
             Destroy(gameObject);
             return;
         }
-        amountDisplay.text = "x" + _challengeData.RewardAmount;
+
+        if (_challengeData.RewardType == ItemType.SeasonExperience)
+        {
+            amountDisplay.text = string.Empty;
+        }
+        else
+        {
+            amountDisplay.text = _challengeData.RewardAmount.ToString();
+        }
         if (_progress.Completed)
         {
             if (_progress.Claimed || _progress.IsClaiming)

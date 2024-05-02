@@ -163,6 +163,7 @@ public class PlayerData
     public static Action OnUpdatedToken;
 
     public const string SNACKS = "snack";
+    public const string FREE_EMOJI = "freeEmoji";
     
     public const string NAME_KEY = "username";
     public const string USE_MILK_BOTTLE = "useMilkBottle";
@@ -398,6 +399,8 @@ public class PlayerData
     }
 
     public bool HasClaimedChallengeSpin => BoomDaoUtility.Instance.DoesEntityExist(ChallengesManager.CLAIMED_LUCKY_SPIN);
+
+    public bool HasClaimedFreeEmoji => BoomDaoUtility.Instance.DoesEntityExist(FREE_EMOJI);
 
     public static void CalculateLevel(double _exp, out int _level, out int _expForNextLevel, out int _experienceOnCurrentLevel)
     {

@@ -32,6 +32,9 @@ public class LeaderboardPostRequestEntity
     [SerializeField]
     public int hp;
     [SerializeField]
-    public MatchStatus status;
+    public MatchStatus status;    
+    
+    [SerializeField]
+    public bool isFriendly;
 
 }

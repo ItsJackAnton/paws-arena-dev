@@ -12,6 +12,8 @@ public class CreateFriendlyMatch : MonoBehaviour
     [SerializeField] private MainMenuUI mainMenuUI;
     [SerializeField] private Toggle allowSpectators;
 
+    public static bool IsFriendly;
+
     private void OnEnable()
     {
         showCreateFriendly.onClick.AddListener(ShowPanel);
@@ -21,6 +23,7 @@ public class CreateFriendlyMatch : MonoBehaviour
         PhotonManager.OnJoinedFriendlyRoom += ShowConnecting;
 
         allowSpectators.isOn = false;
+        IsFriendly = false;
     }
 
     private void OnDisable()
@@ -52,6 +55,7 @@ public class CreateFriendlyMatch : MonoBehaviour
         }
         
         ManageInteractables(false);
+        IsFriendly = true;
         mainMenuUI.TryConnectToFriendlyRoom(_roomName, allowSpectators.isOn);
     }
 

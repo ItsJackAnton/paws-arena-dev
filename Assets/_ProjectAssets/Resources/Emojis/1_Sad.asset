@@ -15,3 +15,4 @@ MonoBehaviour:
   Id: 1
   Name: Sad
   Sprite: {fileID: 21300000, guid: 3679b3872ece0c948b0ecca368d5abb6, type: 3}
+  Key: 'emoji_sad_1 '

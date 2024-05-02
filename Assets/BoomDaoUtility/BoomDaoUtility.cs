@@ -29,6 +29,8 @@ namespace BoomDaoWrapper
 
         public bool CanLogin => canLogin;
 
+        public bool IsLoggedIn => UserUtil.IsLoggedIn();
+
         private void Awake()
         {
             if (Instance == null)
@@ -67,49 +69,40 @@ namespace BoomDaoWrapper
 
         public void Login(Action _callBack)
         {
-            Debug.Log(1);
             loginCallback = _callBack;
-            Debug.Log(2);
             Broadcast.Invoke<UserLoginRequest>();
-            Debug.Log(3);
             UserUtil.AddListenerMainDataChange<MainDataTypes.LoginData>(LoginDataChangeHandler);
-            Debug.Log(4);
         }
 
         private void LoginDataChangeHandler(MainDataTypes.LoginData _data)
         {
-            Debug.Log(5);
             if (_data.state != MainDataTypes.LoginData.State.LoggedIn)
             {
-                Debug.Log(6);
                 return;
             }
 
-            Debug.Log(7);
             UserUtil.RemoveListenerMainDataChange<MainDataTypes.LoginData>(LoginDataChangeHandler);
-            Debug.Log(8);
             loginCallback?.Invoke();
-            Debug.Log(9);
             
             //Update Inventory UI with Entities
             var _allUserDataResult = UserUtil.GetAllDataSelf();
-            Debug.Log(10);
             var _allUserDataAsOk = _allUserDataResult.AsOk();
-            Debug.Log(11);
             TokenDataChangeHandler(_allUserDataAsOk.tokenData);
         }
 
         public void Logout(Action _callBack)
         {
-            Broadcast.Register<UserLogout>(UserLogoutHandler);
+            UserUtil.AddListenerMainDataChange<MainDataTypes.LoginData>(UserLogoutHandler);
             Broadcast.Invoke<UserLogout>();
 
-            void UserLogoutHandler(UserLogout _obj)
+            void UserLogoutHandler(MainDataTypes.LoginData _loginData)
             {
-                Broadcast.Unregister<UserLogout>(UserLogoutHandler);
+                Debug.Log(_loginData.state);
+                UserUtil.RemoveListenerMainDataChange<MainDataTypes.LoginData>(UserLogoutHandler);
                 _callBack?.Invoke();
             }
         }
+
 
         #endregion
 
