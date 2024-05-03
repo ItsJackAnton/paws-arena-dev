@@ -213,9 +213,17 @@ namespace BoomDaoWrapper
 
         public int GetInt(string _entityId, string _fieldName)
         {
-            return EntityUtil.TryGetFieldAsDouble(UserUtil.GetPrincipal(), _entityId, _fieldName, out double _value) 
-                ? Convert.ToInt32(_value)
-                : default;
+            if (EntityUtil.TryGetFieldAsText(UserUtil.GetPrincipal(), _entityId, _fieldName, out string _valueText))
+            {
+                if (_valueText.Contains('.'))
+                {
+                    return Convert.ToInt32(_valueText.Split('.')[0]);
+                }
+
+                return Convert.ToInt32(_valueText);
+            }
+
+            return default;
         }
 
         public bool DoesEntityExist(string _entityId)

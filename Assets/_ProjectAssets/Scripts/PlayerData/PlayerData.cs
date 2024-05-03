@@ -263,7 +263,6 @@ public class PlayerData
     public void SubscribeEvents()
     {
         BoomDaoUtility.OnDataUpdated += RiseEvent;
-
         CalculateLevel();
     }
 

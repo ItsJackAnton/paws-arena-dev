@@ -64,6 +64,7 @@ public class ConnectingToServer : MonoBehaviour
 
     private static void UpdateNfts()
     {
+        Debug.Log("Fetching nfts");
         var _nftCollectionsResult = BoomDaoUtility.Instance.GetNftData;
         if (_nftCollectionsResult.IsErr)
         {

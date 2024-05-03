@@ -235,7 +235,6 @@ public class ChallengesManager : MonoBehaviour
                 long _nextResetTime = Utilities.DateTimeToNanoseconds(DateTime.UtcNow.AddDays(1));
                 List<ActionParameter> _parameters = new List<ActionParameter> { new() { Key = NEXT_RESET, Value = _nextResetTime.ToString() } };
                 BoomDaoUtility.Instance.ExecuteActionWithParameter(SET_RESET_TIME,_parameters, Finish);
-                Debug.Log("Finished");
             }
         }
 
@@ -348,7 +347,10 @@ public class ChallengesManager : MonoBehaviour
                 continue;
             }
             ChallengeData _challengeData = DataManager.Instance.GameData.GetChallengeByIdentifier(_challengeProgress.Identifier);
-
+            if (_challengeData==null)
+            {
+                continue;
+            }
             switch (_challengeData.Category)
             {
                 case ChallengeCategory.WinGame:
@@ -444,7 +446,6 @@ public class ChallengesManager : MonoBehaviour
     private void FinishedUpdating(List<ActionOutcome> _)
     {
         isUpdatingProgress = false;
-        Debug.Log("Finished updating: "+JsonConvert.SerializeObject(progressToUpdate[0]));
         progressToUpdate.RemoveAt(0);
         TryUpdate();
     }
