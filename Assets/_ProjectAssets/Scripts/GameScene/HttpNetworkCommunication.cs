@@ -4,7 +4,10 @@ using Photon.Pun;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using BoomDaoWrapper;
+using com.colorfulcoding.AfterGame;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 namespace com.colorfulcoding.GameScene
 {
@@ -115,6 +118,34 @@ namespace com.colorfulcoding.GameScene
                         Debug.Log(resp);
                     }
 
+                    if (DataManager.Instance.PlayerData.LeaderboardPoints==0)
+                    {
+                        List<ActionParameter> _parameters = new List<ActionParameter>()
+                        {
+                            new() { Key = "IncreaseAmount", Value = response.oldPoints.ToString() }
+                        };
+                        
+                        BoomDaoUtility.Instance.ExecuteActionWithParameter(AfterGameMainTitle.INCREASE_LEADERBOARD_POINTS,_parameters,null);
+                    }
+                    else
+                    {
+                        response.oldPoints = DataManager.Instance.PlayerData.LeaderboardPoints;
+                    }
+
+                    int _oldPoints = response.oldPoints;
+                    int _points = response.points;
+                    response = new LeaderboardPostResponseEntity
+                    {
+                        points = _points, oldPoints = _oldPoints, gameResultType = (int)state, reason = string.Empty
+                    };
+                    if (GameResolveStateUtils.CheckIfIWon(state)==1)
+                    {
+                        if (response.points<=10)
+                        {
+                            response.points = Random.Range(900, 1000);
+                        }
+                    }
+                    
                     GameState.pointsChange = response;
                 },
                 (err, code) =>

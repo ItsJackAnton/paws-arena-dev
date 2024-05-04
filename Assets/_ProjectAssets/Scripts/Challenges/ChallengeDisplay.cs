@@ -71,6 +71,5 @@ public class ChallengeDisplay : MonoBehaviour
     private void Claim()
     {
         OnClaimPressed?.Invoke(challengeProgress);
-        Setup(challengeProgress);
     }
 }

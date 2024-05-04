@@ -120,11 +120,11 @@ public class JoinGuildPanel : GuildPanelBase
             alreadyInGuild.SetActive(true);
             return;
         }
-        if (DataManager.Instance.PlayerData.Points<_guildData.MinimumPoints)
-        {
-            noEnaughtPointsMessage.SetActive(true);
-            return;
-        }
+        // if (DataManager.Instance.PlayerData.Points<_guildData.MinimumPoints)
+        // {
+        //     noEnaughtPointsMessage.SetActive(true);
+        //     return;
+        // }
         joiningGuildPanel.SetActive(true);
         // FirebaseManager.Instance.JoinGuild(FirebaseManager.Instance.PlayerId,_guildData.Id,FinishedJoiningGuild);
     }

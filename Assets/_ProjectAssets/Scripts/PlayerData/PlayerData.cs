@@ -14,7 +14,6 @@ public class PlayerData
     private List<int> ownedEmojis;
     private DailyChallenges dailyChallenges = new();
     private string guildId = string.Empty;
-    private int points;
 
     public void SetStartingValues()
     {
@@ -142,15 +141,6 @@ public class PlayerData
         }
     }
 
-    public int Points
-    {
-        get => points;
-        set
-        {
-            points = value;
-        }
-    }
-
     // new system
     public static Action OnUpdatedSnacks;
     public static Action OnUpdatedShards;
@@ -164,6 +154,7 @@ public class PlayerData
 
     public const string SNACKS = "snack";
     public const string FREE_EMOJI = "freeEmoji";
+    public const string LEADERBOARD_POINTS = "leaderboardPoints";
     
     public const string NAME_KEY = "username";
     public const string USE_MILK_BOTTLE = "useMilkBottle";
@@ -452,4 +443,6 @@ public class PlayerData
     {
         return BoomDaoUtility.Instance.DoesEntityExist(_kittyId);
     }
+
+    public int LeaderboardPoints => BoomDaoUtility.Instance.GetInt(LEADERBOARD_POINTS, AMOUNT_KEY);
 }

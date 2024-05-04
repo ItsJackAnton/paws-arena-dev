@@ -13,6 +13,7 @@ namespace com.colorfulcoding.AfterGame
         private const string HURT_KITTY = "hurtKitty";
         
         private const string SET_LEADERBOARD_POINTS = "setLeaderboardPoints";
+        public const string INCREASE_LEADERBOARD_POINTS = "updateLeaderboardPoints";
         
         
         public GameObject winTitle;
@@ -124,6 +125,12 @@ namespace com.colorfulcoding.AfterGame
                     new ActionParameter { Key = GameData.LEADERBOARD_POINTS, Value = (GameState.pointsChange.oldPoints+GameState.pointsChange.points).ToString()}
                 };
                 BoomDaoUtility.Instance.ExecuteActionWithParameter(SET_LEADERBOARD_POINTS, _parameters,null);
+                _parameters = new List<ActionParameter>()
+                {
+                    new() { Key = "IncreaseAmount", Value = GameState.pointsChange.points.ToString() }
+                };
+                BoomDaoUtility.Instance.ExecuteActionWithParameter(INCREASE_LEADERBOARD_POINTS,_parameters,null);
+                
                 LeanTween.value(gameObject, 0, GameState.pointsChange.points, 2f).setOnUpdate(val =>
                 {
                     totalCoinsValue.text = "" + Math.Floor(GameState.pointsChange.oldPoints + val);

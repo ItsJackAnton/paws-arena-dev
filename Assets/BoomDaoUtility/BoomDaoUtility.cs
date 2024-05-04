@@ -220,7 +220,15 @@ namespace BoomDaoWrapper
                     return Convert.ToInt32(_valueText.Split('.')[0]);
                 }
 
-                return Convert.ToInt32(_valueText);
+                try
+                {
+                    return Convert.ToInt32(_valueText);
+                }
+                catch (Exception e)
+                {
+                    Debug.Log($"{_entityId} {_fieldName}, {_valueText}\n"+e);
+                    throw;
+                }
             }
 
             return default;

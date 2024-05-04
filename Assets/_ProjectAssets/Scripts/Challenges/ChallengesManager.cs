@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using BoomDaoWrapper;
+using NaughtyAttributes;
 using Newtonsoft.Json;
 using UnityEngine;
 
@@ -97,8 +98,6 @@ public class ChallengesManager : MonoBehaviour
         {
             new() { Key = CHALLENGE_NUMBER, Value = PlayerData.DAILY_CHALLENGE_PROGRESS+DataManager.Instance.GameData.GetChallengeIndex(_challengeProgress) }
         };
-        
-        Debug.Log($"{CHALLENGE_NUMBER}: meaning challenge name is {PlayerData.DAILY_CHALLENGE_PROGRESS+DataManager.Instance.GameData.GetChallengeIndex(_challengeProgress)}, calling for action {CHALLENGES_CLAIM_DAILY_CHALLENGE}");
         
         BoomDaoUtility.Instance.ExecuteActionWithParameter(CHALLENGES_CLAIM_DAILY_CHALLENGE, _parameters, _ =>
         {
@@ -448,5 +447,13 @@ public class ChallengesManager : MonoBehaviour
         isUpdatingProgress = false;
         progressToUpdate.RemoveAt(0);
         TryUpdate();
+    }
+
+    [SerializeField] private int score;
+    [Button()]
+    private void TestLevel()
+    {
+        PlayerData.CalculateLevel(score, out int _level,out int _expForNextLevel, out int _expOnCurrentLevel );
+        Debug.Log($"For experience {score}: level: {_level}, expForNextLevel: {_expForNextLevel}, expOnCurrentLevel: {_expOnCurrentLevel}");
     }
 }
