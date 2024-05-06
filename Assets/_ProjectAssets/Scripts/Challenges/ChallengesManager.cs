@@ -3,7 +3,6 @@ using System.Collections;
 using System.Collections.Generic;
 using BoomDaoWrapper;
 using NaughtyAttributes;
-using Newtonsoft.Json;
 using UnityEngine;
 
 public class ChallengesManager : MonoBehaviour
@@ -38,7 +37,7 @@ public class ChallengesManager : MonoBehaviour
     private const string UPDATE_CHALLENGE_PROGRESS = "increaseChallengeProgress";
 
     public static ChallengesManager Instance;
-    private bool isGeneratingNewChallenges;
+    public bool IsGeneratingNewChallenges;
     private bool isSubscribed;
     
     private List<ChallengeUpdateProgress> progressToUpdate = new();
@@ -46,6 +45,7 @@ public class ChallengesManager : MonoBehaviour
 
     private List<ChallengeProgress> challengesToClaim = new();
     private bool isClaiming;
+    private bool generatedNewChallengeInThisSession;
 
     private void OnEnable()
     {
@@ -195,7 +195,6 @@ public class ChallengesManager : MonoBehaviour
             if (DateTime.UtcNow > DataManager.Instance.GameData.DailyChallenges.NextReset)
             {
                 GenerateNewChallenges(StartCheckForReset);
-                yield break;
             }
 
             yield return new WaitForSeconds(1);
@@ -204,13 +203,20 @@ public class ChallengesManager : MonoBehaviour
     
     private void GenerateNewChallenges(Action _callBack)
     {
-        if (isGeneratingNewChallenges)
+        if (IsGeneratingNewChallenges)
         {
             return;
         }
-        
+
+        if (generatedNewChallengeInThisSession)
+        {
+            return;
+        }
+
+        Debug.Log("Generating new challenges");
+        generatedNewChallengeInThisSession = true;
         UnsubscribeEvents();
-        isGeneratingNewChallenges = true;
+        IsGeneratingNewChallenges = true;
 
         BoomDaoUtility.Instance.ExecuteAction(PlayerData.RESET_AMOUNT_OF_GAMES_PLAYED_TODAY, null);
         int _counter = 0;
@@ -241,6 +247,7 @@ public class ChallengesManager : MonoBehaviour
         {
             SubscribeEvents();
             OnCreatedNewChallenges?.Invoke();
+            IsGeneratingNewChallenges = false;
             _callBack?.Invoke();
         }
     }
@@ -449,11 +456,9 @@ public class ChallengesManager : MonoBehaviour
         TryUpdate();
     }
 
-    [SerializeField] private int score;
     [Button()]
-    private void TestLevel()
+    private void Test()
     {
-        PlayerData.CalculateLevel(score, out int _level,out int _expForNextLevel, out int _expOnCurrentLevel );
-        Debug.Log($"For experience {score}: level: {_level}, expForNextLevel: {_expForNextLevel}, expOnCurrentLevel: {_expOnCurrentLevel}");
+        
     }
 }

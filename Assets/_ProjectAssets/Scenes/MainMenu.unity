@@ -19888,6 +19888,7 @@ MonoBehaviour:
   settings: {fileID: 14187468}
   fightButton: {fileID: 1239415175}
   tutorialButton: {fileID: 1387868380}
+  generatingChallenges: {fileID: 1594001617}
 --- !u!1 &1705794695
 GameObject:
   m_ObjectHideFlags: 0

@@ -76,6 +76,12 @@ public class PlayerManager : MonoSingleton<PlayerManager>
         OnDamageTaken(50);
     }
 
+    [Button("Draw the game")]
+    private void DrawTheGame()
+    {
+        RoomStateManager.Instance.roundNumber = 30;
+    }
+    
     private void OnDamageTaken(int damage)
     {
         if (ConfigurationManager.Instance.GameConfig.enableDevLogs)

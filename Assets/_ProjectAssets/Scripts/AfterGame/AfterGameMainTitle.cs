@@ -10,6 +10,7 @@ namespace com.colorfulcoding.AfterGame
     public class AfterGameMainTitle : MonoBehaviour
     {
         private const string BATTLE_LOST_ACTION_KEY = "battle_outcome_lost";
+        private const string BATTLE_DRAW_ACTION_KEY = "battle_outcome_draw";
         private const string HURT_KITTY = "hurtKitty";
         
         private const string SET_LEADERBOARD_POINTS = "setLeaderboardPoints";
@@ -106,6 +107,7 @@ namespace com.colorfulcoding.AfterGame
                 drawTitle.SetActive(true);
                 bg.GetComponent<Image>().color = drawColor;
                 standGlow.color = drawColor;
+                BoomDaoUtility.Instance.ExecuteAction(BATTLE_DRAW_ACTION_KEY, null);
             }
 
             totalCoinsValue.text = "" + GameState.pointsChange.oldPoints;

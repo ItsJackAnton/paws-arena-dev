@@ -19,6 +19,7 @@ public class MainMenuUI : MonoBehaviour
     [SerializeField] private Button settings;
     [SerializeField] private Button fightButton;
     [SerializeField] private Button tutorialButton;
+    [SerializeField] private GameObject generatingChallenges;
 
     private void OnEnable()
     {
@@ -86,6 +87,12 @@ public class MainMenuUI : MonoBehaviour
         {
             RecoveryMessageDisplay.Instance.ShowMessage();
             SceneManager.Instance.LoadNftSelection();
+            return;
+        }
+
+        if (ChallengesManager.Instance.IsGeneratingNewChallenges)
+        {
+            generatingChallenges.SetActive(true);
             return;
         }
         
