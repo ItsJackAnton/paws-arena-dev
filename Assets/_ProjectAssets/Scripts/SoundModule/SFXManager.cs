@@ -1,7 +1,5 @@
 using Anura.Templates.MonoSingleton;
-using System;
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class SFXManager : MonoSingleton<SFXManager>
@@ -9,23 +7,10 @@ public class SFXManager : MonoSingleton<SFXManager>
     public AudioSource musicSource;
     public AudioSource oneShotAudioSource;
 
-    private float initialMusicSourceVolume;
-    private float initialOneShotSourceVolume;
     private float oneShotSourceBaseVolume;
 
-    public IEnumerator Start()
+    private void Start()
     {
-        yield return new WaitForEndOfFrame();
-        if (oneShotAudioSource != null)
-        {
-            initialOneShotSourceVolume = oneShotAudioSource.volume;
-        }
-
-        if(musicSource != null)
-        {
-            initialMusicSourceVolume = musicSource.volume;
-        }
-
         ApplySettings();
     }
 

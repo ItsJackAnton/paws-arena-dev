@@ -157,8 +157,8 @@ public class PlayerData
     public const string LEADERBOARD_POINTS = "leaderboardPoints";
     
     public const string NAME_KEY = "username";
-    public const string USE_MILK_BOTTLE = "useMilkBottle2";
-    public const string USE_MILK_GLASS = "useMilkGlass2";
+    public string UseMilkBottle => GameState.selectedNFT.IsDefaultKitty ? "useMilkBottle" : "useMilkBottle2";
+    public string UseMilkGlass => GameState.selectedNFT.IsDefaultKitty ? "useMilkGlass" : "useMilkGlass2";
 
     public const string COMMON_SHARD = "commonShard";
     public const string UNCOMMON_SHARD = "uncommonShard";

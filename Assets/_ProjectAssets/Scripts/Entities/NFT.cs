@@ -14,6 +14,7 @@ public class NFT
     private DateTime recoveryEndDate;
 
     public bool CanFight => RecoveryEndDate < DateTime.UtcNow;
+    public bool IsDefaultKitty => imageUrl == ConnectingToServer.DEFAULT_KITTY;
     public int MinutesUntilHealed => (int)(RecoveryEndDate - DateTime.UtcNow).TotalMinutes;
 
     public TimeSpan TimeUntilHealed => RecoveryEndDate - DateTime.UtcNow;

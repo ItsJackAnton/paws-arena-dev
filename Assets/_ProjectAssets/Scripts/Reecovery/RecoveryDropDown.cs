@@ -132,12 +132,12 @@ public class RecoveryDropDown : MonoBehaviour
         {
             if (DataManager.Instance.PlayerData.JugOfMilk > 0)
             {
-                BoomDaoUtility.Instance.ExecuteActionWithParameter(PlayerData.USE_MILK_BOTTLE,
+                BoomDaoUtility.Instance.ExecuteActionWithParameter(DataManager.Instance.PlayerData.UseMilkBottle,
                     new List<ActionParameter>()
                     {
                         new ()
                         {
-                            Key = GameData.KITTY_KEY,
+                            Key = DataManager.Instance.GameData.KittyKey,
                             Value = GameState.selectedNFT.imageUrl
                         }
                     },
@@ -154,12 +154,12 @@ public class RecoveryDropDown : MonoBehaviour
         {
             if (DataManager.Instance.PlayerData.GlassOfMilk > 0)
             {
-                BoomDaoUtility.Instance.ExecuteActionWithParameter(PlayerData.USE_MILK_GLASS,
+                BoomDaoUtility.Instance.ExecuteActionWithParameter(DataManager.Instance.PlayerData.UseMilkGlass,
                     new List<ActionParameter>()
                     {
                         new ()
                         {
-                            Key = GameData.KITTY_KEY,
+                            Key = DataManager.Instance.GameData.KittyKey,
                             Value = GameState.selectedNFT.imageUrl
                         }
                     },

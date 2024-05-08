@@ -63,7 +63,7 @@ public class GameData
     private const string AMOUNT_OF_REWARDS = "amountOfRewards";
     
     public const string KITTY_RECOVERY_KEY = "recoveryDate";
-    public const string KITTY_KEY = "kittyId";
+    public string KittyKey => GameState.selectedNFT.IsDefaultKitty ? "kitty_id" : "kittyId";
     
     private List<LevelReward> seasonRewards;
 

@@ -5,6 +5,7 @@ using UnityEngine.UI;
 
 public class ConnectingToServer : MonoBehaviour
 {
+    public const string DEFAULT_KITTY = "https://webapiwithssl20230210160824.azurewebsites.net/download/files/blackKitty.svg";
     [SerializeField] private Button connect;
     [SerializeField] private TextMeshProUGUI logText;
 
@@ -94,7 +95,7 @@ public class ConnectingToServer : MonoBehaviour
         {
             GameState.nfts.Add(new NFT()
             {
-                imageUrl = "https://webapiwithssl20230210160824.azurewebsites.net/download/files/blackKitty.svg"
+                imageUrl = DEFAULT_KITTY
             });
         }
     }

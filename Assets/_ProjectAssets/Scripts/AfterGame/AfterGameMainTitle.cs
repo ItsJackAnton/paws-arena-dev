@@ -11,7 +11,7 @@ namespace com.colorfulcoding.AfterGame
     {
         private const string BATTLE_LOST_ACTION_KEY = "battle_outcome_lost";
         private const string BATTLE_DRAW_ACTION_KEY = "battle_outcome_draw";
-        private const string HURT_KITTY = "hurtKitty2";
+        private const string HURT_KITTY = "hurtKitty";
         
         private const string SET_LEADERBOARD_POINTS = "setLeaderboardPoints";
         public const string INCREASE_LEADERBOARD_POINTS = "updateLeaderboardPoints";
@@ -172,11 +172,12 @@ namespace com.colorfulcoding.AfterGame
             GameState.selectedNFT.RecoveryEndDate = _recoveryEnds;
 
             Debug.Log("Recovery ends: "+_recoveryEnds);
-            BoomDaoUtility.Instance.ExecuteActionWithParameter(HURT_KITTY,
+            string _hurtAction = GameState.selectedNFT.IsDefaultKitty ? HURT_KITTY : HURT_KITTY + 2;
+            BoomDaoUtility.Instance.ExecuteActionWithParameter(_hurtAction,
                 new List<ActionParameter>
                 {
                     new() { Key = GameData.KITTY_RECOVERY_KEY, Value = Utilities.DateTimeToNanoseconds(_recoveryEnds).ToString() },
-                    new() { Key = GameData.KITTY_KEY, Value = GameState.selectedNFT.imageUrl }
+                    new() { Key = DataManager.Instance.GameData.KittyKey, Value = GameState.selectedNFT.imageUrl }
                 }, null);
 
         }
