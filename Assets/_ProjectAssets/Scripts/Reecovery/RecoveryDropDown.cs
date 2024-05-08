@@ -127,6 +127,7 @@ public class RecoveryDropDown : MonoBehaviour
         }
 
         healButton.interactable = false;
+        Debug.Log(GameState.selectedNFT.imageUrl);
         if (recoveryOption == RecoveryOption.JugOfMilk)
         {
             if (DataManager.Instance.PlayerData.JugOfMilk > 0)
@@ -136,7 +137,7 @@ public class RecoveryDropDown : MonoBehaviour
                     {
                         new ()
                         {
-                            Key = PlayerData.KITTY_KEY,
+                            Key = GameData.KITTY_KEY,
                             Value = GameState.selectedNFT.imageUrl
                         }
                     },
@@ -158,7 +159,7 @@ public class RecoveryDropDown : MonoBehaviour
                     {
                         new ()
                         {
-                            Key = PlayerData.KITTY_KEY,
+                            Key = GameData.KITTY_KEY,
                             Value = GameState.selectedNFT.imageUrl
                         }
                     },
@@ -166,6 +167,7 @@ public class RecoveryDropDown : MonoBehaviour
             }
             else
             {
+                Debug.Log(DataManager.Instance.PlayerData.GlassOfMilk);
                 healMessageHolder.SetActive(true);
                 healButton.interactable = true;
                 return;

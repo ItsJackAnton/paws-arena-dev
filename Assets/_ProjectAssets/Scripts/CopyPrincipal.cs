@@ -1,4 +1,4 @@
-using Boom;
+using BoomDaoWrapper;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -18,7 +18,7 @@ public class CopyPrincipal : MonoBehaviour
 
     private void Copy()
     {
-        string _text = UserUtil.GetPrincipal();
+        string _text = BoomDaoUtility.Instance.UserPrincipal;
         Utilities.DoCopyToClipboard(_text);
     }
 }

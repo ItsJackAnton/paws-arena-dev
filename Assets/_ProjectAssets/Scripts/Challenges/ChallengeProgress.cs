@@ -54,6 +54,11 @@ public class ChallengeProgress
 
     private bool CanIncreaseValue()
     {
+        if (DataManager.Instance.GameData.GetChallengeByIdentifier(Identifier)==null)
+        {
+            return false;
+        }
+        
         if (Completed)
         {
             return false;

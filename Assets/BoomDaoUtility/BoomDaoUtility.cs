@@ -31,6 +31,8 @@ namespace BoomDaoWrapper
 
         public bool IsLoggedIn => UserUtil.IsLoggedIn();
 
+        public string UserPrincipal => UserUtil.GetPrincipal();
+
         private void Awake()
         {
             if (Instance == null)
@@ -371,7 +373,6 @@ namespace BoomDaoWrapper
                     {
                         continue;
                     }
-                    Debug.Log($"{_entityId}: {_value}");
                     _entry.Data.Add(_entityId,_value);    
                 }
                 _output.Add(_entry);

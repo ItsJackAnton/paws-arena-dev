@@ -157,11 +157,8 @@ public class PlayerData
     public const string LEADERBOARD_POINTS = "leaderboardPoints";
     
     public const string NAME_KEY = "username";
-    public const string USE_MILK_BOTTLE = "useMilkBottle";
-    public const string USE_MILK_GLASS = "useMilkGlass";
-    
-    public const string KITTY_RECOVERY_KEY = "recoveryDate";
-    public const string KITTY_KEY = "kitty_id";
+    public const string USE_MILK_BOTTLE = "useMilkBottle2";
+    public const string USE_MILK_GLASS = "useMilkGlass2";
 
     public const string COMMON_SHARD = "commonShard";
     public const string UNCOMMON_SHARD = "uncommonShard";
@@ -425,23 +422,6 @@ public class PlayerData
             double _amountOfGamesPlayedToday = BoomDaoUtility.Instance.GetDouble(AMOUNT_OF_GAMES_PLAYED_TODAY, BoomDaoUtility.AMOUNT_KEY);
             return _amountOfGamesPlayedToday<=5;
         }
-    }
-    
-    public DateTime GetKittyRecoveryDate(string _kittyId)
-    {
-        double _recoveryTimeSpan = BoomDaoUtility.Instance.GetDouble(_kittyId, KITTY_RECOVERY_KEY);
-        DateTime _recoveryDate = Utilities.NanosecondsToDateTime(_recoveryTimeSpan);
-        if (_recoveryDate <= DateTime.UtcNow)
-        {
-            _recoveryDate = default;
-        }
-
-        return _recoveryDate;
-    }
-    
-    public bool IsKittyHurt(string _kittyId)
-    {
-        return BoomDaoUtility.Instance.DoesEntityExist(_kittyId);
     }
 
     public int LeaderboardPoints => BoomDaoUtility.Instance.GetInt(LEADERBOARD_POINTS, AMOUNT_KEY);

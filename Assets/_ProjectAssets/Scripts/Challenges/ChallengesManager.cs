@@ -455,10 +455,4 @@ public class ChallengesManager : MonoBehaviour
         progressToUpdate.RemoveAt(0);
         TryUpdate();
     }
-
-    [Button()]
-    private void Test()
-    {
-        
-    }
 }

@@ -174,9 +174,9 @@ public class NftSelection : MonoBehaviour
         foreach (NFT _nft in currentNfts)
         {
             _nft.RecoveryEndDate = DateTime.MinValue;
-            if (DataManager.Instance.PlayerData.IsKittyHurt(_nft.imageUrl))
+            if (DataManager.Instance.GameData.IsKittyHurt(_nft.imageUrl))
             {
-                _nft.RecoveryEndDate = DataManager.Instance.PlayerData.GetKittyRecoveryDate(_nft.imageUrl);
+                _nft.RecoveryEndDate = DataManager.Instance.GameData.GetKittyRecoveryDate(_nft.imageUrl);
             }
             
             nftButtons[_idx].GetComponent<NFTImageButton>().SetTexture(_nft.imageTex);

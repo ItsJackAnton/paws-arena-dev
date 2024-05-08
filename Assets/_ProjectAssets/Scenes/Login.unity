@@ -445,7 +445,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c1d1c2dfc787348249866e8b86672da0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  score: 1804000000
+  IsGeneratingNewChallenges: 0
 --- !u!4 &282485383
 Transform:
   m_ObjectHideFlags: 0
@@ -703,7 +703,7 @@ PrefabInstance:
       objectReference: {fileID: 11400000, guid: 91d457e6a049f924d83c32c9b53ecca9, type: 2}
     - target: {fileID: 2393423864867871020, guid: bb357f1634528a149871a2f38d213b8b, type: 3}
       propertyPath: enableBoomLogs
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 2393423864867871020, guid: bb357f1634528a149871a2f38d213b8b, type: 3}
       propertyPath: <WORLD_CANISTER_ID>k__BackingField

@@ -61,8 +61,9 @@ public class GameData
     private const string BOTTLE_MILK_PRICE = "milkBottle";
     private const string PRICE_TAG = "price";
     private const string AMOUNT_OF_REWARDS = "amountOfRewards";
-    private const string TYPE = "type";
-    private const string AMOUNT = "amount";
+    
+    public const string KITTY_RECOVERY_KEY = "recoveryDate";
+    public const string KITTY_KEY = "kittyId";
     
     private List<LevelReward> seasonRewards;
 
@@ -150,7 +151,7 @@ public class GameData
             return _leaderboardData;
         }
     }
-
+    
     public DailyChallenges DailyChallenges
     {
         get
@@ -212,8 +213,19 @@ public class GameData
         {
             return null;
         }
-        
-        return DataManager.Instance.GameData.DailyChallenges.Challenges.Find(_challenge => _challenge.Identifier == _identifier);
+
+        ChallengeData _challengeData = null;
+        foreach (var _challenge in DataManager.Instance.GameData.DailyChallenges.Challenges)
+        {
+            if (_challenge.Identifier != _identifier)
+            {
+                continue;
+            }
+            _challengeData = _challenge;
+            break;
+        }
+
+        return _challengeData;
     }
 
     public int GetChallengeIndex(ChallengeProgress _challengeProgress)
@@ -242,5 +254,75 @@ public class GameData
         }
 
         throw new Exception("Can't find index of challenge");
+    }
+    
+    public DateTime GetKittyRecoveryDate(string _kittyId)
+    {
+        string _recoveryDateString = GetKittyRecoveryString(_kittyId);
+        
+        if (string.IsNullOrEmpty(_recoveryDateString))
+        {
+            return DateTime.MinValue;
+        }
+        
+        DateTime _recoveryDate = Utilities.NanosecondsToDateTime(Convert.ToDouble(_recoveryDateString));
+        if (_recoveryDate <= DateTime.UtcNow)
+        {
+            _recoveryDate = default;
+        }
+
+        return _recoveryDate;
+    }
+    
+    public bool IsKittyHurt(string _kittyId)
+    {
+        string _recoveryDateString = GetKittyRecoveryString(_kittyId);
+        
+        if (string.IsNullOrEmpty(_recoveryDateString))
+        {
+            return false;
+        }
+
+        DateTime _recoveryDate = Utilities.NanosecondsToDateTime(Convert.ToDouble(_recoveryDateString));
+        
+        return _recoveryDate > DateTime.UtcNow;
+    }
+
+    private string GetKittyRecoveryString(string _kittyId)
+    {
+        List<WorldDataEntry> _recoveryEntires = BoomDaoUtility.Instance.GetWorldData(KITTY_RECOVERY_KEY);
+        if (_recoveryEntires==null)
+        {
+            return string.Empty;
+        }
+
+        string _recoveryDateString = string.Empty;
+
+        foreach (var _recoveryEntire in _recoveryEntires)
+        {
+            if (_recoveryEntire.PrincipalId != _kittyId)
+            {
+                continue;
+            }
+
+            if (_recoveryEntire.Data.Count == 0)
+            {
+                continue;
+            }
+            
+            foreach (var _worldDataEntry in _recoveryEntire.Data)
+            {
+                if (_worldDataEntry.Key != KITTY_RECOVERY_KEY)
+                {
+                    continue;
+                }
+            
+                _recoveryDateString = _worldDataEntry.Value;
+                break;
+            }
+        }
+        
+
+        return _recoveryDateString;
     }
 }
