@@ -647,6 +647,7 @@ MonoBehaviour:
   launchPointLeftPosition: {x: 0.984, y: -0.165}
   launchPointRightPosition: {x: 0.811, y: 0.165}
   currentPower: 0
+  DoHandleKeyboardInput: 0
 --- !u!114 &5767305366585896500
 MonoBehaviour:
   m_ObjectHideFlags: 0

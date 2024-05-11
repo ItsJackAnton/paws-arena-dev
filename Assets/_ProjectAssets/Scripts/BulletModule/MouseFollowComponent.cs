@@ -1,5 +1,4 @@
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class MouseFollowComponent : BulletComponent
@@ -8,20 +7,18 @@ public class MouseFollowComponent : BulletComponent
     [SerializeField] private float speed = 1f;
     [SerializeField] private float rotationCorrectionSpeed = 10f;
     [SerializeField] private AudioSource followingSound;
+    [SerializeField] private LayerMask obstacleLayer; 
+    private float raycastDistance = 0.5f;
 
-
+    private float jumpForce=5f;
     private bool hasHitGround = false;
     private Transform playerToFollow;
+    private bool canJump = true;
 
     protected override void Start()
     {
         base.Start();
-
-        //rb.freezeRotation = true;
-
-
         playerToFollow = isMine ? PlayerManager.Instance.otherPlayerTransform : PlayerManager.Instance.myPlayer.transform;
-
     }
 
     private void Update()
@@ -31,14 +28,22 @@ public class MouseFollowComponent : BulletComponent
             transform.rotation = Quaternion.RotateTowards(transform.rotation, Quaternion.Euler(new Vector3(0, 0, 0)), rotationCorrectionSpeed * Time.deltaTime);
         }
         
-        //var clampedRot = Mathf.Clamp(transform.localRotation.z, -30, 30);
-        //transform.localRotation = Quaternion.Euler(new Vector3(0, 0, clampedRot));
+        // Check for obstacles in front
+        RaycastHit2D hit = Physics2D.Raycast(transform.position, transform.right, raycastDistance, obstacleLayer);
+        if (hit.collider != null && canJump)
+        {
+            StartCoroutine(JumpCooldown());
+            float horizontalSpeed = Mathf.Abs(rb.velocity.x);
+            float adjustedJumpForce = jumpForce + (horizontalSpeed * 0.1f); // Adjust the multiplier as needed
 
+            rb.AddForce(Vector2.up * adjustedJumpForce, ForceMode2D.Impulse);
+        }
+        
         if (!hasHitGround) return;
 
         float dir = Mathf.Sign(playerToFollow.position.x - transform.position.x);
         float force = dir * Time.deltaTime * speed;
-        rb.AddForce(new Vector2(force, 0), ForceMode2D.Force);     
+        rb.velocity = new Vector2(force, rb.velocity.y);     
         
         if(dir < 0)
         {
@@ -48,11 +53,18 @@ public class MouseFollowComponent : BulletComponent
         {
             transform.localScale = Vector3.one;
         }
+    }
 
+    private IEnumerator JumpCooldown()
+    {
+        canJump = false;
+        yield return new WaitForSeconds(1);
+        canJump = true;
     }
 
     protected override void HandleCollision(Vector2 hitPose)
     {
+        Debug.Log("landed");
         StartCoroutine(FollowEnemy(followTime, hitPose));
     }
 
