@@ -1,20 +1,14 @@
-using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using BoomDaoWrapper;
-using UnityEngine;
 
 [Serializable]
 public class PlayerData
 {
-    public const string EARNED_XP_KEY = "earnedXp";
     
     private List<int> ownedEquiptables;
-    private int seasonNumber;
     private List<int> ownedEmojis;
     private DailyChallenges dailyChallenges = new();
-    private string guildId = string.Empty;
-
     public void SetStartingValues()
     {
         ownedEquiptables = new List<int>()
@@ -34,13 +28,11 @@ public class PlayerData
             4
         };
     }
-
     public List<int> OwnedEquiptables
     {
         get { return ownedEquiptables; }
         set { ownedEquiptables = value; }
     }
-
     public void AddOwnedEquipment(int _id)
     {
         if (ownedEquiptables.Contains(_id))
@@ -50,7 +42,6 @@ public class PlayerData
 
         ownedEquiptables.Add(_id);
     }
-
     public void RemoveOwnedEquipment(int _id)
     {
         if (!ownedEquiptables.Contains(_id))
@@ -60,7 +51,6 @@ public class PlayerData
 
         ownedEquiptables.Remove(_id);
     }
-
     public List<int> OwnedEmojis
     {
         get => ownedEmojis;
@@ -70,7 +60,6 @@ public class PlayerData
             ownedEmojis.Sort();
         }
     }
-
     public void AddOwnedEmoji(int _id)
     {
         if (ownedEmojis.Contains(_id))
@@ -82,83 +71,13 @@ public class PlayerData
         ownedEmojis.Sort();
     }
 
-    public string GuildId
-    {
-        get => guildId;
-        set
-        {
-            guildId = value;
-        }
-    }
-
-    [JsonIgnore] public bool IsInGuild => !string.IsNullOrEmpty(GuildId);
-
-    [JsonIgnore]
-    public GuildData Guild
-    {
-        get
-        {
-            if (!IsInGuild)
-            {
-                return null;
-            }
-
-            GuildData _guild;
-            try
-            {
-                _guild = DataManager.Instance.GameData.Guilds[guildId];
-            }
-            catch
-            {
-                GuildId = string.Empty;
-                return null;
-            }
-
-            if (_guild == null)
-            {
-                GuildId = string.Empty;
-                return null;
-            }
-
-            bool _isStillInGuild = false;
-            // foreach (var _player in _guild.Players)
-            // {
-            //     if (_player.Id == FirebaseManager.Instance.PlayerId)
-            //     {
-            //         _isStillInGuild = true;
-            //     }
-            // }
-
-
-            if (!_isStillInGuild)
-            {
-                GuildId = string.Empty;
-                return null;
-            }
-
-            _guild.ReorderPlayersByPoints();
-            return _guild;
-        }
-    }
-
     // new system
-    public static Action OnUpdatedSnacks;
-    public static Action OnUpdatedShards;
-    public static Action OnUpdatedExp;
-    public static Action OnUpdatedJugOfMilk;
-    public static Action OnUpdatedGlassOfMilk;
-    public static Action OnClaimedReward;
-    public static Action OnBoughtPass;
-    public static Action OnUpdatedCraftingProcess;
-    public static Action OnUpdatedToken;
-
     public const string SNACKS = "snack";
     public const string FREE_EMOJI = "freeEmoji";
     public const string LEADERBOARD_POINTS = "leaderboardPoints";
+    public const string EARNED_XP_KEY = "earnedXp";
     
     public const string NAME_KEY = "username";
-    public string UseMilkBottle => GameState.selectedNFT.IsDefaultKitty ? "useMilkBottle" : "useMilkBottle2";
-    public string UseMilkGlass => GameState.selectedNFT.IsDefaultKitty ? "useMilkGlass" : "useMilkGlass2";
 
     public const string COMMON_SHARD = "commonShard";
     public const string UNCOMMON_SHARD = "uncommonShard";
@@ -187,10 +106,23 @@ public class PlayerData
 
     public const string AMOUNT_OF_GAMES_PLAYED_TODAY = "amountOfGamesPlayedToday";
     public const string RESET_AMOUNT_OF_GAMES_PLAYED_TODAY = "resetAmountOfGamesPlayedToday";
+    
+    public static Action OnUpdatedSnacks;
+    public static Action OnUpdatedShards;
+    public static Action OnUpdatedExp;
+    public static Action OnUpdatedJugOfMilk;
+    public static Action OnUpdatedGlassOfMilk;
+    public static Action OnClaimedReward;
+    public static Action OnBoughtPass;
+    public static Action OnUpdatedCraftingProcess;
+    public static Action OnUpdatedToken;
 
     public int Level { get; private set; }
     public int ExperienceOnCurrentLevel { get; private set; }
     public int ExperienceForNextLevel { get; private set; }
+    
+    public string UseMilkBottle => GameState.selectedNFT.IsDefaultKitty ? "useMilkBottle" : "useMilkBottle2";
+    public string UseMilkGlass => GameState.selectedNFT.IsDefaultKitty ? "useMilkGlass" : "useMilkGlass2";
 
     public string Username => BoomDaoUtility.Instance.GetString(USER_PROFILE, NAME_KEY);
 
@@ -425,4 +357,28 @@ public class PlayerData
     }
 
     public int LeaderboardPoints => BoomDaoUtility.Instance.GetInt(LEADERBOARD_POINTS, AMOUNT_KEY);
+
+    public string GuildId => BoomDaoUtility.Instance.GetString(GameData.GUILD_ID, BoomDaoUtility.VALUE_KEY);
+
+    public bool IsInAGuild => !string.IsNullOrEmpty(GuildId.Trim());
+
+    public GuildData Guild
+    {
+        get
+        {
+
+            foreach (var _guild in DataManager.Instance.GameData.Guilds)
+            {
+                var _guildPlayer = _guild.Players.Find(_player => _player.Principal == BoomDaoUtility.Instance.UserPrincipal);
+                if (_guildPlayer == null)
+                {
+                    continue;
+                }
+
+                return _guild;
+            }
+
+            return null;
+        }
+    }
 }

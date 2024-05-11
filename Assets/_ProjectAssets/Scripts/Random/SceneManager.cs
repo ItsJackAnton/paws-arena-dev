@@ -13,6 +13,7 @@ public class SceneManager : MonoBehaviour
     public const string SINGLE_PLAYER = "SinglePlayerGameRoom";
     public const string GAME_SCENE = "GameScene";
     public const string SINGLE_PLAYER_GAME = "SinglePlayerGame";
+    public const string GUILDS = "Guilds";
     public static SceneManager Instance;
 
     private void Awake()
@@ -31,8 +32,13 @@ public class SceneManager : MonoBehaviour
     public void LoadNftSelection()
     {
         LoadScene(NFT_SELECTION);
-    }    
-    
+    }
+
+    public void LoadGuilds()
+    {
+        LoadScene(GUILDS);
+    }
+
     public void LoadLoginScene()
     {
         LoadScene(LOGIN_SCENE);

@@ -197,31 +197,73 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   items:
-  - Sprite: {fileID: 21300000, guid: a328420e74036be489a81fd8304c0bde, type: 3}
+  - Name: 
+    Sprite: {fileID: 21300000, guid: a328420e74036be489a81fd8304c0bde, type: 3}
     Type: 0
-  - Sprite: {fileID: 21300000, guid: 2c35e99b80a18014db9386a56195cac5, type: 3}
+  - Name: 
+    Sprite: {fileID: 21300000, guid: 2c35e99b80a18014db9386a56195cac5, type: 3}
     Type: 1
-  - Sprite: {fileID: 21300000, guid: 8973596adb7b4544ca6a3c3e46189e41, type: 3}
+  - Name: 
+    Sprite: {fileID: 21300000, guid: 8973596adb7b4544ca6a3c3e46189e41, type: 3}
     Type: 2
-  - Sprite: {fileID: 21300000, guid: f01df40dcc8b6c44c9abe081fed80db3, type: 3}
+  - Name: 
+    Sprite: {fileID: 21300000, guid: f01df40dcc8b6c44c9abe081fed80db3, type: 3}
     Type: 3
-  - Sprite: {fileID: 21300000, guid: b5798a61abc64d040b32f98175de7e53, type: 3}
+  - Name: 
+    Sprite: {fileID: 21300000, guid: b5798a61abc64d040b32f98175de7e53, type: 3}
     Type: 4
-  - Sprite: {fileID: 21300000, guid: 90def325780eff04b824e650a86eab3e, type: 3}
+  - Name: 
+    Sprite: {fileID: 21300000, guid: 90def325780eff04b824e650a86eab3e, type: 3}
     Type: 5
-  - Sprite: {fileID: 21300000, guid: d8767927beb3c1946bcf5cc014a51898, type: 3}
+  - Name: 
+    Sprite: {fileID: 21300000, guid: d8767927beb3c1946bcf5cc014a51898, type: 3}
     Type: 6
-  - Sprite: {fileID: 21300000, guid: 8eb374f05f4e1024c8a95802d609a05b, type: 3}
+  - Name: 
+    Sprite: {fileID: 21300000, guid: 8eb374f05f4e1024c8a95802d609a05b, type: 3}
     Type: 7
-  - Sprite: {fileID: 21300000, guid: 905486495de344203aa370f861252035, type: 3}
+  - Name: 
+    Sprite: {fileID: 21300000, guid: 905486495de344203aa370f861252035, type: 3}
     Type: 11
   rewardsForChallenges:
-  - Sprite: {fileID: 21300000, guid: 905486495de344203aa370f861252035, type: 3}
+  - Name: 
+    Sprite: {fileID: 21300000, guid: 905486495de344203aa370f861252035, type: 3}
     Type: 11
-  - Sprite: {fileID: 21300000, guid: 3a79efd68c45e714aa33e96292840838, type: 3}
+  - Name: 
+    Sprite: {fileID: 21300000, guid: 3a79efd68c45e714aa33e96292840838, type: 3}
     Type: 6
-  - Sprite: {fileID: 21300000, guid: 4ff8c242cb5e9c742b248156e4b24506, type: 3}
+  - Name: 
+    Sprite: {fileID: 21300000, guid: 4ff8c242cb5e9c742b248156e4b24506, type: 3}
     Type: 7
+  guildKingdoms:
+  - {fileID: 21300000, guid: 258d015cf7d95f743ac7c69c43b4e6bd, type: 3}
+  - {fileID: 21300000, guid: 85b75e8409091054faac7c4e76aa8f6b, type: 3}
+  - {fileID: 21300000, guid: 89e0d786f01bb11459042790b126a548, type: 3}
+  - {fileID: 21300000, guid: ca0b3bae672bf484d81dad406cbc1268, type: 3}
+  - {fileID: 21300000, guid: e884967dd200ff5468b1a7f98b5c2627, type: 3}
+  - {fileID: 21300000, guid: 3260a78162d950647b57f7dc45069f15, type: 3}
+  - {fileID: 21300000, guid: cd6da7f7c5e526c48a0b503021d23236, type: 3}
+  guildBadge:
+  - {fileID: 21300000, guid: a10f51ab23f82c743b4263e08a6746f4, type: 3}
+  - {fileID: 21300000, guid: 35dcc47c40a61ca47bc6d20fbc08614a, type: 3}
+  - {fileID: 21300000, guid: 29ea322ff85ae9d409350d101651777c, type: 3}
+  - {fileID: 21300000, guid: 625ab9f9ea42cb5479d000ca350aaffa, type: 3}
+  - {fileID: 21300000, guid: d252d52ca520a174ba4cc83f6059c786, type: 3}
+  - {fileID: 21300000, guid: df5046730effde448b31462193975456, type: 3}
+  - {fileID: 21300000, guid: 1421d5bc9d804dd4a95cc5c56a46901d, type: 3}
+  - {fileID: 21300000, guid: b5702c955fdb2194e81a37b6322c9b9a, type: 3}
+  - {fileID: 21300000, guid: 74373d4ea98b5ad4dade7a8743d6a99b, type: 3}
+  - {fileID: 21300000, guid: c992a502f2fa338479c04d1ef1f0d7b1, type: 3}
+  - {fileID: 21300000, guid: 9daa840e88e7d52448c38dde2fb83bbe, type: 3}
+  - {fileID: 21300000, guid: a94bc6df4b363114988fbc8f4b1e4c30, type: 3}
+  - {fileID: 21300000, guid: 72322d3d99ef51049b5bfb8192706f64, type: 3}
+  - {fileID: 21300000, guid: 2355a8cc06936dd45b45581e2f450285, type: 3}
+  - {fileID: 21300000, guid: 528f30406b694964e91887c854171d5e, type: 3}
+  - {fileID: 21300000, guid: 8dc781d3cc46d7e47a30a1d689b8576e, type: 3}
+  - {fileID: 21300000, guid: 8eeaa1c42973ba3409ecc45d2c9a96d9, type: 3}
+  - {fileID: 21300000, guid: 175895ade31d175469593362b84dd87b, type: 3}
+  - {fileID: 21300000, guid: 7048e200c7b8f5849a8121e44318a626, type: 3}
+  - {fileID: 21300000, guid: a3781f0fdfd6c2f4eafdea4dd4e01973, type: 3}
+  - {fileID: 21300000, guid: e4ac74a430fe9784fb9e454cea849f0f, type: 3}
 --- !u!4 &9315802
 Transform:
   m_ObjectHideFlags: 0

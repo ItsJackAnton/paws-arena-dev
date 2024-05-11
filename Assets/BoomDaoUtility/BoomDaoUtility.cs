@@ -5,6 +5,8 @@ using Boom;
 using Boom.Patterns.Broadcasts;
 using Boom.Values;
 using Candid.World.Models;
+using NaughtyAttributes;
+using Newtonsoft.Json;
 using UnityEngine;
 using WebSocketSharp;
 using Action = System.Action;
@@ -451,5 +453,17 @@ namespace BoomDaoWrapper
         }
 
         #endregion
+        
+        [Button()]
+        private void GetGuilds()
+        {
+            Debug.Log(JsonConvert.SerializeObject(DataManager.Instance.GameData.Guilds));
+        }
+
+        [Button()]
+        private void GetGuildPrice()
+        {
+            Debug.Log(DataManager.Instance.GameData.GuildPrice);
+        }
     }
 }

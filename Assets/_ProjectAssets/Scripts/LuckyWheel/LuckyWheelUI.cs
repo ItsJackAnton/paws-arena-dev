@@ -27,7 +27,7 @@ public class LuckyWheelUI : MonoBehaviour
     public static EquipmentData EquipmentData = null;
 
     private bool requestedToSeeReward;
-    private int currentRespinPrice;
+    private double currentRespinPrice;
 
     public void RequestReward()
     {

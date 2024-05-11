@@ -279,7 +279,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 8540616130388727823}
-  - component: {fileID: 3166501989508509487}
+  - component: {fileID: 7589317443842617203}
   m_Layer: 5
   m_Name: GuildPlayerDisplay
   m_TagString: Untagged
@@ -310,10 +310,10 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 419.56, y: -29.545}
+  m_AnchoredPosition: {x: 419.56006, y: -29.545044}
   m_SizeDelta: {x: 839.12, y: 59.09}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &3166501989508509487
+--- !u!114 &7589317443842617203
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -322,7 +322,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 1320047578633827209}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ea8ffd0be85ff2e468e08a78c2a38c12, type: 3}
+  m_Script: {fileID: 11500000, guid: 5d05fb462f8420d4dbca1b41d814ecda, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   placeDisplay: {fileID: 3885549264786548516}

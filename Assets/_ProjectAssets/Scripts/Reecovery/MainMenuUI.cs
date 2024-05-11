@@ -19,6 +19,7 @@ public class MainMenuUI : MonoBehaviour
     [SerializeField] private Button settings;
     [SerializeField] private Button fightButton;
     [SerializeField] private Button tutorialButton;
+    [SerializeField] private Button guildsButton;
     [SerializeField] private GameObject generatingChallenges;
 
     private void OnEnable()
@@ -26,6 +27,7 @@ public class MainMenuUI : MonoBehaviour
         tutorialButton.onClick.AddListener(ShowTutorial);
         settings.onClick.AddListener(ShowSettings);
         lobby.onClick.AddListener(ShowLobby);
+        guildsButton.onClick.AddListener(ShowGuilds);
         GameState.selectedNFT.UpdatedRecoveryTime += CheckIfShouldStopRecovering;
         PlayerData.OnUpdatedExp += ShowLevelProgress;
         fightButton.onClick.AddListener(JoinRoom);
@@ -39,6 +41,7 @@ public class MainMenuUI : MonoBehaviour
         tutorialButton.onClick.RemoveListener(ShowTutorial);
         settings.onClick.RemoveListener(ShowSettings);
         lobby.onClick.RemoveListener(ShowLobby);
+        guildsButton.onClick.RemoveListener(ShowGuilds);
         GameState.selectedNFT.UpdatedRecoveryTime -= CheckIfShouldStopRecovering;
         PlayerData.OnUpdatedExp -= ShowLevelProgress;
         fightButton.onClick.RemoveListener(JoinRoom);
@@ -58,6 +61,12 @@ public class MainMenuUI : MonoBehaviour
     {
         SceneManager.Instance.LoadLeaderboard();
     }
+
+    private void ShowGuilds()
+    {
+        SceneManager.Instance.LoadGuilds();
+    }
+    
 
     private void CheckIfShouldStopRecovering()
     {

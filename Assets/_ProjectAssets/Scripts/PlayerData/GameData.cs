@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using BoomDaoWrapper;
 using Newtonsoft.Json;
 using UnityEngine;
@@ -7,44 +8,9 @@ using UnityEngine;
 [Serializable]
 public class GameData
 {
-    private int respinPrice;
-    private int guildPrice;
-    private int guildMaxPlayers;
-    private Dictionary<string, GuildData> guilds = new ();
+    public double RespinPrice => BoomDaoUtility.Instance.GetConfigDataAsDouble("respinPrice", "cost");
 
-    public int RespinPrice
-    {
-        get
-        {
-            return respinPrice;
-        }
-        set
-        {
-            respinPrice = value;
-        }
-    }
-
-    public int GuildPrice
-    {
-        get => guildPrice;
-        set => guildPrice = value;
-    }
-
-    public Dictionary<string, GuildData> Guilds
-    {
-        get => guilds;
-        set => guilds = value;
-    }
-
-    public int GuildMaxPlayers
-    {
-        get=> guildMaxPlayers;
-        set => guildMaxPlayers=value;
-    }
-
-    public GuildRankingBorders RankingBorders;
-
-    
+    //new system
     public const string CLAIM_PREMIUM_REWARD = "battlePassPremium";
     public const string CLAIM_NORMAL_REWARD = "battlePassNormal";
     public const string LEADERBOARD_POINTS = "leaderboardPoints";
@@ -59,6 +25,15 @@ public class GameData
     private const string BOTTLE_MILK_PRICE = "milkBottle";
     private const string PRICE_TAG = "price";
     private const string AMOUNT_OF_REWARDS = "amountOfRewards";
+    
+    public const string GUILD_ID = "guildId";
+    public const string GUILD_NAME = "name";
+    public const string GUILD_KINGDOM_NAME = "kingdomName";
+    public const string GUILD_OWNER = "owner";
+    public const string GUILD_BADGE_NAME = "badgeName";
+    public const string GUILD_POINTS_REQUIREMENT = "pointsRequirement";
+    public const string GUILD_PLAYERS = "players";
+
     
     public const string KITTY_RECOVERY_KEY = "recoveryDate";
     public string KittyKey => GameState.selectedNFT.IsDefaultKitty ? "kitty_id" : "kittyId";
@@ -288,15 +263,15 @@ public class GameData
 
     private string GetKittyRecoveryString(string _kittyId)
     {
-        List<WorldDataEntry> _recoveryEntires = BoomDaoUtility.Instance.GetWorldData(KITTY_RECOVERY_KEY);
-        if (_recoveryEntires==null)
+        List<WorldDataEntry> _recoveryEntries = BoomDaoUtility.Instance.GetWorldData(KITTY_RECOVERY_KEY);
+        if (_recoveryEntries==null)
         {
             return string.Empty;
         }
 
         string _recoveryDateString = string.Empty;
 
-        foreach (var _recoveryEntire in _recoveryEntires)
+        foreach (var _recoveryEntire in _recoveryEntries)
         {
             if (_recoveryEntire.PrincipalId != _kittyId)
             {
@@ -337,4 +312,78 @@ public class GameData
             return _data;
         }
     }
+
+    public List<GuildData> Guilds
+    {
+        get
+        {
+            List<WorldDataEntry> _entries = BoomDaoUtility.Instance.GetWorldData(GUILD_ID, GUILD_NAME, GUILD_PLAYERS, GUILD_BADGE_NAME, 
+            GUILD_KINGDOM_NAME, GUILD_POINTS_REQUIREMENT, GUILD_OWNER);
+            
+            if (_entries==null)
+            {
+                Debug.Log("No entries found");
+                return new List<GuildData>();
+            }
+            
+            var _leaderboardEntries = GetLeaderboard.Entries;
+            List<GuildData> _guilds = new();
+            foreach (var _worldEntry in _entries)
+            {
+                if (_worldEntry.PrincipalId == "de572c03-e27f-4d67-8e06-84cef068a952")
+                {
+                    Debug.Log("Found guild");
+                    Debug.Log(JsonConvert.SerializeObject(_worldEntry.Data));
+                }
+                if (_worldEntry.GetProperty(GUILD_KINGDOM_NAME)== null)
+                {
+                    continue;
+                }
+                
+                GuildData _guildData = new GuildData
+                {
+                    Id = _worldEntry.GetProperty(GUILD_ID),
+                    Name = _worldEntry.GetProperty(GUILD_NAME),
+                    KingdomName = _worldEntry.GetProperty(GUILD_KINGDOM_NAME),
+                    BadgeName = _worldEntry.GetProperty(GUILD_BADGE_NAME),
+                    PointsRequirement = Convert.ToInt32(_worldEntry.GetProperty(GUILD_POINTS_REQUIREMENT)),
+                    Owner = _worldEntry.GetProperty(GUILD_OWNER)
+                };
+                
+                _guilds.Add(_guildData);
+
+                if (string.IsNullOrEmpty(_worldEntry.GetProperty(GUILD_PLAYERS)))
+                {
+                    Debug.Log("Found guild but it has no players");
+                    continue;
+                }
+
+                List<GuildPlayerData> _players = JsonConvert.DeserializeObject<List<GuildPlayerData>>(_worldEntry.GetProperty(GUILD_PLAYERS));
+                foreach (var _player in _players)
+                {
+                    LeaderboardEntries _leaderboardEntry = _leaderboardEntries.Find(_entry => _entry.PrincipalId == _player.Principal);
+                    if (_leaderboardEntry == null)
+                    {
+                        _player.Points = 0;
+                        _player.Name = "WaitingForLeaderboardEntry";
+                        continue;
+                    }
+
+                    _player.Points = _leaderboardEntry.Points;
+                    _player.Name = _leaderboardEntry.Nickname;
+                    _player.IsLeader = _player.Principal == _guildData.Owner;
+                }
+
+                _guildData.Players = _players.OrderByDescending(_player => _player.Points).ToList();
+            }
+
+            return _guilds;
+        }
+    }
+
+    public double GuildPrice => BoomDaoUtility.Instance.GetConfigDataAsDouble("guildsConfig", "price");
+    public double MaxGuildPlayers => BoomDaoUtility.Instance.GetConfigDataAsDouble("guildsConfig", "maxPlayers");
+    public double GuildGoldBar => BoomDaoUtility.Instance.GetConfigDataAsDouble("guildsConfig", "goldBar");
+    public double GuildSilverBar => BoomDaoUtility.Instance.GetConfigDataAsDouble("guildsConfig", "silverBar");
+    public double GuildBronzeBar => BoomDaoUtility.Instance.GetConfigDataAsDouble("guildsConfig", "bronzeBar");
 }
