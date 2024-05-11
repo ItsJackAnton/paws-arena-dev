@@ -45,8 +45,6 @@ public class GameData
     public GuildRankingBorders RankingBorders;
 
     
-    // new system
-    
     public const string CLAIM_PREMIUM_REWARD = "battlePassPremium";
     public const string CLAIM_NORMAL_REWARD = "battlePassNormal";
     public const string LEADERBOARD_POINTS = "leaderboardPoints";
@@ -324,5 +322,19 @@ public class GameData
         
 
         return _recoveryDateString;
+    }
+
+    public FlagData FlagData
+    {
+        get
+        {
+            List<ConfigData> _flagConfigData = BoomDaoUtility.Instance.GetConfigData("mainMenuFlag");
+            FlagData _data = new FlagData
+            {
+                ImageUrl = _flagConfigData.FindEntityValue("imageUrl"),
+                Description = _flagConfigData.FindEntityValue("description").ReplaceBackslashN()
+            };
+            return _data;
+        }
     }
 }

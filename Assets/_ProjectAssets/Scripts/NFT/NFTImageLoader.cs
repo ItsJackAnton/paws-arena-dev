@@ -5,6 +5,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Xml;
+using Newtonsoft.Json;
 using Unity.VectorGraphics;
 using UnityEngine;
 using UnityEngine.Networking;
@@ -89,8 +90,21 @@ public class NFTImageLoader
         // Set the pixels of each sprite onto the final texture
         foreach (XmlNode image in images)
         {
-            var id = image.Attributes["id"];
-            if (id == null) continue;
+            XmlAttribute id = image.Attributes["id"];
+            if (id == null)
+            {
+                string _href = image.Attributes["href"].Value;
+                string _hrefLast6 = _href.Substring(_href.Length - 6);
+                if (_hrefLast6 == "SuQmCC")
+                {
+                    id = image.OwnerDocument.CreateAttribute("id");
+                    id.Value = "body19";
+                }
+                else
+                {
+                    continue;
+                }
+            }
             if (id.Value == "Background")
             {
                 string _href = image.Attributes["href"].Value;
@@ -100,6 +114,7 @@ public class NFTImageLoader
                     id.Value = "bg2";
                 }
             }
+
             Sprite sprite = Resources.Load<Sprite>("KittiesParts/" + id.Value);
             if (sprite == null)
             {

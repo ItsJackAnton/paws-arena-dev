@@ -36,7 +36,6 @@ public class ConnectingToServer : MonoBehaviour
         GameState.principalId = _loginDataAsOk.principal;
         DataManager.Instance.Setup();
         ChallengesManager.Instance.Setup();
-        //MockNfts();
         
         SceneManager.Instance.LoadNftSelection();
     }
@@ -52,8 +51,8 @@ public class ConnectingToServer : MonoBehaviour
         {
             GameState.nfts.Add(new NFT()
             {
-                imageUrl = "https://webapiwithssl20230210160824.azurewebsites.net/download/files/blackKitty.svg"
-            });
+                imageUrl = "https://rw7qm-eiaaa-aaaak-aaiqq-cai.raw.icp0.io/?tokenid=45rna-aykor-uwiaa-aaaaa-cqace-eaqca-aadhw-q"
+            });  
         }
     }
 
@@ -65,7 +64,6 @@ public class ConnectingToServer : MonoBehaviour
 
     private static void UpdateNfts()
     {
-        Debug.Log("Fetching nfts");
         var _nftCollectionsResult = BoomDaoUtility.Instance.GetNftData;
         if (_nftCollectionsResult.IsErr)
         {

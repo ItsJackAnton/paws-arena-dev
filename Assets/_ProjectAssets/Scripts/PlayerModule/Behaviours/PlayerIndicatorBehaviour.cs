@@ -37,8 +37,11 @@ public class PlayerIndicatorBehaviour : MonoBehaviour
     private Config config => ConfigurationManager.Instance.Config;
     private Vector2 lastMousePosition;
     private float maxRadius = -1;
+    private float angle;
 
     private bool isHoldingSelect = false;
+
+    public bool DoHandleKeyboardInput;
 
     private void Start()
     {
@@ -58,6 +61,47 @@ public class PlayerIndicatorBehaviour : MonoBehaviour
         {
             indicatorCircle.CheckPointerClick(lastMousePosition);
         }
+    }
+    
+    private void FixedUpdate()
+    {
+        if (DoHandleKeyboardInput)
+        {
+            HandleKeyboardInput();
+        }
+    }
+
+    private void HandleKeyboardInput()
+    {
+        float _powerChanger = 0.01f;
+        float _angleChanger = 0.1f;
+        if (Input.GetKey(KeyCode.UpArrow) || Input.GetKey(KeyCode.W))
+        {
+            currentPower = Mathf.Clamp(currentPower + _powerChanger, 0, 1);
+            SetPowerLineLength(currentPower);
+        }
+        else if (Input.GetKey(KeyCode.DownArrow) || Input.GetKey(KeyCode.S))
+        {
+            currentPower = Mathf.Clamp(currentPower - _powerChanger, 0, 1);
+            SetPowerLineLength(currentPower);
+        }
+        else if (Input.GetKey(KeyCode.RightArrow)|| Input.GetKey(KeyCode.D))
+        {
+            angle -= _angleChanger; 
+            indicator.rotation = Quaternion.Euler(0, 0, angle);
+        }
+        else if (Input.GetKey(KeyCode.LeftArrow) || Input.GetKey(KeyCode.A))
+        {
+            angle += _angleChanger; 
+            indicator.rotation = Quaternion.Euler(0, 0, angle);
+        }
+        else
+        {
+            return;
+        }
+
+        OnIndicatorPlaced(angle,currentPower);
+        SetPowerLineLength(currentPower);
     }
 
     private void OnEnable()
@@ -99,9 +143,10 @@ public class PlayerIndicatorBehaviour : MonoBehaviour
         playerActions.Select.canceled += _ => isHoldingSelect = false;
     }
 
-    private void OnIndicatorPlaced(float angle, float power)
+    private void OnIndicatorPlaced(float _angle, float power)
     {
-        indicator.rotation = Quaternion.Euler(Vector3.zero.WithZ(angle));
+        angle = _angle;
+        indicator.rotation = Quaternion.Euler(Vector3.zero.WithZ(_angle));
 
         SingleAndMultiplayerUtils.RpcOrLocal(this, photonView, false, "SetPowerLineLength", RpcTarget.All, power);
     }

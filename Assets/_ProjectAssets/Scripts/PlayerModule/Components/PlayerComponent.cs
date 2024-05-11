@@ -52,6 +52,7 @@ public class PlayerComponent : MonoBehaviour
             InputManager.OnDragged += MobileMovement;
             InputManager.OnDragEnded += StopMobileMovement;
             InputManager.OnDoubleTap += MobileJump;
+            GetComponentInChildren<PlayerIndicatorBehaviour>().DoHandleKeyboardInput = true;
         }
     }
 

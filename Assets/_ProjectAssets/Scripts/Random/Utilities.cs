@@ -1,6 +1,8 @@
 using System;
+using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using System.Runtime.InteropServices;
+using BoomDaoWrapper;
 using UnityEngine;
 
 public static class Utilities
@@ -183,5 +185,23 @@ public static class Utilities
         {
             GUIUtility.systemCopyBuffer = _string;
         }
+    }
+
+    public static string FindEntityValue(this List<ConfigData> _this, string _key)
+    {
+        foreach (var _entity in _this)
+        {
+            if (_entity.Name==_key)
+            {
+                return _entity.Value;
+            }
+        }
+
+        return string.Empty;
+    }
+
+    public static string ReplaceBackslashN(this string _this)
+    {
+        return _this.Replace("\\n","\n");
     }
 }

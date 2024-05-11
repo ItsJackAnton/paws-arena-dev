@@ -163,28 +163,9 @@ public class PlayerThrowBehaviour : MonoBehaviour
 
             projectiles[i].GetComponent<BulletComponent>().Launch(direction, GetBulletSpeed());
         }
+        
         RoomStateManager.Instance.SetProjectileLaunchedState(weapon.waitBeforeTurnEnd);
     }
-
-    private LineRenderer lr;
-    private BotAIAim aiaim;
-    /*private void Update()
-    {
-        if (lr == null)
-        {
-            lr = gameObject.AddComponent<LineRenderer>();
-            lr.startWidth = 0.2f;
-
-            aiaim = new BotAIAim(BotManager.Instance.Enemy.ToArray());
-        }
-
-        Vector3 dir = Quaternion.Euler(0, 0, 10 * (0 - 1 / 2)) * launchPoint.up;
-        float force = GetBulletSpeed();
-
-        var pos = aiaim.SimulateArc(dir, launchPoint.position, force, 1).ToArray();
-        lr.positionCount = pos.Length;
-        lr.SetPositions(pos);
-    }*/
 
     private float GetBulletSpeed()
     {

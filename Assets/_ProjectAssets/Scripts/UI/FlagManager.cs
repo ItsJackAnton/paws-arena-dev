@@ -3,7 +3,6 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using UnityEngine.Networking;
-using Newtonsoft.Json;
 
 public class FlagManager : MonoBehaviour
 {
@@ -11,18 +10,14 @@ public class FlagManager : MonoBehaviour
     [SerializeField] private Image flagShineDisplay;
     [SerializeField] private TextMeshProUGUI messageDisplay;
     [SerializeField] private Material shiningMaterial;
-    [SerializeField] private string imageUrl;
-    [SerializeField] private string detailsUrl;
 
-    private static Sprite flagSprite = null;
-    private static string message;
+    private static Sprite flagSprite;
 
     private void Start()
     {
         if (flagSprite == null)
         {
             StartCoroutine(GetImageFromUrl());
-            StartCoroutine(GetMessage());
         }
         else
         {
@@ -32,7 +27,7 @@ public class FlagManager : MonoBehaviour
 
     private IEnumerator GetImageFromUrl()
     {
-        UnityWebRequest _request = UnityWebRequestTexture.GetTexture(imageUrl);
+        UnityWebRequest _request = UnityWebRequestTexture.GetTexture(DataManager.Instance.GameData.FlagData.ImageUrl);
         yield return _request.SendWebRequest();
 
         if (_request.result != UnityWebRequest.Result.Success)
@@ -65,27 +60,7 @@ public class FlagManager : MonoBehaviour
 
             shiningMaterial.SetTexture("_Mask", _texture);
         }
-        if (message != null)
-        {
-            messageDisplay.text = message;
-        }
-    }
-
-    private IEnumerator GetMessage()
-    {
-        UnityWebRequest _request = UnityWebRequest.Get(detailsUrl);
-        yield return _request.SendWebRequest();
-
-        if (_request.result != UnityWebRequest.Result.Success)
-        {
-            Debug.Log("Something went wrong while downloading tournament details");
-        }
-        else
-        {
-            var _jsonData = _request.downloadHandler.text;
-            TournamentResponse _response = JsonConvert.DeserializeObject<TournamentResponse>(_jsonData);
-            message = _response.Message;
-            SetDetails();
-        }
+        
+        messageDisplay.text = DataManager.Instance.GameData.FlagData.Description;
     }
 }
