@@ -7,4 +7,5 @@ public class LeaderboardEntries
     public string Nickname;
     public string KittyUrl;
     public int Points;
+    public int Level;
 }

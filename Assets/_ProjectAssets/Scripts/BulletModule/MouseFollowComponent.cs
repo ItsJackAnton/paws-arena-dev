@@ -4,10 +4,11 @@ using UnityEngine;
 public class MouseFollowComponent : BulletComponent
 {
     [SerializeField] private float followTime = 10f;
-    [SerializeField] private float speed = 1f;
     [SerializeField] private float rotationCorrectionSpeed = 10f;
     [SerializeField] private AudioSource followingSound;
     [SerializeField] private LayerMask obstacleLayer; 
+    [SerializeField] private float speed = 1f;
+
     private float raycastDistance = 0.5f;
 
     private float jumpForce=5f;
@@ -43,7 +44,7 @@ public class MouseFollowComponent : BulletComponent
 
         float dir = Mathf.Sign(playerToFollow.position.x - transform.position.x);
         float force = dir * Time.deltaTime * speed;
-        rb.velocity = new Vector2(force, rb.velocity.y);     
+        rb.AddForce(new Vector2(force, 0), ForceMode2D.Force);     
         
         if(dir < 0)
         {

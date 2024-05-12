@@ -124,7 +124,8 @@ namespace com.colorfulcoding.AfterGame
                 {
                     new ActionParameter { Key = GameData.LEADERBOARD_NICK_NAME, Value = DataManager.Instance.PlayerData.Username},
                     new ActionParameter { Key = GameData.LEADERBOARD_KITTY_URL, Value = GameState.selectedNFT.imageUrl},
-                    new ActionParameter { Key = GameData.LEADERBOARD_POINTS, Value = (GameState.pointsChange.oldPoints+GameState.pointsChange.points).ToString()}
+                    new ActionParameter { Key = GameData.LEADERBOARD_POINTS, Value = (GameState.pointsChange.oldPoints+GameState.pointsChange.points).ToString()},
+                    new ActionParameter { Key = PlayerData.SEASON_LEVEL, Value = DataManager.Instance.PlayerData.Level.ToString()}
                 };
                 BoomDaoUtility.Instance.ExecuteActionWithParameter(SET_LEADERBOARD_POINTS, _parameters,null);
                 _parameters = new List<ActionParameter>()

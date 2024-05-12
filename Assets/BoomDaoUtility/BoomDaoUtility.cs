@@ -290,7 +290,7 @@ namespace BoomDaoWrapper
             return _output;
         }
 
-        private string GetConfigDataAsString(string _configId, string _fieldName)
+        public string GetConfigDataAsString(string _configId, string _fieldName)
         {
             List<ConfigData> _configs = GetConfigData(_configId);
             if (_configs == default)

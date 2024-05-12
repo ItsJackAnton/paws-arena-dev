@@ -43,7 +43,7 @@ public class GuildCreate : MonoBehaviour
 
     private void CreateGuild()
     {
-        GuildsPanel.Instance.ShowQuestion($"Create new guild for {DataManager.Instance.GameData.GuildPrice} ICP?", YesCreate);
+        GuildsPanel.Instance.ShowQuestion($"Create new guild for {DataManager.Instance.GameData.GuildPriceAsString} ICP?", YesCreate);
     }
 
     private void YesCreate()
@@ -59,11 +59,6 @@ public class GuildCreate : MonoBehaviour
         int _pointsRequired = string.IsNullOrEmpty(pointsRequirementInput.text) ? 0 : Convert.ToInt32(pointsRequirementInput.text);
         string _id = Guid.NewGuid().ToString();
 
-        GuildPlayerData _myData = new GuildPlayerData
-        {
-            Principal = BoomDaoUtility.Instance.UserPrincipal,
-            Level = DataManager.Instance.PlayerData.Level
-        };
 
         GuildsPanel.Instance.ManageInputBlocker(true);
         var _parameters = new List<ActionParameter>
@@ -72,11 +67,8 @@ public class GuildCreate : MonoBehaviour
             new () { Key = GameData.GUILD_KINGDOM_NAME, Value = _kingdomName },
             new () { Key = GameData.GUILD_BADGE_NAME, Value = _badgeName },
             new () { Key = GameData.GUILD_OWNER, Value = BoomDaoUtility.Instance.UserPrincipal },
-            new () { Key = PLAYER_DATA, Value = JsonConvert.SerializeObject(_myData) },
-            new ()
-            {
-                Key = GameData.GUILD_POINTS_REQUIREMENT, Value = _pointsRequired.ToString()
-            }
+            new () { Key = PLAYER_DATA, Value = BoomDaoUtility.Instance.UserPrincipal },
+            new () { Key = GameData.GUILD_POINTS_REQUIREMENT, Value = _pointsRequired.ToString() }
         };
 
         BoomDaoUtility.Instance.ExecuteActionWithParameter(CREATE_GUILD, _parameters, HandleFinishedCreation);
@@ -105,7 +97,6 @@ public class GuildCreate : MonoBehaviour
     
     private void HandleFinishedCreation(List<ActionOutcome> _outcomes)
     {
-        Debug.Log(123);
         GuildsPanel.Instance.ManageInputBlocker(false);
         if (DataManager.Instance.PlayerData.IsInAGuild)
         {

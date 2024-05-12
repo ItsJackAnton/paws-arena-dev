@@ -244,12 +244,12 @@ MonoBehaviour:
   hasEnabledPositionTracking: 1
   isMine: 1
   followTime: 5
-  speed: 380
   rotationCorrectionSpeed: 100
   followingSound: {fileID: 6351086389716351629}
   obstacleLayer:
     serializedVersion: 2
     m_Bits: 64
+  speed: 100
 --- !u!114 &-4025527950535064798
 MonoBehaviour:
   m_ObjectHideFlags: 0

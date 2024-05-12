@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using BoomDaoWrapper;
+using Newtonsoft.Json;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -25,6 +26,7 @@ public class GuildMy : MonoBehaviour
     public void Setup()
     {
         GuildData _guild = DataManager.Instance.PlayerData.Guild;
+        Debug.Log(JsonConvert.SerializeObject(_guild));
         badgeDisplay.sprite = AssetsManager.Instance.GetChallengeBadgeSprite(_guild.BadgeName);
         kingdomDisplay.sprite = AssetsManager.Instance.GetChallengeKingdomSprite(_guild.KingdomName);
         nameDisplay.text = _guild.Name;

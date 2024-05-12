@@ -102,21 +102,31 @@ public class GameData
         get
         {
             LeaderboardData _leaderboardData = new LeaderboardData();
-            List<WorldDataEntry> _entries = BoomDaoUtility.Instance.GetWorldData(LEADERBOARD_POINTS,LEADERBOARD_NICK_NAME, LEADERBOARD_KITTY_URL);
+            List<WorldDataEntry> _entries = BoomDaoUtility.Instance.GetWorldData(LEADERBOARD_POINTS,LEADERBOARD_NICK_NAME, LEADERBOARD_KITTY_URL, 
+            PlayerData.SEASON_LEVEL);
             foreach (var _worldEntry in _entries)
             {
-                string _pointsString = _worldEntry.GetProperty(LEADERBOARD_POINTS);
                 if (_worldEntry.GetProperty(LEADERBOARD_NICK_NAME)== null)
                 {
                     continue;
                 }
+                string _pointsString = _worldEntry.GetProperty(LEADERBOARD_POINTS);
+                string _levelString = _worldEntry.GetProperty(PlayerData.SEASON_LEVEL);
+                if (string.IsNullOrEmpty(_levelString))
+                {
+                    _levelString = "0";
+                }
+             
                 int _points = Convert.ToInt32(_pointsString.Contains('.') ? _pointsString.Split('.')[0] : _pointsString);
+                int _level = Convert.ToInt32(_levelString.Contains('.') ? _levelString.Split('.')[0] : _levelString);
+                
                 _leaderboardData.Entries.Add(new LeaderboardEntries
                 {
                     PrincipalId = _worldEntry.PrincipalId,
                     Nickname = _worldEntry.GetProperty(LEADERBOARD_NICK_NAME),
                     Points = _points,
-                    KittyUrl = _worldEntry.GetProperty(LEADERBOARD_KITTY_URL)
+                    KittyUrl = _worldEntry.GetProperty(LEADERBOARD_KITTY_URL),
+                    Level = _level
                 });
             }
 
@@ -358,20 +368,24 @@ public class GameData
                     continue;
                 }
 
-                List<GuildPlayerData> _players = JsonConvert.DeserializeObject<List<GuildPlayerData>>(_worldEntry.GetProperty(GUILD_PLAYERS));
-                foreach (var _player in _players)
+                List<string> _playersPrincipals = _worldEntry.GetProperty(GUILD_PLAYERS).Split(",").ToList();
+                List<GuildPlayerData> _players = new ();
+                foreach (var _player in _playersPrincipals)
                 {
-                    LeaderboardEntries _leaderboardEntry = _leaderboardEntries.Find(_entry => _entry.PrincipalId == _player.Principal);
+                    LeaderboardEntries _leaderboardEntry = _leaderboardEntries.Find(_entry => _entry.PrincipalId == _player);
+                    GuildPlayerData _guildPlayer = new();
+                    _players.Add(_guildPlayer);
                     if (_leaderboardEntry == null)
                     {
-                        _player.Points = 0;
-                        _player.Name = "WaitingForLeaderboardEntry";
+                        _guildPlayer.Points = 0;
+                        _guildPlayer.Name = "WaitingForLeaderboardEntry";
                         continue;
                     }
 
-                    _player.Points = _leaderboardEntry.Points;
-                    _player.Name = _leaderboardEntry.Nickname;
-                    _player.IsLeader = _player.Principal == _guildData.Owner;
+                    _guildPlayer.Points = _leaderboardEntry.Points;
+                    _guildPlayer.Name = _leaderboardEntry.Nickname;
+                    _guildPlayer.IsLeader = _player == _guildData.Owner;
+                    _guildPlayer.Level = _leaderboardEntry.Level;
                 }
 
                 _guildData.Players = _players.OrderByDescending(_player => _player.Points).ToList();
@@ -382,6 +396,7 @@ public class GameData
     }
 
     public double GuildPrice => BoomDaoUtility.Instance.GetConfigDataAsDouble("guildsConfig", "price");
+    public string GuildPriceAsString => BoomDaoUtility.Instance.GetConfigDataAsString("guildsConfig", "price");
     public double MaxGuildPlayers => BoomDaoUtility.Instance.GetConfigDataAsDouble("guildsConfig", "maxPlayers");
     public double GuildGoldBar => BoomDaoUtility.Instance.GetConfigDataAsDouble("guildsConfig", "goldBar");
     public double GuildSilverBar => BoomDaoUtility.Instance.GetConfigDataAsDouble("guildsConfig", "silverBar");

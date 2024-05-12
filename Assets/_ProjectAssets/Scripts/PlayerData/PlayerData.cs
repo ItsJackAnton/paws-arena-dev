@@ -91,6 +91,7 @@ public class PlayerData
     public const string USER_PROFILE = "user_profile";
 
     private const string XP = "xp";
+    public const string SEASON_LEVEL = "seasonLevel";
     private const string AMOUNT_KEY = "amount";
 
     private const string CLAIMED_NORMAL_REWARDS = "claimedNormalRewards";
