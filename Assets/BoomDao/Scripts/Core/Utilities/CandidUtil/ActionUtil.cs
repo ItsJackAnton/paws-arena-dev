@@ -594,6 +594,23 @@ namespace Boom
 
     public static class ActionUtil
     {
+        public static async UniTask<UResult<bool, string>> CanClaimGuildQuest(string questActionId)
+        {
+            if (UserUtil.IsLoggedIn(out var loginData) == false)
+            {
+                $"User is not yet logged in!".Warning(typeof(ActionUtil).Name);
+
+                return new("User is not yet logged in!");
+            }
+
+
+            var result = await BoomManager.Instance.GuildApiClient.GetActionStatusComposite(new Candid.World.WorldApiClient.GetActionStatusCompositeArg0(questActionId, loginData.principal));
+
+
+            if (result.Tag == Result7Tag.Err) return new(result.AsErr());
+
+            return new(result.AsOk().IsValid);
+        }
         public static bool ActionsInProcess(params string[] actionIds)
         {
             foreach (var actionDependency in actionIds)
@@ -1087,7 +1104,23 @@ namespace Boom
             return new(processedActionResponse);
         }
 
+        public static class Guilds
+        {
+            public async static UniTask<UResult<ProcessedActionResponse,string>> UserWonMatch()
+            {
+                var result = await ProcessAction("match_won");
 
+                if (result.IsOk) return new(result.AsOk());
+                return new(result.AsErr().Content);
+            }
+            public async static UniTask<UResult<ProcessedActionResponse, string>> UserLostMatch()
+            {
+                var result = await ProcessAction("match_lost");
+
+                if (result.IsOk) return new(result.AsOk());
+                return new(result.AsErr().Content);
+            }
+        }
 
         public static class Transfer
         {

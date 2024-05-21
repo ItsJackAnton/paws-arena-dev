@@ -63,12 +63,12 @@ public class GuildCreate : MonoBehaviour
         GuildsPanel.Instance.ManageInputBlocker(true);
         var _parameters = new List<ActionParameter>
         {
-            new() { Key = GameData.GUILD_ID, Value = _id }, new() { Key = GameData.GUILD_NAME, Value = _guildName },
+            new() { Key = GameData.GUILD_ID, Value = _id }, 
+            new() { Key = GameData.GUILD_NAME, Value = _guildName },
             new () { Key = GameData.GUILD_KINGDOM_NAME, Value = _kingdomName },
             new () { Key = GameData.GUILD_BADGE_NAME, Value = _badgeName },
-            new () { Key = GameData.GUILD_OWNER, Value = BoomDaoUtility.Instance.UserPrincipal },
-            new () { Key = PLAYER_DATA, Value = BoomDaoUtility.Instance.UserPrincipal },
-            new () { Key = GameData.GUILD_POINTS_REQUIREMENT, Value = _pointsRequired.ToString() }
+            new () { Key = GameData.GUILD_POINTS_REQUIREMENT, Value = _pointsRequired.ToString() },
+            new () { Key = GameData.GUILD_OWNER, Value = BoomDaoUtility.Instance.UserPrincipal }
         };
 
         BoomDaoUtility.Instance.ExecuteActionWithParameter(CREATE_GUILD, _parameters, HandleFinishedCreation);

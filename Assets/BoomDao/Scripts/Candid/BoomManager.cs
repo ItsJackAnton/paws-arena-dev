@@ -23,9 +23,11 @@ namespace Boom
     {
         [SerializeField] bool enableBoomLogs = true;
 
-        [SerializeField] BoomSettings boomSettings;
-        [field: SerializeField] public string WORLD_HUB_CANISTER_ID { get => boomSettings.WorldHubId; } 
-        [field: SerializeField] public string WORLD_CANISTER_ID { get => boomSettings.WorldId; }
+        [field: SerializeField] public BoomSettings BoomSettings { private set; get; }
+        public string WORLD_HUB_CANISTER_ID { get => BoomSettings.WorldHubId; }
+        public string WORLD_CANISTER_ID { get => BoomSettings.WorldId; }
+        public string GAMING_GUILDS_CANISTER_ID { get => BoomSettings.GamingGuildsId; }
+
         [field: SerializeField] public string WORLD_COLLECTION_CANISTER_ID { private set; get; } = "6uvic-diaaa-aaaap-abgca-cai";
 
         public enum GameType { SinglePlayer, Multiplayer, WebsocketMultiplayer }
@@ -37,7 +39,9 @@ namespace Boom
 
         // Canister APIs
         public WorldApiClient WorldApiClient { get; private set; }
+        public WorldApiClient GuildApiClient { get; private set; }
         public WorldHubApiClient WorldHub { get; private set; }
+
 
         [SerializeField, ShowOnly] string principal;
         [SerializeField, ShowOnly] bool isLoginIn;
@@ -63,6 +67,8 @@ namespace Boom
 
         protected override void Awake_()
         {
+            Broadcast.Register<LoginManager.IndetityJson>(OnLoginCompleted);
+
             BroadcastState.Invoke(new WaitingForResponse(true));
 
             IAgent CreateAgentWithRandomIdentity(bool useLocalHost = false)
@@ -163,7 +169,7 @@ namespace Boom
                 }
 
                 var loginDataOk = loginDataResult.AsOk();
-                UserUtil.UpdateMainData(new MainDataTypes.LoginData(loginDataOk, MainDataTypes.LoginData.State.LoggedIn));
+                UserUtil.UpdateMainData(new MainDataTypes.LoginData(loginDataOk, MainDataTypes.LoginData.State.LoggedIn, LoginManager.Instance.IsEmbeddedAgent));
                 BroadcastState.Invoke(new WaitingForResponse(false));
             }
         }
@@ -172,6 +178,8 @@ namespace Boom
 
         protected override void OnDestroy_()
         {
+            Broadcast.Unregister<LoginManager.IndetityJson>(OnLoginCompleted);
+
             Broadcast.Unregister<UserLoginRequest>(FetchHandler);
 
             Broadcast.Unregister<UserLogout>(UserLogoutHandler);
@@ -182,6 +190,7 @@ namespace Boom
 
             UserUtil.RemoveListenerRequestData<DataTypeRequestArgs.Entity>(FetchHandler);
             UserUtil.RemoveListenerRequestData<DataTypeRequestArgs.ActionState>(FetchHandler);
+
             UserUtil.RemoveListenerRequestData<DataTypeRequestArgs.Token>(FetchHandler);
             UserUtil.RemoveListenerRequestData<DataTypeRequestArgs.NftCollection>(FetchHandler);
 
@@ -222,13 +231,13 @@ namespace Boom
         //
 
 
-        void OnLoginCompleted(string json)
+        void OnLoginCompleted(LoginManager.IndetityJson json)
         {
             var isLoggedIn = UserUtil.IsLoggedIn();
 
             if (isLoggedIn == false)
             {
-                CreateAgentUsingIdentityJson(json, false).Forget();
+                CreateAgentUsingIdentityJson(json.data, false).Forget();
                 return;
             }
 
@@ -262,6 +271,22 @@ namespace Boom
 
         private void UserLogoutHandler(UserLogout obj)
         {
+            var loginData = UserUtil.GetLogInData();
+
+            if (loginData.IsErr)
+            {
+                loginData.AsErr().Error(GetType().Name);
+                return;
+            }
+
+            if (loginData.AsOk().state != MainDataTypes.LoginData.State.LoggedIn)
+            {
+                $"To log out you must be logged in. Current state: {loginData.AsOk().state}".Error(GetType().Name);
+                return;
+            }
+
+            LoginManager.Instance.IsEmbeddedAgent = false;
+
             loginCompleted = false;
 
             UserUtil.ClearData<DataTypes.Entity>();
@@ -273,6 +298,8 @@ namespace Boom
             InitializeCandidApis(cachedAnonAgent.Value, true).Forget();
 
             configsRequested = false;
+
+            "You have logged out".Log(GetType().Name);
 
             //WEBSOCKET
             if (BoomDaoGameType == BoomManager.GameType.WebsocketMultiplayer)
@@ -303,6 +330,7 @@ namespace Boom
                     //Build Interfaces
                     WorldHub = new WorldHubApiClient(agent, Principal.FromText(WORLD_HUB_CANISTER_ID));
                     WorldApiClient = new WorldApiClient(agent, Principal.FromText(WORLD_CANISTER_ID));
+                    GuildApiClient = new WorldApiClient(agent, Principal.FromText(GAMING_GUILDS_CANISTER_ID));
                 }
                 //Else fetch required dependencies and catch it
                 else
@@ -310,6 +338,7 @@ namespace Boom
                     //Build Interfaces
                     WorldHub = new WorldHubApiClient(agent, Principal.FromText(WORLD_HUB_CANISTER_ID));
                     WorldApiClient = new WorldApiClient(agent, Principal.FromText(WORLD_CANISTER_ID));
+                    GuildApiClient = new WorldApiClient(agent, Principal.FromText(GAMING_GUILDS_CANISTER_ID));
 
                     cachedAnonAgent.Value = agent;
 
@@ -319,13 +348,19 @@ namespace Boom
 
 
                 //Set Login Data
-                UserUtil.UpdateMainData(new MainDataTypes.LoginData(agent, userPrincipal, userAccountIdentity, MainDataTypes.LoginData.State.Logedout));
+                UserUtil.UpdateMainData(new MainDataTypes.LoginData(agent, userPrincipal, userAccountIdentity, MainDataTypes.LoginData.State.Logedout, LoginManager.Instance.IsEmbeddedAgent));
             }
             else
             {
+                //var loginData = UserUtil.GetLogInData();
+
+                //UserUtil.UpdateMainData(new MainDataTypes.LoginData(loginData.AsOk(), LoginManager.Instance.IsEmbeddedAgent));
+
+
                 //Build Interfaces
                 WorldHub = new WorldHubApiClient(agent, Principal.FromText(WORLD_HUB_CANISTER_ID));
                 WorldApiClient = new WorldApiClient(agent, Principal.FromText(WORLD_CANISTER_ID));
+                GuildApiClient = new WorldApiClient(agent, Principal.FromText(GAMING_GUILDS_CANISTER_ID));
 
                 userAccountIdentity = await WorldHub.GetAccountIdentifier(userPrincipal);
 
@@ -335,13 +370,14 @@ namespace Boom
 
                 //Set Login Data
                 //UserUtil.Clean<DataTypes.LoginData>(new UserUtil.CleanUpType.All());
-                UserUtil.UpdateMainData(new MainDataTypes.LoginData(agent, userPrincipal, userAccountIdentity, MainDataTypes.LoginData.State.FetchingUserData));
+                UserUtil.UpdateMainData(new MainDataTypes.LoginData(agent, userPrincipal, userAccountIdentity, MainDataTypes.LoginData.State.FetchingUserData, LoginManager.Instance.IsEmbeddedAgent));
 
                 //USER DATA
                 UserUtil.RequestData(new DataTypeRequestArgs.Entity(userPrincipal, WORLD_CANISTER_ID));
 
                 UserUtil.RequestDataSelf<DataTypeRequestArgs.ActionState>();
 
+                await UniTask.WaitUntil(() => UserUtil.IsMainDataValid<MainDataTypes.AllTokenConfigs>());
 
                 //WE REQUEST USER TOKENS
 
@@ -361,7 +397,10 @@ namespace Boom
                 });
                 UserUtil.RequestData(new DataTypeRequestArgs.Token(tokensToFetchIds.ToArray()));
 
+                await UniTask.WaitUntil(() => UserUtil.IsMainDataValid<MainDataTypes.AllNftCollectionConfig>());
+
                 //WE REQUEST USER NFTs
+
                 var nftsToFetchResult = ConfigUtil.GetAllNftConfigs();
 
                 if (nftsToFetchResult.IsErr)
@@ -458,7 +497,7 @@ namespace Boom
             BroadcastState.Invoke(new WaitingForResponse(false));
         }
 
-        //
+        //Entities And ActionsState
 
         private async UniTask FetchEntities(DataTypeRequestArgs.Entity arg)
         {
@@ -478,7 +517,7 @@ namespace Boom
                 });
 
                 //NEW
-                if(asOk.ContainsKey(principal)) HandleLoginCompletion();
+                if (asOk.ContainsKey(principal)) HandleLoginCompletion();
             }
             else
             {
@@ -510,7 +549,8 @@ namespace Boom
                 $"DATA of type {nameof(DataTypes.ActionState)} failed to load. Message: {result.AsErr()}".Warning(nameof(BoomManager));
             }
         }
-        //
+
+        //Tokens
         private async UniTask FetchToken(DataTypeRequestArgs.Token arg)
         {
             await UniTask.SwitchToMainThread();
@@ -538,6 +578,7 @@ namespace Boom
             }
         }
 
+        //Nfts
         private async UniTask FetchNfts(DataTypeRequestArgs.NftCollection arg)
         {
             await UniTask.SwitchToMainThread();
@@ -719,6 +760,7 @@ namespace Boom
             UserUtil.UpdateMainData(new MainDataTypes.AllListings(listing.ToArray().ToDictionary(e => e.index)));
         }
 
+        //Rooms
         private void FetchRoomData()
         {
             if (UserUtil.IsLoggedIn(out var loginData) == false)
@@ -790,10 +832,7 @@ namespace Boom
         }
         private void FetchHandler(UserLoginRequest arg)
         {
-            if (UserUtil.IsLoginRequestedPending() || UserUtil.IsLoggedIn())
-            {
-                return;
-            }
+            if (UserUtil.IsLoginRequestedPending() || UserUtil.IsLoggedIn()) return;
 
             UserUtil.SetAsLoginIn();
             BroadcastState.Invoke(new WaitingForResponse(true));
@@ -802,11 +841,12 @@ namespace Boom
             PlayerPrefs.SetString("walletType", "II");
 
 #if UNITY_WEBGL && !UNITY_EDITOR
-            LoginManager.Instance.StartLoginFlowWebGl(OnLoginCompleted);
+            LoginManager.Instance.StartLoginFlowWebGl();
             return;
 #endif
+
             isLoginIn = true;
-            LoginManager.Instance.StartLoginFlow(OnLoginCompleted);
+            LoginManager.Instance.StartLoginFlow();
         }
 
         private void FetchHandler(FetchDataReq<DataTypeRequestArgs.Entity> req)

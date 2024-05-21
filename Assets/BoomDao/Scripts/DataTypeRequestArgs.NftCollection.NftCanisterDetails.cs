@@ -1318,6 +1318,7 @@ namespace Boom
             }
         }
 
+
         [Preserve]
         [Serializable]
         public class AllTokenConfigs : Base
@@ -1408,25 +1409,39 @@ namespace Boom
             public string accountIdentifier;
             public State state;
             public long updateTs;
+            public bool isEmbeddedAgent;
             public LoginData()
             {
                 this.state = State.None;
             }
-            public LoginData(LoginData loginData, State state)
+            public LoginData(LoginData loginData, bool isEmbeddedAgent)
+            {
+                this.agent = loginData.agent;
+                this.principal = loginData.principal;
+                this.accountIdentifier = loginData.accountIdentifier;
+                this.state = loginData.state;
+                updateTs = MainUtil.Now();
+
+                this.isEmbeddedAgent = isEmbeddedAgent;
+            }
+            public LoginData(LoginData loginData, State state, bool isEmbeddedAgent)
             {
                 this.agent = loginData.agent;
                 this.principal = loginData.principal;
                 this.accountIdentifier = loginData.accountIdentifier;
                 this.state = state;
                 updateTs = MainUtil.Now();
+
+                this.isEmbeddedAgent = isEmbeddedAgent;
             }
-            public LoginData(IAgent agent, string principal, string accountIdentifier, State state)
+            public LoginData(IAgent agent, string principal, string accountIdentifier, State state, bool isEmbeddedAgent)
             {
                 this.agent = agent;
                 this.principal = principal;
                 this.accountIdentifier = accountIdentifier;
                 this.state = state;
                 updateTs = MainUtil.Now();
+                this.isEmbeddedAgent = isEmbeddedAgent;
             }
         }
 

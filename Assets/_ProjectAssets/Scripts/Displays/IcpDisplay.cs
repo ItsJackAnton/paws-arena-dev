@@ -20,6 +20,6 @@ public class IcpDisplay : MonoBehaviour
 
     private void ShowIcp()
     {
-        icpAmountDisplay.text = BoomDaoUtility.Instance.GetTokenBalance(BoomDaoUtility.ICP_KEY).ToString(CultureInfo.InvariantCulture);
+        icpAmountDisplay.text = BoomDaoUtility.Instance.GetTokenBalance(BoomDaoUtility.ICP_KEY).ToString();
     }
 }

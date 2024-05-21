@@ -29,7 +29,7 @@ public class GameData
     public const string GUILD_ID = "guildId";
     public const string GUILD_NAME = "name";
     public const string GUILD_KINGDOM_NAME = "kingdomName";
-    public const string GUILD_OWNER = "owner";
+    public const string GUILD_OWNER = "guildOwner";
     public const string GUILD_BADGE_NAME = "badgeName";
     public const string GUILD_POINTS_REQUIREMENT = "pointsRequirement";
     public const string GUILD_PLAYERS = "players";

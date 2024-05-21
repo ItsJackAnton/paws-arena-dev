@@ -316,16 +316,26 @@ namespace Boom
         /// <param name="loadingMessage">This is the message you want to display when waiting for the data to be fetched</param>
         public static void RequestData(DataTypeRequestArgs.Base arg)
         {
-            if (IsDataManipulable(out var loginData) == false)
+            var loginData = UserUtil.GetLogInData();
+
+            if (loginData.IsErr)
             {
-                Debug.LogError("You cannot fetch shared data as an anon user!");
+                loginData.AsErr().Error(nameof(UserUtil.RequestData));
+
+                return;
+            }
+            var loginDataAsOk = loginData.AsOk();
+
+            if ((loginDataAsOk.state == MainDataTypes.LoginData.State.FetchingUserData || loginDataAsOk.state == MainDataTypes.LoginData.State.LoggedIn) == false)
+            {
+                $"You can only fetch data if your login state is {MainDataTypes.LoginData.State.FetchingUserData} or {MainDataTypes.LoginData.State.LoggedIn}, Current state: {loginDataAsOk.state}".Error(nameof(UserUtil.RequestData));
 
                 return;
             }
 
             if (arg.uids.Length == 0)
             {
-                arg.uids = new string[1] { loginData.principal };
+                arg.uids = new string[1] { loginDataAsOk.principal };
             }
 
             switch (arg)
@@ -336,7 +346,7 @@ namespace Boom
 
                     foreach (var uid in arg.uids)
                     {
-                        string _uid = uid != loginData.principal ? uid : "self";
+                        string _uid = uid != loginDataAsOk.principal ? uid : "self";
                         BroadcastState.Invoke(new DataLoadingState<DataTypes.Entity>(true), false, $"{_uid}");
                     }
                     break;
@@ -347,7 +357,7 @@ namespace Boom
 
                     foreach (var uid in arg.uids)
                     {
-                        string _uid = uid != loginData.principal ? uid : "self";
+                        string _uid = uid != loginDataAsOk.principal ? uid : "self";
                         BroadcastState.Invoke(new DataLoadingState<DataTypes.ActionState>(true), false, $"{_uid}");
                     }
                     break;
@@ -358,7 +368,7 @@ namespace Boom
 
                     foreach (var uid in arg.uids)
                     {
-                        string _uid = uid != loginData.principal ? uid : "self";
+                        string _uid = uid != loginDataAsOk.principal ? uid : "self";
                         BroadcastState.Invoke(new DataLoadingState<DataTypes.Token>(true), false, $"{_uid}");
                     }
                     break;
@@ -369,7 +379,7 @@ namespace Boom
 
                     foreach (var uid in arg.uids)
                     {
-                        string _uid = uid != loginData.principal ? uid : "self";
+                        string _uid = uid != loginDataAsOk.principal ? uid : "self";
                         BroadcastState.Invoke(new DataLoadingState<DataTypes.NftCollection>(true), false, $"{_uid}");
                     }
                     break;
@@ -401,21 +411,26 @@ namespace Boom
             if (newVals != null) $">>> DATA of type {typeof(T).Name}, key: {uid}, has been edited.\nKeys to store:\n{newVals.Reduce(e => $"* {e.GetKey()}, value: {JsonConvert.SerializeObject(e)}", ",\n")}".Log(nameof(UserUtil));
             //#endif
 
-            if (IsDataManipulable(out var loginData) == false)
+            var loginData = UserUtil.GetLogInData();
+
+            if (loginData.IsErr)
             {
-                Debug.LogError("Issue getting loginData!");
+                loginData.AsErr().Error(nameof(UserUtil.UpdateData));
+
+                return;
+            }
+            var loginDataAsOk = loginData.AsOk();
+
+            if ((loginDataAsOk.state == MainDataTypes.LoginData.State.FetchingUserData || loginDataAsOk.state == MainDataTypes.LoginData.State.LoggedIn) == false)
+            {
+                $"You can only update data if your login state is {MainDataTypes.LoginData.State.FetchingUserData} or {MainDataTypes.LoginData.State.LoggedIn}, Current state: {loginDataAsOk.state}".Error(nameof(UserUtil.UpdateData));
 
                 return;
             }
 
-            if ((loginData.state == MainDataTypes.LoginData.State.LoggedIn || loginData.state == MainDataTypes.LoginData.State.FetchingUserData) == false)
-            {
-                Debug.LogError("You cannot update shared data as an anon user!");
 
-                return;
-            }
 
-            if (uid == loginData.principal) uid = "self";
+            if (uid == loginDataAsOk.principal) uid = "self";
 
             //
 

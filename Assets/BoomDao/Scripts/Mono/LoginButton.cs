@@ -9,6 +9,7 @@ namespace Boom.UI
     public class LoginButton : MonoBehaviour
     {
         [SerializeField] Button button;
+        [SerializeField, ShowOnly] bool isEmbeddedAgent;
         [SerializeField, ShowOnly] bool noneInteractable;
         [SerializeField, ShowOnly] MainDataTypes.LoginData.State loginState;
 
@@ -36,13 +37,15 @@ namespace Boom.UI
         private void AllowButtonInteractionHandler(WaitingForResponse response)
         {
             noneInteractable = response.value;
+            button.gameObject.SetActive(!isEmbeddedAgent);
             button.interactable = !noneInteractable && loginState == MainDataTypes.LoginData.State.Logedout;
         }
         //Handle whether or not the button must be disabled
         private void EnableButtonHandler(MainDataTypes.LoginData data)
         {
             loginState = data.state;
-            button.gameObject.SetActive(data.state != MainDataTypes.LoginData.State.LoggedIn);
+            isEmbeddedAgent = data.isEmbeddedAgent;
+            button.gameObject.SetActive(!isEmbeddedAgent);
             button.interactable = !noneInteractable && loginState == MainDataTypes.LoginData.State.Logedout;
         }
 

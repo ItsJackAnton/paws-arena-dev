@@ -157,7 +157,33 @@
               // Make sure to check the origin property for security reasons
               var loginWebpageUrl = "{{{ LOGIN_WEBPAGE_URL }}}";
               var sanitizedUrl = loginWebpageUrl.replace(/\/+$/, "");
-              if (e.origin !== sanitizedUrl) return;
+
+              if ((
+              e.origin === sanitizedUrl || //Login Url
+
+              //If embedded
+              (window !== window.parent && (
+              e.origin === "https://awcae-maaaa-aaaam-abmyq-cai.icp0.io" || //Production Boom Launchpad
+              e.origin === "https://n7z64-2yaaa-aaaam-abnsa-cai.icp0.io" || //Staging Boom Launchpad
+              e.origin === "https://t2qzd-6qaaa-aaaak-qdbdq-cai.icp0.io" || //Development Boom Launchpad
+              e.origin === "https://4s6wt-wiaaa-aaaap-qhjdq-cai.icp0.io" //Test Website (TODO: Remove)
+              ))
+              ) == false) { // Check origin for security
+              console.error(
+                "Source: Gaming HTML, Message: You are using a origin that is not valid, current origin: ",
+                e.origin,
+                "data: ",
+                JSON.stringify(e.data)
+              );
+                return;
+              }
+
+              console.log(
+                "Source: Gaming HTML, Message: message received from origin: ",
+                event.origin,
+                "data: ",
+                event.data
+              );
 
               gameInstance.SendMessage(
                 "BoomManager",

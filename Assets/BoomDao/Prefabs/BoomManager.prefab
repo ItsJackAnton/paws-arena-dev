@@ -27,7 +27,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2393423864867871022}
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 938.3497, y: 563.4335, z: -0.36021423}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -61,7 +61,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   enableBoomLogs: 1
-  boomSettings: {fileID: 11400000, guid: c4016ee1ea51b934ab9168df14e83284, type: 2}
+  <BoomSettings>k__BackingField: {fileID: 11400000, guid: f922e6742e5194632aea2d31c472258f, type: 2}
   <WORLD_COLLECTION_CANISTER_ID>k__BackingField: 6uvic-diaaa-aaaap-abgca-cai
   <BoomDaoGameType>k__BackingField: 0
   cachedAnonAgent:

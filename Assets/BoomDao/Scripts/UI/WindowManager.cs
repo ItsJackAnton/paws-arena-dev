@@ -25,6 +25,39 @@ namespace Boom.UI
         {
             string typeName = window.GetType().Name;
 
+            foreach (var item in openedWindows)
+            {
+                string key = item.Key;
+                var openedWindow = item.Value;
+
+                var openedWindowConflictWindows = openedWindow.GetConflictWindow();
+
+                if (openedWindowConflictWindows != null)
+                {
+                    foreach (var openedWindowConflictWindow in openedWindowConflictWindows)
+                    {
+                        string conflictWindowTypeName = openedWindowConflictWindow.Name;
+
+                        if (conflictWindowTypeName == typeName)
+                        {
+                            window.gameObject.SetActive(false);
+
+                            if (!hiddenWindows.TryGetValue(typeName, out var conflictWithList))
+                            {
+                                conflictWithList = new();
+                                hiddenWindows.Add(typeName, conflictWithList);
+                            }
+
+                            if (!conflictWithList.Contains(key)) conflictWithList.Add(key);
+
+                            return;
+                        }
+                    }
+                }
+            }
+
+            //
+
             Type[] windows = window.GetConflictWindow();
             if (windows != null)
             {
@@ -71,6 +104,8 @@ namespace Boom.UI
                             conflictWindowList.Remove(currentWindowType);
                             if (conflictWindowList.Count == 0)
                             {
+                                hiddenWindows.Remove(conflictWindowName);
+
                                 if (openedWindows.TryGetValue(conflictWindowName, out Window hiddenWindow))
                                 {
                                     hiddenWindow.gameObject.SetActive(true);
@@ -162,6 +197,9 @@ namespace Boom.UI
                     //Instantiate
                     baseWindow = Instantiate(baseWindow, noParent ? null : transform);
                     baseWindow.transform.localPosition = Vector3.zero;
+
+                    //if (noParent == false)
+                    //    baseWindow.transform.SetSiblingIndex(baseWindow.transform.parent.childCount - 1);
                 }
             }
 
@@ -190,14 +228,13 @@ namespace Boom.UI
 
             return window;
         }
-        public T AddWidgets<T>(object data, Transform parent, Vector3 offset = default) where T : Window
+        public T AddWidgets<T>(object data, Transform parent = null, Vector3 offset = default) where T : Window
         {
             string typeName = EnableTemplateWindows == false ? typeof(T).Name : $"{typeof(T).Name}Template";
 
             if (parent == null)
             {
-                $"Tried to add a widget of name '{typeName}' but has no parent specified".Log<WindowManager>();
-                return null;
+                parent = transform;
             }
 
             T window = Resources.Load<T>($"Widgets/{typeName}");
@@ -244,6 +281,8 @@ namespace Boom.UI
 
                 if (objInstance.RequireUnlockCursor()) --unlockCursorWindowCount;
                 if (objInstance != null) Destroy(objInstance.gameObject);
+
+                //OnWindowClose.Invoke(objInstance.GetType().FullName.ToHash16());
 
                 if (unlockCursorWindowCount == 0)
                 {

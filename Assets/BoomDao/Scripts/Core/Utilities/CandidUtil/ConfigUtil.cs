@@ -27,13 +27,13 @@ namespace Boom
 
             if (allConfigs.configs.TryGetValue(worldId, out var worldConfigs) == false)
             {
-                $"Could not find configs from world of id: {worldId}".Warning();
+                $"Could not find configs from world of id: \"{worldId}\"".Warning();
                 return false;
             }
 
             if (worldConfigs.TryGetValue(configId, out outValue) == false)
             {
-                $"Could not find config of id: {configId} in world of id: {worldId}".Warning();
+                $"Could not find config of id: \"{configId}\" in world of id: \"{worldId}\"".Warning();
 
                 return false;
             }
@@ -140,14 +140,14 @@ namespace Boom
 
             if (!config.fields.TryGetValue(fieldName, out var value))
             {
-                $"Failure to find in config of id: {configId} a field of name {fieldName}".Warning();
+                $"Failure to find in config of id: \"{configId}\" a field of name \"{fieldName}\"".Warning();
 
                 return false;
             }
 
             if (value.TryParseValue<T>(out outValue) == false)
             {
-                $"Failure to parse config field of id: {configId} to {typeof(T).Name}".Warning();
+                $"Failure to parse config field of id: \"{configId}\" to \"{typeof(T).Name}\"".Warning();
 
                 return false;
             }
@@ -229,7 +229,7 @@ namespace Boom
                     _ => throw new Exception("Unmatch")
                 };
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 e.Message.Error();
                 return false;
@@ -252,6 +252,59 @@ namespace Boom
             outValue = subAction.Outcomes;
 
             return true;
+        }
+
+        public static bool TryGetFirstActionEntityOutcomeFieldValue<T>(string actionId, string entityId, string fieldId, out T outValue, DataSourceType dataSourceType = DataSourceType.Caller) where T : EntityFieldEdit.Base
+        {
+            outValue = null;
+
+            if (TryGetSubAction(actionId, out var subAction, dataSourceType) == false)
+            {
+                "Could not find subaction".Error();
+
+                return false;
+            }
+
+            var gacha = subAction.Outcomes;
+
+            if (gacha == null)
+            {
+                "There is no outcomes".Error();
+                return false;
+            }
+
+            foreach (var roll in gacha)
+            {
+                foreach (var item in roll.PossibleOutcomes)
+                {
+                    if (item.possibleOutcomeType == Candid.World.Models.ActionOutcomeOption.OptionInfoTag.UpdateEntity)
+                    {
+                        var asEntity = item as PossibleOutcomeTypes.UpdateEntity;
+
+                        if (asEntity.Eid == entityId)
+                        {
+                            foreach (var field in asEntity.Fields)
+                            {
+                                if (field.Key == fieldId)
+                                {
+                                    if (field.Value is T t)
+                                    {
+                                        outValue = t;
+                                        return true;
+                                    }
+                                    else
+                                    {
+                                        $"EntityOutcome casted to the wrong type: {typeof(T).Name}, current type is: {field.Value.GetType().Name}".Error();
+                                    }
+                                }
+                            }
+                        }
+
+                    }
+                }
+            }
+
+            return false;
         }
 
         public static bool TryGetActionPart<T>(this string actionId, Func<MainDataTypes.AllAction.Action, T> func, out T outValue, string worldId = "")

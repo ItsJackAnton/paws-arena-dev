@@ -3,8 +3,8 @@ using EdjCase.ICP.Candid.Models;
 using EdjCase.ICP.Candid;
 using System.Threading.Tasks;
 using Candid.World;
-using EdjCase.ICP.Agent.Responses;
 using System.Collections.Generic;
+using EdjCase.ICP.Agent.Responses;
 using EdjCase.ICP.Candid.Mapping;
 using WorldId = System.String;
 using UserId = System.String;
@@ -61,10 +61,31 @@ namespace Candid.World
 			return reply.ToObjects<Models.Result4>(this.Converter);
 		}
 
+		public async Task<Models.Result4> CreateEntityForAllUsers(WorldApiClient.CreateEntityForAllUsersArg0 arg0)
+		{
+			CandidArg arg = CandidArg.FromCandid(CandidTypedValue.FromObject(arg0, this.Converter));
+			CandidArg reply = await this.Agent.CallAndWaitAsync(this.CanisterId, "createEntityForAllUsers", arg);
+			return reply.ToObjects<Models.Result4>(this.Converter);
+		}
+
 		public async Task<Models.Result4> CreateMinigameWinAction()
 		{
 			CandidArg arg = CandidArg.FromCandid();
 			CandidArg reply = await this.Agent.CallAndWaitAsync(this.CanisterId, "createMinigameWinAction", arg);
+			return reply.ToObjects<Models.Result4>(this.Converter);
+		}
+
+		public async Task<Models.Result4> CreateTestQuestActions(WorldApiClient.CreateTestQuestActionsArg0 arg0)
+		{
+			CandidArg arg = CandidArg.FromCandid(CandidTypedValue.FromObject(arg0, this.Converter));
+			CandidArg reply = await this.Agent.CallAndWaitAsync(this.CanisterId, "createTestQuestActions", arg);
+			return reply.ToObjects<Models.Result4>(this.Converter);
+		}
+
+		public async Task<Models.Result4> CreateTestQuestConfigs(List<WorldApiClient.CreateTestQuestConfigsArg0Item> arg0)
+		{
+			CandidArg arg = CandidArg.FromCandid(CandidTypedValue.FromObject(arg0, this.Converter));
+			CandidArg reply = await this.Agent.CallAndWaitAsync(this.CanisterId, "createTestQuestConfigs", arg);
 			return reply.ToObjects<Models.Result4>(this.Converter);
 		}
 
@@ -147,6 +168,13 @@ namespace Candid.World
 			CandidArg arg = CandidArg.FromCandid(CandidTypedValue.FromObject(arg0, this.Converter));
 			CandidArg reply = await this.Agent.CallAndWaitAsync(this.CanisterId, "deleteEntity", arg);
 			return reply.ToObjects<Models.Result4>(this.Converter);
+		}
+
+		public async Task<Models.Result9> DeleteTestQuestActionStateForUser(WorldApiClient.DeleteTestQuestActionStateForUserArg0 arg0)
+		{
+			CandidArg arg = CandidArg.FromCandid(CandidTypedValue.FromObject(arg0, this.Converter));
+			CandidArg reply = await this.Agent.CallAndWaitAsync(this.CanisterId, "deleteTestQuestActionStateForUser", arg);
+			return reply.ToObjects<Models.Result9>(this.Converter);
 		}
 
 		public async Task DeleteUser(WorldApiClient.DeleteUserArg0 arg0)
@@ -305,6 +333,14 @@ namespace Candid.World
 			return reply.ToObjects<Models.Result5>(this.Converter);
 		}
 
+		public async Task<Models.Result5> GetUserEntitiesFromWorldNodeFilteredSortingComposite(WorldApiClient.GetUserEntitiesFromWorldNodeFilteredSortingCompositeArg0 arg0)
+		{
+			CandidArg arg = CandidArg.FromCandid(CandidTypedValue.FromObject(arg0, this.Converter));
+			QueryResponse response = await this.Agent.QueryAsync(this.CanisterId, "getUserEntitiesFromWorldNodeFilteredSortingComposite", arg);
+			CandidArg reply = response.ThrowOrGetReply();
+			return reply.ToObjects<Models.Result5>(this.Converter);
+		}
+
 		public async Task<List<string>> GetTrustedOrigins()
 		{
 			CandidArg arg = CandidArg.FromCandid();
@@ -386,6 +422,12 @@ namespace Candid.World
 			CandidArg arg = CandidArg.FromCandid(CandidTypedValue.FromObject(arg0, this.Converter));
 			CandidArg reply = await this.Agent.CallAndWaitAsync(this.CanisterId, "processActionAwait", arg);
 			return reply.ToObjects<Models.Result3>(this.Converter);
+		}
+
+		public async Task ProcessActionForAllUsers(Models.ActionArg arg0)
+		{
+			CandidArg arg = CandidArg.FromCandid(CandidTypedValue.FromObject(arg0, this.Converter));
+			await this.Agent.CallAndWaitAsync(this.CanisterId, "processActionForAllUsers", arg);
 		}
 
 		public async Task RemoveAdmin(WorldApiClient.RemoveAdminArg0 arg0)
@@ -484,6 +526,79 @@ namespace Candid.World
 			}
 		}
 
+		public class CreateEntityForAllUsersArg0
+		{
+			[CandidName("eid")]
+			public EntityId Eid { get; set; }
+
+			[CandidName("fields")]
+			public List<Models.Field> Fields { get; set; }
+
+			public CreateEntityForAllUsersArg0(EntityId eid, List<Models.Field> fields)
+			{
+				this.Eid = eid;
+				this.Fields = fields;
+			}
+
+			public CreateEntityForAllUsersArg0()
+			{
+			}
+		}
+
+		public class CreateTestQuestActionsArg0
+		{
+			[CandidName("actionId_1")]
+			public string Actionid1 { get; set; }
+
+			[CandidName("actionId_2")]
+			public string Actionid2 { get; set; }
+
+			[CandidName("game_world_canister_id")]
+			public string GameWorldCanisterId { get; set; }
+
+			public CreateTestQuestActionsArg0(string actionid1, string actionid2, string gameWorldCanisterId)
+			{
+				this.Actionid1 = actionid1;
+				this.Actionid2 = actionid2;
+				this.GameWorldCanisterId = gameWorldCanisterId;
+			}
+
+			public CreateTestQuestActionsArg0()
+			{
+			}
+		}
+
+		public class CreateTestQuestConfigsArg0Item
+		{
+			[CandidName("cid")]
+			public string Cid { get; set; }
+
+			[CandidName("description")]
+			public string Description { get; set; }
+
+			[CandidName("image_url")]
+			public string ImageUrl { get; set; }
+
+			[CandidName("name")]
+			public string Name { get; set; }
+
+			[CandidName("quest_url")]
+			public string QuestUrl { get; set; }
+
+			public CreateTestQuestConfigsArg0Item(string cid, string description, string imageUrl, string name, string questUrl)
+			{
+				this.Cid = cid;
+				this.Description = description;
+				this.ImageUrl = imageUrl;
+				this.Name = name;
+				this.QuestUrl = questUrl;
+			}
+
+			public CreateTestQuestConfigsArg0Item()
+			{
+			}
+		}
+
 		public class DeleteActionArg0
 		{
 			[CandidName("aid")]
@@ -578,6 +693,21 @@ namespace Candid.World
 			}
 
 			public DeleteEntityArg0()
+			{
+			}
+		}
+
+		public class DeleteTestQuestActionStateForUserArg0
+		{
+			[CandidName("aid")]
+			public string Aid { get; set; }
+
+			public DeleteTestQuestActionStateForUserArg0(string aid)
+			{
+				this.Aid = aid;
+			}
+
+			public DeleteTestQuestActionStateForUserArg0()
 			{
 			}
 		}
@@ -786,6 +916,39 @@ namespace Candid.World
 
 			public GetUserEntitiesFromWorldNodeCompositeArg0()
 			{
+			}
+		}
+
+		public class GetUserEntitiesFromWorldNodeFilteredSortingCompositeArg0
+		{
+			[CandidName("fieldName")]
+			public string FieldName { get; set; }
+
+			[CandidName("order")]
+			public WorldApiClient.GetUserEntitiesFromWorldNodeFilteredSortingCompositeArg0.OrderInfo Order { get; set; }
+
+			[CandidName("page")]
+			public OptionalValue<UnboundedUInt> Page { get; set; }
+
+			[CandidName("uid")]
+			public string Uid { get; set; }
+
+			public GetUserEntitiesFromWorldNodeFilteredSortingCompositeArg0(string fieldName, WorldApiClient.GetUserEntitiesFromWorldNodeFilteredSortingCompositeArg0.OrderInfo order, OptionalValue<UnboundedUInt> page, string uid)
+			{
+				this.FieldName = fieldName;
+				this.Order = order;
+				this.Page = page;
+				this.Uid = uid;
+			}
+
+			public GetUserEntitiesFromWorldNodeFilteredSortingCompositeArg0()
+			{
+			}
+
+			public enum OrderInfo
+			{
+				Ascending,
+				Descending
 			}
 		}
 

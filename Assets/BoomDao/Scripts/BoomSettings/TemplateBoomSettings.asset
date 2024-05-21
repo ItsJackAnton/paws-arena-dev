@@ -13,5 +13,6 @@ MonoBehaviour:
   m_Name: TemplateBoomSettings
   m_EditorClassIdentifier: 
   <DeploymentEnv_>k__BackingField: 0
-  WorldId: fp3rf-kqaaa-aaaal-qdmmq-cai
+  WorldId: 
   WorldEnv_: 0
+  proGuildsAsDevMode: 1

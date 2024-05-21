@@ -22,9 +22,12 @@ namespace Boom
         [Header("Edit this only if your are manually setting this up with a WorldId")]
         public WorldEnv WorldEnv_ = WorldEnv.None;
 
+        [SerializeField, Header("Production Only Settings")] bool proGuildsAsDevMode = true;
+
         public string WorldHubId
         {
-            get {
+            get
+            {
                 if (WorldEnv_ == WorldEnv.None) Debug.LogError("WorldSettings is not yet setup!");
 
                 return WorldEnv_ ==
@@ -32,7 +35,16 @@ namespace Boom
             }
         }
 
+        public string GamingGuildsId
+        {
+            get
+            {
+                if (WorldEnv_ == WorldEnv.None) Debug.LogError("WorldSettings is not yet setup!");
 
+                return WorldEnv_ ==
+                    WorldEnv.Production ? (proGuildsAsDevMode ? Env.CanisterIds.GAMING_GUILDS.DEVELOPMENT : Env.CanisterIds.GAMING_GUILDS.PRODUCTION) : Env.CanisterIds.GAMING_GUILDS.STAGING;
+            }
+        }
 
         #region EDITOR
 #if UNITY_EDITOR

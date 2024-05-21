@@ -204,7 +204,6 @@ namespace Boom.Tutorials
             }
 
             var allUserDataAsOk = allUserDataResult.AsOk();
-            
 
             EntiyDataChangeHandler(allUserDataAsOk.entityData);
             TokenDataChangeHandler(allUserDataAsOk.tokenData);
@@ -225,12 +224,6 @@ namespace Boom.Tutorials
                     $"Could not find config for token canister ID: {balance.canisterId}".Warning(typeof(TutorialPaymentIcrc).Name);
                     return "";
                 }
-                
-                Debug.Log(tokenConfig.symbol);
-                Debug.Log(tokenConfig.name);
-                Debug.Log(tokenConfig.canisterId);
-                Debug.Log(tokenConfig.urlLogo);
-                Debug.Log(balance.baseUnitAmount);
 
                 return $"> {tokenConfig.symbol}: {TokenUtil.ConvertToDecimal(balance.baseUnitAmount, tokenConfig.decimals)}";
 

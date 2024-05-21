@@ -6,19 +6,19 @@ public class OpenWindowBehaviour : MonoBehaviour
     [SerializeField] string windowName;
     [SerializeField] int sortingOrder = 0;
     [SerializeField] bool noParent;
-    [SerializeField] bool onpenOnStart;
+    [SerializeField] bool openOnStart;
     [SerializeField, ShowOnly] Window window;
 
     private void Start()
     {
-        if (onpenOnStart)
+        if (openOnStart)
         {
             Open();
         }
     }
     private void OnDestroy()
     {
-        if (onpenOnStart)
+        if (openOnStart)
         {
             Close();
         }
