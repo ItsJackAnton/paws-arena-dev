@@ -98,6 +98,8 @@ public class GuildCreate : MonoBehaviour
     private void HandleFinishedCreation(List<ActionOutcome> _outcomes)
     {
         GuildsPanel.Instance.ManageInputBlocker(false);
+        DataManager.Instance.PlayerData.GetMyGuild();
+        
         if (DataManager.Instance.PlayerData.IsInAGuild)
         {
             GuildsPanel.Instance.ShowMyGuild();

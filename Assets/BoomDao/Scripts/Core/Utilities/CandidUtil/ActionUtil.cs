@@ -1,3 +1,5 @@
+using UnityEngine;
+
 namespace Boom
 {
     using Cysharp.Threading.Tasks;
@@ -300,7 +302,6 @@ namespace Boom
                                             }
 
                                             allFieldsToEdit = entityToEdit11.fields;
-
 
                                             if (allFieldsToEdit != null)
                                             {

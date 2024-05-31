@@ -1,5 +1,7 @@
 using System;
 using System.Collections.Generic;
+using BoomDaoWrapper;
+using UnityEngine;
 
 [Serializable]
 public class GuildData
@@ -10,10 +12,14 @@ public class GuildData
     public string KingdomName;
     public string BadgeName;
     public int PointsRequirement;
-    public int MatchesWon;
+    public List<int> BattlesHistory = new ();
     public List<GuildPlayerData> Players = new ();
     public bool IsFull => Players.Count >= DataManager.Instance.GameData.MaxGuildPlayers;
+    public GuildBattle GuildBattle = new ();
     public int BattlesWon;
+
+    public Sprite Badge => AssetsManager.Instance.GetChallengeBadgeSprite(BadgeName);
+    public Sprite Kingdom => AssetsManager.Instance.GetChallengeBadgeSprite(KingdomName);
     
     public int SumOfPoints
     {
@@ -28,4 +34,6 @@ public class GuildData
             return _sumOfPoints;
         }
     }
+
+    public bool IsAdmin => Owner == BoomDaoUtility.Instance.UserPrincipal;
 }

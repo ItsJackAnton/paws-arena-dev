@@ -1,4 +1,6 @@
-﻿namespace Boom
+﻿using Newtonsoft.Json;
+
+namespace Boom
 {
     using Boom.Utility;
     using Boom.Values;
@@ -335,6 +337,9 @@
             {
                 return true;
             }
+            
+            Debug.Log(fieldName);
+            Debug.Log(JsonConvert.SerializeObject(entity));
             $"Error on \"value\" type, current type: {value.GetType()}, desired type is: {typeof(T)}".Error();
             return false;
         }

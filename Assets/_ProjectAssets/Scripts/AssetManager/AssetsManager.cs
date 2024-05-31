@@ -9,6 +9,7 @@ public class AssetsManager : MonoBehaviour
     [SerializeField] private List<ItemSprite> rewardsForChallenges;
     [SerializeField] private List<Sprite> guildKingdoms;
     [SerializeField] private List<Sprite> guildBadge;
+    [SerializeField] private List<ItemColor> kingdomColors;
 
     private void Awake()
     {
@@ -56,5 +57,10 @@ public class AssetsManager : MonoBehaviour
             throw new Exception("Not found: " + _badgeName);
         }
         return _itemSprite;
+    }
+
+    public Color GetKingdomColor(Sprite _kingdom)
+    {
+        return kingdomColors.Find(_kingdomSprite => _kingdomSprite.Sprite == _kingdom).Color;
     }
 }

@@ -12,6 +12,7 @@ public class GuildsPanel : MonoBehaviour
    [SerializeField] private GuildTop guildTop;
    [SerializeField] private GuildsSearch guildsSearch;
    [SerializeField] private GuildJoin guildJoin;
+   [SerializeField] private GuildBattlesPanel guildBattles;
    
    [SerializeField] private Button myGuild;
    [SerializeField] private Button guildBattle;
@@ -51,6 +52,7 @@ public class GuildsPanel : MonoBehaviour
 
    private void Start()
    {
+      DataManager.Instance.PlayerData.GetMyGuild();
       ShowMyGuild();
    }
 
@@ -76,11 +78,7 @@ public class GuildsPanel : MonoBehaviour
       
       if (DataManager.Instance.PlayerData.IsInAGuild)
       {
-         //todo show guild battle
-         
-         //show this if guild battle is not active
-         ShowMessage("There is a peace between kitties");
-         ShowMyGuild();
+         guildPanel.Setup();
          return;
       }
 
@@ -136,6 +134,7 @@ public class GuildsPanel : MonoBehaviour
       guildTop.Close();
       guildsSearch.Close();
       guildJoin.Close();
+      guildBattles.Close();
    }
 
    private void Close()

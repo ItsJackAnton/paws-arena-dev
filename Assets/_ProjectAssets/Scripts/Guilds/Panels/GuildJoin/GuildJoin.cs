@@ -1,10 +1,12 @@
 using System.Collections.Generic;
+using BoomDaoWrapper;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
 public class GuildJoin : MonoBehaviour
 {
+    private const string JOIN_GUILD = "joinGuild";
     [SerializeField] private GameObject holder;
     [SerializeField] private Button join;
     [SerializeField] private Button cancel;
@@ -74,7 +76,7 @@ public class GuildJoin : MonoBehaviour
 
     private void Join()
     {
-        if (!string.IsNullOrEmpty(DataManager.Instance.PlayerData.GuildId))
+        if (DataManager.Instance.PlayerData.IsInAGuild)
         {
             GuildsPanel.Instance.ShowMessage("You are already in a guild");
             return;
@@ -86,15 +88,39 @@ public class GuildJoin : MonoBehaviour
             return;
         }
 
-        if (DataManager.Instance.PlayerData.IsInAGuild)
+        if (guildData.IsFull)
         {
-            GuildsPanel.Instance.ShowMessage("You are already in a guild");
+            GuildsPanel.Instance.ShowMessage("This guild is full");
             return;
         }
         
-        //todo add join option
-        GuildsPanel.Instance.ShowMessage("Join option will be added soon");
+        GuildsPanel.Instance.ShowQuestion($"Are you sure that you want to join {guildData.Name}?",YesJoin);
     }
+
+    private void YesJoin()
+    {
+        GuildsPanel.Instance.ManageInputBlocker(true);
+        List<ActionParameter> _parameters = new List<ActionParameter>();
+        _parameters.Add(new () { Key = "playerId", Value = BoomDaoUtility.Instance.UserPrincipal });
+        _parameters.Add(new () { Key = GameData.GUILD_ID, Value = guildData.Id });
+        BoomDaoUtility.Instance.ExecuteActionWithParameter(JOIN_GUILD, _parameters, HandleJoinGuildFinished);
+    }
+
+    private void HandleJoinGuildFinished(List<ActionOutcome> _outcomes)
+    {
+        GuildsPanel.Instance.ManageInputBlocker(false);
+        DataManager.Instance.PlayerData.GetMyGuild();
+        
+        if (DataManager.Instance.PlayerData.IsInAGuild)
+        {
+            DataManager.Instance.PlayerData.GuildId = guildData.Id;
+            GuildsPanel.Instance.ShowMyGuild();
+            return;
+        }
+
+        GuildsPanel.Instance.ShowMessage("Something went wrong, please try again later");
+    }
+
 
     private void Cancel()
     {

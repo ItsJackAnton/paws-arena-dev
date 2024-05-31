@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using BoomDaoWrapper;
 using NaughtyAttributes;
+using Newtonsoft.Json;
 using UnityEngine;
 
 public class ChallengesManager : MonoBehaviour
@@ -219,10 +220,9 @@ public class ChallengesManager : MonoBehaviour
         IsGeneratingNewChallenges = true;
 
         BoomDaoUtility.Instance.ExecuteAction(PlayerData.RESET_AMOUNT_OF_GAMES_PLAYED_TODAY, null);
-        int _counter = 0;
-        CheckForFinishCreating(null);
+        CheckForFinishCreating(null,0);
 
-        void CheckForFinishCreating(List<ActionOutcome> _)
+        void CheckForFinishCreating(List<ActionOutcome> _, int _counter)
         {
             if (_counter<AMOUNT_OF_CHALLENGES)
             {
@@ -232,8 +232,11 @@ public class ChallengesManager : MonoBehaviour
                     new () { Key = CHALLENGE_IDENTIFIER, Value = Guid.NewGuid().ToString() },
                     new () { Key = "progressNumber" , Value = PlayerData.DAILY_CHALLENGE_PROGRESS+_counter }
                 };
-                BoomDaoUtility.Instance.ExecuteActionWithParameter(GENERATE_DAILY_CHALLENGE,_parameters, CheckForFinishCreating);
                 _counter++;
+                BoomDaoUtility.Instance.ExecuteActionWithParameter(GENERATE_DAILY_CHALLENGE,_parameters, _outcomes =>
+                {
+                    CheckForFinishCreating(_outcomes, _counter);
+                });
             }
             else
             {
@@ -267,7 +270,9 @@ public class ChallengesManager : MonoBehaviour
                 continue;
             }
 
+            Debug.Log(_challengeProgress.Identifier);
             ChallengeData _challengeData = DataManager.Instance.GameData.GetChallengeByIdentifier(_challengeProgress.Identifier);
+            Debug.Log(JsonConvert.SerializeObject(_challengeData));
             switch (_challengeData.Category)
             {
                 case ChallengeCategory.WinGame:

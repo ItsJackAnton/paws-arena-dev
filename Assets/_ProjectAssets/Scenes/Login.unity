@@ -264,6 +264,28 @@ MonoBehaviour:
   - {fileID: 21300000, guid: 7048e200c7b8f5849a8121e44318a626, type: 3}
   - {fileID: 21300000, guid: a3781f0fdfd6c2f4eafdea4dd4e01973, type: 3}
   - {fileID: 21300000, guid: e4ac74a430fe9784fb9e454cea849f0f, type: 3}
+  kingdomColors:
+  - Name: 
+    Sprite: {fileID: 21300000, guid: 258d015cf7d95f743ac7c69c43b4e6bd, type: 3}
+    Color: {r: 0.5686275, g: 0.93725497, b: 0.30588236, a: 1}
+  - Name: 
+    Sprite: {fileID: 21300000, guid: 85b75e8409091054faac7c4e76aa8f6b, type: 3}
+    Color: {r: 0.8313726, g: 0.97647065, b: 0.97647065, a: 1}
+  - Name: 
+    Sprite: {fileID: 21300000, guid: 89e0d786f01bb11459042790b126a548, type: 3}
+    Color: {r: 0.33333334, g: 0.8980393, b: 0.80392164, a: 1}
+  - Name: 
+    Sprite: {fileID: 21300000, guid: ca0b3bae672bf484d81dad406cbc1268, type: 3}
+    Color: {r: 1, g: 0.67058825, b: 0.21960786, a: 1}
+  - Name: 
+    Sprite: {fileID: 21300000, guid: e884967dd200ff5468b1a7f98b5c2627, type: 3}
+    Color: {r: 1, g: 0.4431373, b: 0.5803922, a: 1}
+  - Name: 
+    Sprite: {fileID: 21300000, guid: 3260a78162d950647b57f7dc45069f15, type: 3}
+    Color: {r: 0.7137255, g: 0.32941177, b: 0.9058824, a: 1}
+  - Name: 
+    Sprite: {fileID: 21300000, guid: cd6da7f7c5e526c48a0b503021d23236, type: 3}
+    Color: {r: 0.92549026, g: 0.26666668, b: 0.40000004, a: 1}
 --- !u!4 &9315802
 Transform:
   m_ObjectHideFlags: 0
@@ -644,6 +666,50 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: c1b685f548a011944b47fa7be2b6daf8, type: 3}
+--- !u!1 &802774747
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 802774748}
+  - component: {fileID: 802774749}
+  m_Layer: 0
+  m_Name: JavaScriptManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &802774748
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 802774747}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 13
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &802774749
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 802774747}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6af628ba37591e140ac285156b9b8528, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &814613065
 GameObject:
   m_ObjectHideFlags: 0
@@ -688,7 +754,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a53fc13414a52d043b831d48761cd805, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  doubleNumber: 1.38317235623e+17
 --- !u!1 &1099789900
 GameObject:
   m_ObjectHideFlags: 0
@@ -748,6 +813,10 @@ PrefabInstance:
       propertyPath: enableBoomLogs
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 2393423864867871020, guid: bb357f1634528a149871a2f38d213b8b, type: 3}
+      propertyPath: <BoomSettings>k__BackingField
+      value: 
+      objectReference: {fileID: 11400000, guid: 91d457e6a049f924d83c32c9b53ecca9, type: 2}
     - target: {fileID: 2393423864867871020, guid: bb357f1634528a149871a2f38d213b8b, type: 3}
       propertyPath: <WORLD_CANISTER_ID>k__BackingField
       value: aqxsc-zaaaa-aaaal-qdloa-cai

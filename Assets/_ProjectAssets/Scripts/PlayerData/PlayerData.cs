@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
 using BoomDaoWrapper;
+using Newtonsoft.Json;
+using UnityEngine;
 
 [Serializable]
 public class PlayerData
@@ -359,15 +361,14 @@ public class PlayerData
 
     public int LeaderboardPoints => BoomDaoUtility.Instance.GetInt(LEADERBOARD_POINTS, AMOUNT_KEY);
 
-    public string GuildId => BoomDaoUtility.Instance.GetString(GameData.GUILD_ID, BoomDaoUtility.VALUE_KEY);
+    public string GuildId;
 
-    public bool IsInAGuild => !string.IsNullOrEmpty(GuildId.Trim());
+    public bool IsInAGuild => !string.IsNullOrEmpty(GuildId);
 
     public GuildData Guild
     {
         get
         {
-
             foreach (var _guild in DataManager.Instance.GameData.Guilds)
             {
                 var _guildPlayer = _guild.Players.Find(_player => _player.Principal == BoomDaoUtility.Instance.UserPrincipal);
@@ -381,5 +382,11 @@ public class PlayerData
 
             return null;
         }
+    }
+
+    public void GetMyGuild()
+    {
+        //this needs to be here, since getting Guilds will set my guild id
+        Debug.Log("There are: "+DataManager.Instance.GameData.Guilds.Count+" guilds");
     }
 }

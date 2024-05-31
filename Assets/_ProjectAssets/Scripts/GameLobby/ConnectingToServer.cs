@@ -2,6 +2,7 @@ using BoomDaoWrapper;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using NaughtyAttributes;
 
 public class ConnectingToServer : MonoBehaviour
 {
@@ -96,5 +97,11 @@ public class ConnectingToServer : MonoBehaviour
                 imageUrl = DEFAULT_KITTY
             });
         }
+    }
+
+    [Button()]
+    private void Test()
+    {
+        Debug.Log(Utilities.NanosecondsToDateTime(138567934127000000));
     }
 }

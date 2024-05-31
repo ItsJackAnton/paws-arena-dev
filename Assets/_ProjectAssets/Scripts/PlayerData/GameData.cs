@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using BoomDaoWrapper;
-using Newtonsoft.Json;
 using UnityEngine;
 
 [Serializable]
@@ -34,6 +33,12 @@ public class GameData
     public const string GUILD_POINTS_REQUIREMENT = "pointsRequirement";
     public const string GUILD_PLAYERS = "players";
 
+    public const string GUILD_BATTLES = "guildBattles";
+    public const string GUILD_HISTORY = "guildHistory";
+    public const string GUILD_BATTLES_START = "guildBattlesStart";
+    public const string GUILD_BATTLES_END = "guildBattlesEnd";
+    public const string GUILD_BATTLES_OPPONENT = "guildBattleOpponent";
+    public const string GUILD_BATTLES_NUMBER = "battleNumber";
     
     public const string KITTY_RECOVERY_KEY = "recoveryDate";
     public string KittyKey => GameState.selectedNFT.IsDefaultKitty ? "kitty_id" : "kittyId";
@@ -147,6 +152,7 @@ public class GameData
                 {
                     continue;
                 }
+                
                 _dailyChallenges.Challenges.Add(_challenge);
             }
 
@@ -160,6 +166,7 @@ public class GameData
                 : Convert.ToUInt64(_nextResetString);
             
             _dailyChallenges.NextReset = Utilities.NanosecondsToDateTime(_nextResetLong);
+            
             return _dailyChallenges;
         }
     }
@@ -328,7 +335,7 @@ public class GameData
         get
         {
             List<WorldDataEntry> _entries = BoomDaoUtility.Instance.GetWorldData(GUILD_ID, GUILD_NAME, GUILD_PLAYERS, GUILD_BADGE_NAME, 
-            GUILD_KINGDOM_NAME, GUILD_POINTS_REQUIREMENT, GUILD_OWNER);
+            GUILD_KINGDOM_NAME, GUILD_POINTS_REQUIREMENT, GUILD_OWNER, GUILD_BATTLES_OPPONENT);
             
             if (_entries==null)
             {
@@ -338,13 +345,9 @@ public class GameData
             
             var _leaderboardEntries = GetLeaderboard.Entries;
             List<GuildData> _guilds = new();
+            DataManager.Instance.PlayerData.GuildId = string.Empty;
             foreach (var _worldEntry in _entries)
             {
-                if (_worldEntry.PrincipalId == "de572c03-e27f-4d67-8e06-84cef068a952")
-                {
-                    Debug.Log("Found guild");
-                    Debug.Log(JsonConvert.SerializeObject(_worldEntry.Data));
-                }
                 if (_worldEntry.GetProperty(GUILD_KINGDOM_NAME)== null)
                 {
                     continue;
@@ -359,32 +362,71 @@ public class GameData
                     PointsRequirement = Convert.ToInt32(_worldEntry.GetProperty(GUILD_POINTS_REQUIREMENT)),
                     Owner = _worldEntry.GetProperty(GUILD_OWNER)
                 };
+
+                _guildData.GuildBattle = new GuildBattle
+                {
+                    OpponentId = _worldEntry.GetProperty(GUILD_BATTLES_OPPONENT),
+                    Number = Convert.ToInt32(_worldEntry.GetProperty(GUILD_BATTLES_NUMBER))
+                };
                 
                 _guilds.Add(_guildData);
 
-                if (string.IsNullOrEmpty(_worldEntry.GetProperty(GUILD_PLAYERS)))
+                string _guildHistory = _worldEntry.GetProperty(GUILD_HISTORY);
+                if (!string.IsNullOrEmpty(_guildHistory))
                 {
-                    Debug.Log("Found guild but it has no players");
-                    continue;
+                    if (_guildHistory.Contains(","))
+                    {
+                        List<string>  _history= _guildHistory.Split(".").ToList();
+                        foreach (var _his in _history)
+                        {
+                            _guildData.BattlesHistory.Add(Convert.ToInt32(_his));
+                        }
+                    }
+                    else
+                    {
+                        _guildData.BattlesHistory.Add(Convert.ToInt32(_guildHistory));
+                    }
                 }
 
-                List<string> _playersPrincipals = _worldEntry.GetProperty(GUILD_PLAYERS).Split(",").ToList();
-                List<GuildPlayerData> _players = new ();
-                foreach (var _player in _playersPrincipals)
+                string _playersString = _worldEntry.GetProperty(GUILD_PLAYERS);
+                if (string.IsNullOrEmpty(_playersString))
                 {
-                    LeaderboardEntries _leaderboardEntry = _leaderboardEntries.Find(_entry => _entry.PrincipalId == _player);
+                    _guilds.Remove(_guildData);
+                    continue;
+                }
+                
+                List<string> _playersPrincipals = new();
+                if (_playersString.Contains(","))
+                {
+                    _playersPrincipals = _playersString.Split(",").ToList();
+                }
+                else
+                {
+                    _playersPrincipals.Add(_playersString);
+                }
+                
+                List<GuildPlayerData> _players = new ();
+                foreach (var _playerPrincipal in _playersPrincipals)
+                {
+                    LeaderboardEntries _leaderboardEntry = _leaderboardEntries.Find(_entry => _entry.PrincipalId == _playerPrincipal);
                     GuildPlayerData _guildPlayer = new();
                     _players.Add(_guildPlayer);
+                    _guildPlayer.Principal = _playerPrincipal;
+                    _guildPlayer.IsLeader = _playerPrincipal == _guildData.Owner;
+                    if (_playerPrincipal == BoomDaoUtility.Instance.UserPrincipal)
+                    {
+                        DataManager.Instance.PlayerData.GuildId = _guildData.Id;
+                    }
+
                     if (_leaderboardEntry == null)
                     {
                         _guildPlayer.Points = 0;
-                        _guildPlayer.Name = "WaitingForLeaderboardEntry";
+                        _guildPlayer.Name = "NoEntry";
                         continue;
                     }
-
+                    
                     _guildPlayer.Points = _leaderboardEntry.Points;
                     _guildPlayer.Name = _leaderboardEntry.Nickname;
-                    _guildPlayer.IsLeader = _player == _guildData.Owner;
                     _guildPlayer.Level = _leaderboardEntry.Level;
                 }
 
@@ -395,6 +437,18 @@ public class GameData
         }
     }
 
+    public GuildBattles GuildBattles
+    {
+        get
+        {
+            GuildBattles _guildBattles = new GuildBattles();
+            List<ConfigData> _config =BoomDaoUtility.Instance.GetConfigData(GUILD_BATTLES);
+            _guildBattles.StartingDate = Convert.ToDateTime(_config.Find(_configField => _configField.Name == GUILD_BATTLES_START));
+            _guildBattles.EndingDate = Convert.ToDateTime(_config.Find(_configField => _configField.Name == GUILD_BATTLES_END));
+            return _guildBattles;
+        }
+    }
+    
     public double GuildPrice => BoomDaoUtility.Instance.GetConfigDataAsDouble("guildsConfig", "price");
     public string GuildPriceAsString => BoomDaoUtility.Instance.GetConfigDataAsString("guildsConfig", "price");
     public double MaxGuildPlayers => BoomDaoUtility.Instance.GetConfigDataAsDouble("guildsConfig", "maxPlayers");

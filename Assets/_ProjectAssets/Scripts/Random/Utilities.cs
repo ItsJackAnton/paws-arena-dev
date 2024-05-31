@@ -204,4 +204,16 @@ public static class Utilities
     {
         return _this.Replace("\\n","\n");
     }
+
+    public static string TimeSpanToTimer(TimeSpan _timeLeft)
+    {
+        string _output = string.Empty;
+        _output += _timeLeft.Hours < 10 ? "0" + _timeLeft.Hours : _timeLeft.Hours;
+        _output += "h ";
+        _output += _timeLeft.Minutes < 10 ? "0" + _timeLeft.Minutes : _timeLeft.Minutes;
+        _output += "m ";
+        _output += _timeLeft.Seconds < 10 ? "0" + _timeLeft.Seconds : _timeLeft.Seconds;
+        _output += "s ";
+        return _output;
+    }
 }
