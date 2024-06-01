@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using System.Runtime.InteropServices;
 using BoomDaoWrapper;
+using TMPro;
 using UnityEngine;
 
 public static class Utilities

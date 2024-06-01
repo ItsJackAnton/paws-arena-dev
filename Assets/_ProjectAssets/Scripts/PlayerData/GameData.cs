@@ -267,13 +267,27 @@ public class GameData
     public bool IsKittyHurt(string _kittyId)
     {
         string _recoveryDateString = GetKittyRecoveryString(_kittyId);
+        Debug.Log($"Checking if kitty {_kittyId} is hurt: "+_recoveryDateString);
         
         if (string.IsNullOrEmpty(_recoveryDateString))
         {
+            Debug.Log("Returning false");
             return false;
         }
 
-        DateTime _recoveryDate = Utilities.NanosecondsToDateTime(Convert.ToDouble(_recoveryDateString));
+        DateTime _recoveryDate;
+        
+        try
+        {
+            _recoveryDate= Utilities.NanosecondsToDateTime(Convert.ToDouble(_recoveryDateString));
+        }
+        catch (Exception e)
+        {
+            _recoveryDate = DateTime.MinValue;
+            Debug.Log("Failed to convert recoveryDate: "+e);
+        }
+        
+        Debug.Log($"Recovery date: {_recoveryDate} > {DateTime.UtcNow} = {_recoveryDate > DateTime.UtcNow}");
         
         return _recoveryDate > DateTime.UtcNow;
     }
