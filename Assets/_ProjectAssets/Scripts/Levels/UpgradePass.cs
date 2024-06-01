@@ -33,6 +33,10 @@ public class UpgradePass : MonoBehaviour
 
     private void Upgrade()
     {
+        if (!DataManager.Instance.GameData.IsSeasonActive)
+        {
+            return;
+        }
         dialog.SetActive(true);
     }
 

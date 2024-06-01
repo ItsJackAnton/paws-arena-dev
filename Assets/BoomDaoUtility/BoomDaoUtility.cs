@@ -41,6 +41,7 @@ namespace BoomDaoWrapper
             {
                 Instance = this;
                 DontDestroyOnLoad(gameObject);
+                UserUtil.AddListenerMainDataChange<MainDataTypes.LoginData>(LoginDataChangeHandler);
             }
             else
             {
@@ -60,6 +61,7 @@ namespace BoomDaoWrapper
             BroadcastState.Unregister<WaitingForResponse>(AllowLogin);
             UserUtil.RemoveListenerDataChangeSelf<DataTypes.Entity>(OnEntityDataChangeHandler);
             UserUtil.RemoveListenerDataChangeSelf<DataTypes.Token>(TokenDataChangeHandler);
+            UserUtil.RemoveListenerMainDataChange<MainDataTypes.LoginData>(LoginDataChangeHandler);
         }
 
 
@@ -74,8 +76,15 @@ namespace BoomDaoWrapper
         public void Login(Action _callBack)
         {
             loginCallback = _callBack;
+            if (IsLoggedIn)
+            {
+                Debug.Log(1);
+                _callBack?.Invoke();
+                return;
+            }
+
+            Debug.Log(3);
             Broadcast.Invoke<UserLoginRequest>();
-            UserUtil.AddListenerMainDataChange<MainDataTypes.LoginData>(LoginDataChangeHandler);
         }
 
         private void LoginDataChangeHandler(MainDataTypes.LoginData _data)
@@ -85,7 +94,6 @@ namespace BoomDaoWrapper
                 return;
             }
 
-            UserUtil.RemoveListenerMainDataChange<MainDataTypes.LoginData>(LoginDataChangeHandler);
             loginCallback?.Invoke();
             
             //Update Inventory UI with Entities

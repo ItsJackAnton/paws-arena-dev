@@ -6,6 +6,7 @@ using System.Collections;
 using System.Collections.Generic;
 using BoomDaoWrapper;
 using com.colorfulcoding.AfterGame;
+using TMPro;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
@@ -134,6 +135,7 @@ namespace com.colorfulcoding.GameScene
 
                     int _oldPoints = response.oldPoints;
                     int _points = response.points;
+                    Debug.Log("------------ "+response.gameResultType);
                     response = new LeaderboardPostResponseEntity
                     {
                         points = _points, oldPoints = _oldPoints, gameResultType = (int)state, reason = string.Empty

@@ -2,7 +2,6 @@ using BoomDaoWrapper;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
-using NaughtyAttributes;
 
 public class ConnectingToServer : MonoBehaviour
 {
@@ -37,6 +36,7 @@ public class ConnectingToServer : MonoBehaviour
         GameState.principalId = _loginDataAsOk.principal;
         DataManager.Instance.Setup();
         ChallengesManager.Instance.Setup();
+        //MockNfts();
         
         SceneManager.Instance.LoadNftSelection();
     }
@@ -52,7 +52,7 @@ public class ConnectingToServer : MonoBehaviour
         {
             GameState.nfts.Add(new NFT()
             {
-                imageUrl = "https://rw7qm-eiaaa-aaaak-aaiqq-cai.raw.icp0.io/?tokenid=45rna-aykor-uwiaa-aaaaa-cqace-eaqca-aadhw-q"
+                imageUrl = "https://rw7qm-eiaaa-aaaak-aaiqq-cai.raw.icp0.io/?type=thumbnail&tokenid=i56dg-jykor-uwiaa-aaaaa-cqace-eaqca-aaavb-a"
             });  
         }
     }
@@ -97,11 +97,5 @@ public class ConnectingToServer : MonoBehaviour
                 imageUrl = DEFAULT_KITTY
             });
         }
-    }
-
-    [Button()]
-    private void Test()
-    {
-        Debug.Log(Utilities.NanosecondsToDateTime(138567934127000000));
     }
 }

@@ -1,6 +1,5 @@
 using System.Runtime.InteropServices;
 using UnityEngine;
-using NaughtyAttributes;
 
 public class JavaScriptManager : MonoBehaviour
 {
@@ -25,11 +24,5 @@ public class JavaScriptManager : MonoBehaviour
     public void ShareImageToTwitter(string _image, string _text)
     {
         DoShareImageToTwitter(_image, _text);
-    }
-    
-    [Button()]
-    private void Test()
-    {
-        Debug.Log(Utilities.NanosecondsToDateTime(139403407139000000.000000));
     }
 }
