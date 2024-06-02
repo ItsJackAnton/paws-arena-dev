@@ -121,7 +121,10 @@ public class BotAI : MonoBehaviour
 
     private void OnDisable()
     {
-        AreaEffectsManager.Instance.OnAreaDamage -= AreaDamage;
+        if (AreaEffectsManager.Instance)
+        {
+            AreaEffectsManager.Instance.OnAreaDamage -= AreaDamage;
+        }
     }
 
     private bool playing = false;

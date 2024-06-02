@@ -92,7 +92,7 @@ namespace com.colorfulcoding.GameScene
                                 : GameResult.Player2
                         )
                 ),
-                isFriendly =  PhotonNetwork.CurrentRoom is { IsVisible: false }
+                isFriendly =  PhotonManager.IsFriendly
             };
 
             string reqJson = JsonUtility.ToJson(req);
@@ -140,13 +140,6 @@ namespace com.colorfulcoding.GameScene
                     {
                         points = _points, oldPoints = _oldPoints, gameResultType = (int)state, reason = string.Empty
                     };
-                    if (GameResolveStateUtils.CheckIfIWon(state)==1)
-                    {
-                        if (response.points<=10)
-                        {
-                            response.points = Random.Range(900, 1000);
-                        }
-                    }
                     
                     GameState.pointsChange = response;
                 },

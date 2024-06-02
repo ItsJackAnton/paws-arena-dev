@@ -41,6 +41,7 @@ namespace BoomDaoWrapper
             {
                 Instance = this;
                 DontDestroyOnLoad(gameObject);
+                Debug.Log("------------ Subscribed for login changes");
                 UserUtil.AddListenerMainDataChange<MainDataTypes.LoginData>(LoginDataChangeHandler);
             }
             else
@@ -61,6 +62,8 @@ namespace BoomDaoWrapper
             BroadcastState.Unregister<WaitingForResponse>(AllowLogin);
             UserUtil.RemoveListenerDataChangeSelf<DataTypes.Entity>(OnEntityDataChangeHandler);
             UserUtil.RemoveListenerDataChangeSelf<DataTypes.Token>(TokenDataChangeHandler);
+            
+            Debug.Log("------------ Unsubscribed for login data changes");
             UserUtil.RemoveListenerMainDataChange<MainDataTypes.LoginData>(LoginDataChangeHandler);
         }
 
@@ -75,25 +78,29 @@ namespace BoomDaoWrapper
 
         public void Login(Action _callBack)
         {
+            Debug.Log("------------ Started login process");
             loginCallback = _callBack;
             if (IsLoggedIn)
             {
-                Debug.Log(1);
+                Debug.Log("------------ User is already logged in, calling callback");
                 _callBack?.Invoke();
                 return;
             }
 
-            Debug.Log(3);
+            Debug.Log("------------ Broadcasting login request");
             Broadcast.Invoke<UserLoginRequest>();
         }
 
         private void LoginDataChangeHandler(MainDataTypes.LoginData _data)
         {
+            Debug.Log("------------ Login data changed: "+ JsonConvert.SerializeObject(_data));
             if (_data.state != MainDataTypes.LoginData.State.LoggedIn)
             {
+                Debug.Log("------------ Data is not logged in, returning");
                 return;
             }
 
+            Debug.Log("------------ Login finished, calling callback and setting up tokens");
             loginCallback?.Invoke();
             
             //Update Inventory UI with Entities

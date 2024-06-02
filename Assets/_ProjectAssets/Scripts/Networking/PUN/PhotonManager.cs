@@ -26,6 +26,7 @@ public class PhotonManager : MonoBehaviourPunCallbacks
     private bool isSinglePlayer = false;
     private string friendlyRoomName;
     public static bool AllowSpectators;
+    public static bool IsFriendly;
 
 
     #region ACTIONS
@@ -135,7 +136,12 @@ public class PhotonManager : MonoBehaviourPunCallbacks
 
         if (PhotonNetwork.CurrentRoom is { IsVisible: false })
         {
+            IsFriendly = true;
             OnJoinedFriendlyRoom?.Invoke();
+        }
+        else
+        {
+            IsFriendly = false;
         }
     }
 

@@ -15,6 +15,8 @@ public class PlayerComponent : MonoBehaviour
     private PhotonView photonView;
     [field: SerializeField] public Transform EmojiHolder { get; private set; }
 
+    private bool isSubscribed;
+
 
     private void Awake()
     {
@@ -48,6 +50,7 @@ public class PlayerComponent : MonoBehaviour
     {
         if (!isMultiplayer || (photonView != null && photonView.IsMine))
         {
+            isSubscribed = true;
             RoomStateManager.OnStateUpdated += OnStateUpdatedForMyPlayer;
             InputManager.OnDragged += MobileMovement;
             InputManager.OnDragEnded += StopMobileMovement;
@@ -60,8 +63,9 @@ public class PlayerComponent : MonoBehaviour
     {
         photonView = GetComponent<PhotonView>();
 
-        if (photonView != null && photonView.IsMine)
+        if (isSubscribed)
         {
+            isSubscribed = false;
             RoomStateManager.OnStateUpdated -= OnStateUpdatedForMyPlayer;
             InputManager.OnDragged -= MobileMovement;
             InputManager.OnDragEnded -= StopMobileMovement;

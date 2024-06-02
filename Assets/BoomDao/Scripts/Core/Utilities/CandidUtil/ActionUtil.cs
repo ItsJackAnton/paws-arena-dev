@@ -1,5 +1,3 @@
-using UnityEngine;
-
 namespace Boom
 {
     using Cysharp.Threading.Tasks;
@@ -266,6 +264,9 @@ namespace Boom
                                             if (fieldName == "$caller") fieldName = callerPrincipalId;
                                             else if (fieldName == "$target") fieldName = optionalTargetPrincipalId;
 
+                                            if (fieldValue10 == "$caller") fieldValue10 = callerPrincipalId;
+                                            else if (fieldValue10 == "$target") fieldValue10 = optionalTargetPrincipalId;
+
                                             if (!entityOutcomes.TryGetValue(entityKey, out var entityToEdit10))
                                             {
                                                 entityToEdit10 = new(wid, eid, new());
@@ -276,9 +277,7 @@ namespace Boom
 
 
                                             if (allFieldsToEdit != null)
-                                            {
-                                                fieldValue10 = EntityUtil.ReplaceVariables(fieldValue10, worldEntities, callerEntities, targetEntities, configs, args);
-                                                
+                                            {                                                
                                                 if (!allFieldsToEdit.TryAdd(fieldName, new EntityFieldEdit.AddToList((string)fieldValue10)))
                                                 {
                                                     allFieldsToEdit[fieldName] = new EntityFieldEdit.AddToList((string)fieldValue10);
@@ -295,21 +294,26 @@ namespace Boom
                                             if (fieldName == "$caller") fieldName = callerPrincipalId;
                                             else if (fieldName == "$target") fieldName = optionalTargetPrincipalId;
 
+                                            if (fieldValue11 == "$caller") fieldValue11 = callerPrincipalId;
+                                            else if (fieldValue11 == "$target") fieldValue11 = optionalTargetPrincipalId;
+
                                             if (!entityOutcomes.TryGetValue(entityKey, out var entityToEdit11))
                                             {
                                                 entityToEdit10 = new(wid, eid, new());
                                                 entityOutcomes.Add(entityKey, entityToEdit11);
                                             }
 
-                                            allFieldsToEdit = entityToEdit11.fields;
-
-                                            if (allFieldsToEdit != null)
+                                            if(entityToEdit11 != null)
                                             {
-                                                fieldValue11 = EntityUtil.ReplaceVariables(fieldValue11, worldEntities, callerEntities, targetEntities, configs, args);
+                                                allFieldsToEdit = entityToEdit11.fields;
 
-                                                if (!allFieldsToEdit.TryAdd(fieldName, new EntityFieldEdit.RemoveFromList((string)fieldValue11)))
+
+                                                if (allFieldsToEdit != null)
                                                 {
-                                                    allFieldsToEdit[fieldName] = new EntityFieldEdit.RemoveFromList((string)fieldValue11);
+                                                    if (!allFieldsToEdit.TryAdd(fieldName, new EntityFieldEdit.RemoveFromList((string)fieldValue11)))
+                                                    {
+                                                        allFieldsToEdit[fieldName] = new EntityFieldEdit.RemoveFromList((string)fieldValue11);
+                                                    }
                                                 }
                                             }
 

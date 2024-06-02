@@ -5,7 +5,7 @@ using System.Collections.Generic;
 public class GuildBattle
 {
     public string OpponentId;
-    public List<GuildBattleEntry> BattleEntries;
+    public List<GuildBattleEntry> BattleEntries = new ();
     public int Number;
     public GuildData Opponent => DataManager.Instance.GameData.Guilds.Find(_guild => _guild.Id == OpponentId);
 

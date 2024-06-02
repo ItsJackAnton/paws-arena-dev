@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using BoomDaoWrapper;
+using Newtonsoft.Json;
 using UnityEngine;
 
 [Serializable]
@@ -18,8 +19,8 @@ public class GuildData
     public GuildBattle GuildBattle = new ();
     public int BattlesWon;
 
-    public Sprite Badge => AssetsManager.Instance.GetChallengeBadgeSprite(BadgeName);
-    public Sprite Kingdom => AssetsManager.Instance.GetChallengeBadgeSprite(KingdomName);
+    [JsonIgnore] public Sprite Badge => AssetsManager.Instance.GetChallengeBadgeSprite(BadgeName);
+    [JsonIgnore] public Sprite Kingdom => AssetsManager.Instance.GetChallengeKingdomSprite(KingdomName);
     
     public int SumOfPoints
     {

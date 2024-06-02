@@ -27,7 +27,10 @@ public class BasePlayerComponent : MonoBehaviour
 
     private void OnDisable()
     {
-        AreaEffectsManager.Instance.OnAreaDamage -= AreaDamage;
+        if (AreaEffectsManager.Instance)
+        {
+            AreaEffectsManager.Instance.OnAreaDamage -= AreaDamage;
+        }
     }
 
     private void AreaDamage(Vector2 position, float area, int maxDamage, bool damageByDistance, bool hasPushForce, float pushForce, int bulletCount)

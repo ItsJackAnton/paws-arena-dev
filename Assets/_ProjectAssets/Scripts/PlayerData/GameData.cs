@@ -283,8 +283,25 @@ public class GameData
         }
         catch (Exception e)
         {
-            _recoveryDate = DateTime.MinValue;
             Debug.Log("Failed to convert recoveryDate: "+e);
+            try
+            {
+                if (_recoveryDateString.Contains("."))
+                {
+                    Debug.Log("Found dot in recovery text");
+                    _recoveryDate = Utilities.NanosecondsToDateTime(Convert.ToDouble(_recoveryDateString.Split(".")[0]));
+                }
+                else
+                {
+                    Debug.Log("Didnt find dot in recovery text, trying to parse it");
+                    _recoveryDate = Utilities.NanosecondsToDateTime(double.Parse(_recoveryDateString));
+                }
+            }
+            catch (Exception _exception)
+            {
+                Debug.Log("Failed 2 to convert recoveryDate: "+_exception);
+                _recoveryDate = DateTime.MinValue;
+            }
         }
         
         Debug.Log($"Recovery date: {_recoveryDate} > {DateTime.UtcNow} = {_recoveryDate > DateTime.UtcNow}");

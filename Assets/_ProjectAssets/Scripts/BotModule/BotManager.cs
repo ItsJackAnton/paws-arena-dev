@@ -168,6 +168,7 @@ public class BotManager : MonoSingleton<BotManager>
     public PlayerDataCustomView botUI;
 
     private BotPlayerComponent currentBot;
+    private BasePlayerComponent basePlayerComponent;
     private int maxHP;
     private int botHP;
 
@@ -197,7 +198,8 @@ public class BotManager : MonoSingleton<BotManager>
     public void RegisterBot(BotPlayerComponent botComponent)
     {
         currentBot = botComponent;
-        currentBot.GetComponent<BasePlayerComponent>().onDamageTaken += AreaDamage;
+        basePlayerComponent = currentBot.GetComponent<BasePlayerComponent>();
+        basePlayerComponent.onDamageTaken += AreaDamage;
         maxHP = ConfigurationManager.Instance.Config.GetPlayerTotalHealth();
         PlayerManager.Instance.otherPlayerTransform = botComponent.transform;
         SetBotHealth(maxHP);
@@ -210,7 +212,10 @@ public class BotManager : MonoSingleton<BotManager>
 
     private void OnDestroy()
     {
-        currentBot.GetComponent<BasePlayerComponent>().onDamageTaken -= AreaDamage;
+        if (basePlayerComponent)
+        {
+            basePlayerComponent.onDamageTaken -= AreaDamage;
+        }
     }
 
     private void SetBotHealth(int value)

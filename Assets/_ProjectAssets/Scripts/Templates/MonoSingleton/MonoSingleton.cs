@@ -46,13 +46,17 @@ namespace Anura.Templates.MonoSingleton
             Debug.LogWarning(typeof(T) + " is null.");
 
             var managersParent = GameObject.FindWithTag("Managers");
-            var manager = managersParent.GetComponentInChildren<T>();
-            if (manager == null)
+            if (managersParent)
             {
-                manager = CreateInstance(managersParent.transform);
+                var manager = managersParent.GetComponentInChildren<T>();
+                if (manager)
+                {
+                    return manager;
+                }
+                return CreateInstance(managersParent.transform);
             }
 
-            return manager;
+            return null;
         }
 
         private static T CreateInstance(Transform newParent)

@@ -861,7 +861,7 @@ MonoBehaviour:
   guildTop: {fileID: 1816072618}
   guildsSearch: {fileID: 272591558}
   guildJoin: {fileID: 1050700877}
-  guildBattles: {fileID: 0}
+  guildBattles: {fileID: 1519116467}
   myGuild: {fileID: 929533276024529793}
   guildBattle: {fileID: 929533275196759976}
   topGuilds: {fileID: 929533274728855281}
@@ -20345,7 +20345,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 45.8785, y: -29.91}
+  m_AnchoredPosition: {x: 45.87851, y: -29.91}
   m_SizeDelta: {x: 91.757, y: 59.82}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &2461198419045236495

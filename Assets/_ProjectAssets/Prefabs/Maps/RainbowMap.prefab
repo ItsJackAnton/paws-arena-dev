@@ -150,7 +150,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4353723578636837849, guid: 85938879427c20e45a5215f84924fcfb, type: 3}
       propertyPath: <SortingLayerID>k__BackingField
-      value: 2
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4353723578636837849, guid: 85938879427c20e45a5215f84924fcfb, type: 3}
       propertyPath: <OriginalTexture>k__BackingField
