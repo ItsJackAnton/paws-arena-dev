@@ -11,7 +11,7 @@ namespace com.colorfulcoding.AfterGame
     {
         private const string BATTLE_LOST_ACTION_KEY = "battle_outcome_lost";
         private const string BATTLE_DRAW_ACTION_KEY = "battle_outcome_draw";
-        private const string HURT_KITTY = "hurtKitty";
+        public const string HURT_KITTY = "hurtKitty";
         
         private const string SET_LEADERBOARD_POINTS = "setLeaderboardPoints";
         public const string INCREASE_LEADERBOARD_POINTS = "updateLeaderboardPoints";

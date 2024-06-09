@@ -39,11 +39,6 @@ namespace com.colorfulcoding.GameScene
 
             string reqJson = JsonUtility.ToJson(req);
 
-            if (ConfigurationManager.Instance.GameConfig.enableDevLogs)
-            {
-                Debug.Log(reqJson);
-            }
-
             try
             {
                 await NetworkManager.POSTRequest(
@@ -97,28 +92,12 @@ namespace com.colorfulcoding.GameScene
 
             string reqJson = JsonUtility.ToJson(req);
 
-            Debug.Log("Registering match end");
-            Debug.Log(reqJson);
-            
-            Debug.Log("Registering match ended: "+reqJson+ " my principal: "+GameState.principalId);
-
             await NetworkManager.POSTRequest(
                 "/leaderboard/match",
                 reqJson,
                 (resp) =>
                 {
-                    Debug.Log("----- Got result of the match: "+resp);
                     LeaderboardPostResponseEntity response = JsonUtility.FromJson<LeaderboardPostResponseEntity>(resp);
-                    Debug.Log(resp);
-                    Debug.Log(
-                        $"[HTTP]Match ending registered! You won {response.oldPoints + response.points} points."
-                    );
-
-                    if (ConfigurationManager.Instance.GameConfig.enableDevLogs)
-                    {
-                        Debug.Log(resp);
-                    }
-
                     if (DataManager.Instance.PlayerData.LeaderboardPoints==0)
                     {
                         List<ActionParameter> _parameters = new List<ActionParameter>()
@@ -135,7 +114,6 @@ namespace com.colorfulcoding.GameScene
 
                     int _oldPoints = response.oldPoints;
                     int _points = response.points;
-                    Debug.Log("------------ "+response.gameResultType);
                     response = new LeaderboardPostResponseEntity
                     {
                         points = _points, oldPoints = _oldPoints, gameResultType = (int)state, reason = string.Empty

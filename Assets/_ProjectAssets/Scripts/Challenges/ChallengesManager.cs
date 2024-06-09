@@ -214,7 +214,6 @@ public class ChallengesManager : MonoBehaviour
             return;
         }
 
-        Debug.Log("Generating new challenges");
         generatedNewChallengeInThisSession = true;
         UnsubscribeEvents();
         IsGeneratingNewChallenges = true;
@@ -270,9 +269,7 @@ public class ChallengesManager : MonoBehaviour
                 continue;
             }
 
-            Debug.Log(_challengeProgress.Identifier);
             ChallengeData _challengeData = DataManager.Instance.GameData.GetChallengeByIdentifier(_challengeProgress.Identifier);
-            Debug.Log(JsonConvert.SerializeObject(_challengeData));
             switch (_challengeData.Category)
             {
                 case ChallengeCategory.WinGame:

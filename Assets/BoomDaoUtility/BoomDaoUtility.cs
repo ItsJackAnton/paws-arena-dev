@@ -1,12 +1,11 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using Boom;
 using Boom.Patterns.Broadcasts;
 using Boom.Values;
 using Candid.World.Models;
-using NaughtyAttributes;
-using Newtonsoft.Json;
 using UnityEngine;
 using WebSocketSharp;
 using Action = System.Action;
@@ -28,12 +27,15 @@ namespace BoomDaoWrapper
         private Action loginCallback;
         private bool canLogin;
         private Dictionary<string, double> balances = new ();
+        private CultureInfo culture = CultureInfo.InvariantCulture;
 
         public bool CanLogin => canLogin;
 
         public bool IsLoggedIn => UserUtil.IsLoggedIn();
 
         public string UserPrincipal => UserUtil.GetPrincipal();
+        private bool isLoginEmbedded;
+        private MainDataTypes.LoginData.State loginState;
 
         private void Awake()
         {
@@ -41,7 +43,6 @@ namespace BoomDaoWrapper
             {
                 Instance = this;
                 DontDestroyOnLoad(gameObject);
-                Debug.Log("------------ Subscribed for login changes");
                 UserUtil.AddListenerMainDataChange<MainDataTypes.LoginData>(LoginDataChangeHandler);
             }
             else
@@ -78,29 +79,37 @@ namespace BoomDaoWrapper
 
         public void Login(Action _callBack)
         {
-            Debug.Log("------------ Started login process");
             loginCallback = _callBack;
             if (IsLoggedIn)
             {
-                Debug.Log("------------ User is already logged in, calling callback");
                 _callBack?.Invoke();
                 return;
             }
 
-            Debug.Log("------------ Broadcasting login request");
+            if (isLoginEmbedded)
+            {
+                _callBack?.Invoke();
+                return;
+            }
+
+            if (loginState != MainDataTypes.LoginData.State.Logedout)
+            {
+                return;
+            }
+            
+
             Broadcast.Invoke<UserLoginRequest>();
         }
 
         private void LoginDataChangeHandler(MainDataTypes.LoginData _data)
         {
-            Debug.Log("------------ Login data changed: "+ JsonConvert.SerializeObject(_data));
-            if (_data.state != MainDataTypes.LoginData.State.LoggedIn)
+            loginState = _data.state;
+            if (loginState != MainDataTypes.LoginData.State.LoggedIn)
             {
-                Debug.Log("------------ Data is not logged in, returning");
                 return;
             }
 
-            Debug.Log("------------ Login finished, calling callback and setting up tokens");
+            isLoginEmbedded = _data.isEmbeddedAgent;
             loginCallback?.Invoke();
             
             //Update Inventory UI with Entities
@@ -116,7 +125,6 @@ namespace BoomDaoWrapper
 
             void UserLogoutHandler(MainDataTypes.LoginData _loginData)
             {
-                Debug.Log(_loginData.state);
                 UserUtil.RemoveListenerMainDataChange<MainDataTypes.LoginData>(UserLogoutHandler);
                 _callBack?.Invoke();
             }
@@ -236,12 +244,12 @@ namespace BoomDaoWrapper
             {
                 if (_valueText.Contains('.'))
                 {
-                    return Convert.ToInt32(_valueText.Split('.')[0]);
+                    return Convert.ToInt32(_valueText.Split('.')[0],culture);
                 }
 
                 try
                 {
-                    return Convert.ToInt32(_valueText);
+                    return Convert.ToInt32(_valueText,culture);
                 }
                 catch (Exception e)
                 {
@@ -279,7 +287,7 @@ namespace BoomDaoWrapper
                 return default;
             }
 
-            return int.Parse(_int);
+            return Convert.ToInt32(_int,culture);
         }
         
         public double GetConfigDataAsDouble(string _configId, string _fieldName)
@@ -290,7 +298,7 @@ namespace BoomDaoWrapper
                 return default;
             }
 
-            return double.Parse(_double);
+            return ConvertToDouble(_double);
         }
 
         public DateTime GetConfigDataAsDate(string _configId, string _fieldName)
@@ -469,16 +477,72 @@ namespace BoomDaoWrapper
 
         #endregion
         
-        [Button()]
-        private void GetGuilds()
+        
+        public double ConvertToDouble(string _string)
         {
-            Debug.Log(JsonConvert.SerializeObject(DataManager.Instance.GameData.Guilds));
+            try
+            {
+                return Convert.ToDouble(_string, culture);
+            }
+            catch (Exception e)
+            {
+                Debug.Log("Failed to convert to double : "+_string);
+                string _numberPart = string.Empty;
+                for (int _i = 0; _i < _string.Length; _i++)
+                {
+                    char _char = _string[_i];
+                    if (!char.IsNumber(_char))
+                    {
+                        break;
+                    }
+
+                    _numberPart += _char;
+                }
+
+                try
+                {
+                    return Convert.ToDouble(_numberPart, culture);
+                }
+                catch (Exception _exception)
+                {
+                    Debug.Log("Failed to convert even the number part to double: "+_numberPart);
+                }
+            }
+
+            return 0;
         }
 
-        [Button()]
-        private void GetGuildPrice()
+        public int ConvertToInt(string _string)
         {
-            Debug.Log(DataManager.Instance.GameData.GuildPrice);
+            try
+            {
+                return Convert.ToInt32(_string, culture);
+            }
+            catch (Exception e)
+            {
+                string _numberPart = string.Empty;
+                for (int _i = 0; _i < _string.Length; _i++)
+                {
+                    char _char = _string[_i];
+                    if (!char.IsNumber(_char))
+                    {
+                        break;
+                    }
+
+                    _numberPart += _char;
+                }
+
+                try
+                {
+                    return Convert.ToInt32(_numberPart, culture);
+                }
+                catch (Exception _exception)
+                {
+                    Debug.Log("Failed to convert even the number part to int: "+_numberPart);
+                }
+            }
+
+            return 0;
         }
     }
 }

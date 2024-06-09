@@ -66,7 +66,6 @@ public class GameplayPVPLevelBar : GameplayLevelBarBase
     [PunRPC]
     private void TellOpponentMyExp(double _experience)
     {
-        Debug.Log("Opponents experience: "+_experience);
         ShowProgress(_experience);
     }
 }

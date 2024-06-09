@@ -62,9 +62,6 @@ public class LuckyWheelUI : MonoBehaviour
                 case PlayerData.MILK_BOTTLE:
                     choosenReward = LuckyWheelRewardSO.Get(_reward.Name);
                     break;
-                default:
-                    Debug.Log($"Don't know how to handle {_reward.Value} of {_reward.Name}");
-                    break;
             }
         }
 

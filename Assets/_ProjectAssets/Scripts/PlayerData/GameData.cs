@@ -2,14 +2,12 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using BoomDaoWrapper;
+using Newtonsoft.Json;
 using UnityEngine;
 
 [Serializable]
 public class GameData
 {
-    public double RespinPrice => BoomDaoUtility.Instance.GetConfigDataAsDouble("respinPrice", "cost");
-
-    //new system
     public const string CLAIM_PREMIUM_REWARD = "battlePassPremium";
     public const string CLAIM_NORMAL_REWARD = "battlePassNormal";
     public const string LEADERBOARD_POINTS = "leaderboardPoints";
@@ -44,6 +42,8 @@ public class GameData
     public string KittyKey => GameState.selectedNFT.IsDefaultKitty ? "kitty_id" : "kittyId";
     
     private List<LevelReward> seasonRewards;
+    
+    public double RespinPrice => BoomDaoUtility.Instance.GetConfigDataAsDouble("respinPrice", "cost");
 
     public int SeasonNumber => BoomDaoUtility.Instance.GetConfigDataAsInt(SEASON_KEY, SEASON_NUMBER);
     public DateTime SeasonStarts => BoomDaoUtility.Instance.GetConfigDataAsDate(SEASON_KEY, SEASON_START);
@@ -122,8 +122,8 @@ public class GameData
                     _levelString = "0";
                 }
              
-                int _points = Convert.ToInt32(_pointsString.Contains('.') ? _pointsString.Split('.')[0] : _pointsString);
-                int _level = Convert.ToInt32(_levelString.Contains('.') ? _levelString.Split('.')[0] : _levelString);
+                int _points = BoomDaoUtility.Instance.ConvertToInt(_pointsString);
+                int _level = BoomDaoUtility.Instance.ConvertToInt(_levelString);
                 
                 _leaderboardData.Entries.Add(new LeaderboardEntries
                 {
@@ -161,10 +161,8 @@ public class GameData
             {
                 return default;
             }
-            ulong _nextResetLong = _nextResetString.Contains('.')
-                ? Convert.ToUInt64(_nextResetString.Split('.')[0])
-                : Convert.ToUInt64(_nextResetString);
-            
+
+            double _nextResetLong = BoomDaoUtility.Instance.ConvertToDouble(_nextResetString);
             _dailyChallenges.NextReset = Utilities.NanosecondsToDateTime(_nextResetLong);
             
             return _dailyChallenges;
@@ -255,7 +253,7 @@ public class GameData
             return DateTime.MinValue;
         }
         
-        DateTime _recoveryDate = Utilities.NanosecondsToDateTime(Convert.ToDouble(_recoveryDateString));
+        DateTime _recoveryDate = Utilities.NanosecondsToDateTime(BoomDaoUtility.Instance.ConvertToDouble(_recoveryDateString));
         if (_recoveryDate <= DateTime.UtcNow)
         {
             _recoveryDate = default;
@@ -267,44 +265,14 @@ public class GameData
     public bool IsKittyHurt(string _kittyId)
     {
         string _recoveryDateString = GetKittyRecoveryString(_kittyId);
-        Debug.Log($"Checking if kitty {_kittyId} is hurt: "+_recoveryDateString);
         
         if (string.IsNullOrEmpty(_recoveryDateString))
         {
-            Debug.Log("Returning false");
             return false;
         }
 
-        DateTime _recoveryDate;
+        var _recoveryDate = Utilities.NanosecondsToDateTime(BoomDaoUtility.Instance.ConvertToDouble(_recoveryDateString));
         
-        try
-        {
-            _recoveryDate= Utilities.NanosecondsToDateTime(Convert.ToDouble(_recoveryDateString));
-        }
-        catch (Exception e)
-        {
-            Debug.Log("Failed to convert recoveryDate: "+e);
-            try
-            {
-                if (_recoveryDateString.Contains("."))
-                {
-                    Debug.Log("Found dot in recovery text");
-                    _recoveryDate = Utilities.NanosecondsToDateTime(Convert.ToDouble(_recoveryDateString.Split(".")[0]));
-                }
-                else
-                {
-                    Debug.Log("Didnt find dot in recovery text, trying to parse it");
-                    _recoveryDate = Utilities.NanosecondsToDateTime(double.Parse(_recoveryDateString));
-                }
-            }
-            catch (Exception _exception)
-            {
-                Debug.Log("Failed 2 to convert recoveryDate: "+_exception);
-                _recoveryDate = DateTime.MinValue;
-            }
-        }
-        
-        Debug.Log($"Recovery date: {_recoveryDate} > {DateTime.UtcNow} = {_recoveryDate > DateTime.UtcNow}");
         
         return _recoveryDate > DateTime.UtcNow;
     }
@@ -370,7 +338,6 @@ public class GameData
             
             if (_entries==null)
             {
-                Debug.Log("No entries found");
                 return new List<GuildData>();
             }
             
@@ -390,14 +357,14 @@ public class GameData
                     Name = _worldEntry.GetProperty(GUILD_NAME),
                     KingdomName = _worldEntry.GetProperty(GUILD_KINGDOM_NAME),
                     BadgeName = _worldEntry.GetProperty(GUILD_BADGE_NAME),
-                    PointsRequirement = Convert.ToInt32(_worldEntry.GetProperty(GUILD_POINTS_REQUIREMENT)),
+                    PointsRequirement = BoomDaoUtility.Instance.ConvertToInt(_worldEntry.GetProperty(GUILD_POINTS_REQUIREMENT)),
                     Owner = _worldEntry.GetProperty(GUILD_OWNER)
                 };
 
                 _guildData.GuildBattle = new GuildBattle
                 {
                     OpponentId = _worldEntry.GetProperty(GUILD_BATTLES_OPPONENT),
-                    Number = Convert.ToInt32(_worldEntry.GetProperty(GUILD_BATTLES_NUMBER))
+                    Number = BoomDaoUtility.Instance.ConvertToInt(_worldEntry.GetProperty(GUILD_BATTLES_NUMBER))
                 };
                 
                 _guilds.Add(_guildData);
@@ -410,12 +377,12 @@ public class GameData
                         List<string>  _history= _guildHistory.Split(".").ToList();
                         foreach (var _his in _history)
                         {
-                            _guildData.BattlesHistory.Add(Convert.ToInt32(_his));
+                            _guildData.BattlesHistory.Add(BoomDaoUtility.Instance.ConvertToInt(_his));
                         }
                     }
                     else
                     {
-                        _guildData.BattlesHistory.Add(Convert.ToInt32(_guildHistory));
+                        _guildData.BattlesHistory.Add(BoomDaoUtility.Instance.ConvertToInt(_guildHistory));
                     }
                 }
 

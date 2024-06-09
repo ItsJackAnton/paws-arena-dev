@@ -299,7 +299,7 @@ namespace Boom
             {
                 return false;
             }
-
+            
             if (!entity.fields.TryGetValue(fieldName, out var value)) return false;
 
             if (value.TryParseValue<T>(out outValue))
