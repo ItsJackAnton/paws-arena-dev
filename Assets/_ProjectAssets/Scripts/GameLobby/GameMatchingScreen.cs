@@ -43,7 +43,7 @@ public class GameMatchingScreen : MonoBehaviour
         PUNRoomUtils.onPlayerLeft -= OnPlayerLeft;
     }
 
-    private void Init()
+    protected virtual void Init()
     {
         notices.SetActive(false);
 
@@ -82,7 +82,7 @@ public class GameMatchingScreen : MonoBehaviour
         }
     }
 
-    public void SetSeats()
+    public virtual void SetSeats()
     {
         foreach (SeatGameobject seat in seats)
         {
@@ -225,17 +225,17 @@ public class GameMatchingScreen : MonoBehaviour
         return _bots[_index];
     }
 
-    private void OccupySeat(SeatGameobject seat, string nickName)
+    protected void OccupySeat(SeatGameobject seat, string nickName)
     {
         seat.occupierNickname.text = nickName;
     }
 
-    private void FreeSeat(SeatGameobject seat)
+    protected void FreeSeat(SeatGameobject seat)
     {
         seat.occupierNickname.text = "-";
     }
 
-    private void OnPlayerJoined(string opponentNickname, string userId)
+    protected virtual void OnPlayerJoined(string opponentNickname, string userId)
     {
         int mySeat = Int32.Parse(PhotonNetwork.LocalPlayer.CustomProperties["seat"].ToString());
         int otherSeat = (mySeat + 1) % 2;
