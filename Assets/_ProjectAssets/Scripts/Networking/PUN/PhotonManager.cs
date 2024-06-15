@@ -9,6 +9,7 @@ public class PhotonManager : MonoBehaviourPunCallbacks
 {
     public const string NAME = "Name";
     public const string SEAT = "Seat";
+    public const string ALLOW_SPECTATORS = "AllowSpectators";
     
     public event Action OnStartedConnection;
     public event Action OnConnectedServer;
@@ -86,7 +87,7 @@ public class PhotonManager : MonoBehaviourPunCallbacks
         isRoomCreated = true;
 
         string roomName = Guid.NewGuid().ToString();
-        PhotonNetwork.CreateRoom(roomName, new RoomOptions{ MaxPlayers = maxPlayersPerRoom });
+        PhotonNetwork.CreateRoom(roomName, new RoomOptions{ MaxPlayers = maxPlayersPerRoom,  });
         GameState.roomName = roomName;
         OnCreatingRoom?.Invoke();
     }
@@ -100,6 +101,10 @@ public class PhotonManager : MonoBehaviourPunCallbacks
             {
                 IsVisible = false,
                 MaxPlayers = CreateFriendlyMatch.AllowSpectators ? maxPlayersPerSpectatorRoom : maxPlayersPerRoom,
+                CustomRoomProperties = new Hashtable()
+                {
+                    [ALLOW_SPECTATORS] = CreateFriendlyMatch.AllowSpectators ? 1: 0,
+                }
             });
         GameState.roomName = friendlyRoomName;
         OnCreatingRoom?.Invoke();
@@ -120,6 +125,11 @@ public class PhotonManager : MonoBehaviourPunCallbacks
 
     public override void OnJoinedRoom()
     {
+        if (PhotonNetwork.CurrentRoom.CustomProperties[ALLOW_SPECTATORS] != null)
+        {
+            CreateFriendlyMatch.AllowSpectators = Convert.ToInt32(PhotonNetwork.CurrentRoom.CustomProperties[ALLOW_SPECTATORS]) == 1;
+        }
+        
         if (isRoomCreated)
         {
             if (!isSinglePlayer)

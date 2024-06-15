@@ -48,7 +48,8 @@ public class GameMatchingScreenSpectator : GameMatchingScreen
             OccupySeat(seats[_seat], _name);
         }
         
-        startButton.gameObject.SetActive(Convert.ToInt32(PhotonNetwork.LocalPlayer.CustomProperties[PhotonManager.SEAT])<=2);
+        startButton.gameObject.SetActive(Convert.ToInt32(PhotonNetwork.LocalPlayer.CustomProperties[PhotonManager.SEAT])<=2 && PhotonNetwork
+        .CurrentRoom.Players.Count==4);
     }
 
     protected override void OnPlayerJoined(string _opponentNickname, string _userId)

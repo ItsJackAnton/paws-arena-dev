@@ -1672,19 +1672,19 @@ MonoBehaviour:
   gameMatchingScreen: {fileID: 594010646}
   syncPlayerPlatformPrefab: {fileID: 9122209185718362659, guid: 3f631740f087cba4381debb0a059a5d8, type: 3}
   player1Pose:
-    seatIdx: 1
+    seatIdx: 3
     pos: {x: -0.92, y: -0.35, z: 0}
     scale: {x: 0.81, y: 0.81, z: 0.81}
   player2Pose:
-    seatIdx: 2
+    seatIdx: 4
     pos: {x: 0.92, y: -0.35, z: 0}
     scale: {x: -0.81, y: 0.81, z: 0.81}
   spectator1pose:
-    seatIdx: 3
+    seatIdx: 1
     pos: {x: -3.7, y: -3.6, z: 0}
     scale: {x: 0.81, y: 0.81, z: 0.81}
   spectator2pose:
-    seatIdx: 4
+    seatIdx: 2
     pos: {x: 3.7, y: -3.6, z: 0}
     scale: {x: -0.81, y: 0.81, z: 0.81}
 --- !u!4 &1429538793
