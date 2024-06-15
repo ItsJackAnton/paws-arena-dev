@@ -64,7 +64,7 @@ public class SyncPlayerPlatformBehaviour : MonoBehaviour
         SyncPlatformsBehaviour.onPlayersChanged -= Reposition;
     }
 
-    private void Reposition()
+    protected virtual void Reposition()
     {
         PlatformPose pose = SyncPlatformsBehaviour.Instance.GetMySeatPosition(photonView, isBot);
         transform.position = pose.pos;
@@ -84,6 +84,18 @@ public class SyncPlayerPlatformBehaviour : MonoBehaviour
         {
             TurnOnLights();
         }
+
+        if (CreateFriendlyMatch.AllowSpectators)
+        {
+            if (pose.seatIdx<=2)
+            {
+                TurnOffLights();
+            }
+            else
+            {
+                TurnOnLights();
+            }
+        }
     }
 
     private void OnPlayerJoined(string nickname, string userId)
@@ -93,12 +105,12 @@ public class SyncPlayerPlatformBehaviour : MonoBehaviour
         photonView.RPC("SetCatStyle", player, GameState.selectedNFT.imageUrl, serializedConfig);
     }
 
-    private void TurnOffLights()
+    public void TurnOffLights()
     {
         photonView.RPC(nameof(DoTurnOffLights), RpcTarget.All);
     }
     
-    private void TurnOnLights()
+    public void TurnOnLights()
     {
         photonView.RPC(nameof(DoTurnOnLights), RpcTarget.All);
     }

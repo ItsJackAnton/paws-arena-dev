@@ -1665,19 +1665,27 @@ MonoBehaviour:
   m_GameObject: {fileID: 1429538791}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1c6166ccad4a5e8429db9641d6335264, type: 3}
+  m_Script: {fileID: 11500000, guid: 0ec1a77304493e443b91978168facece, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   punRoomUtils: {fileID: 99993738}
   gameMatchingScreen: {fileID: 594010646}
   syncPlayerPlatformPrefab: {fileID: 9122209185718362659, guid: 3f631740f087cba4381debb0a059a5d8, type: 3}
   player1Pose:
-    seatIdx: 0
+    seatIdx: 1
     pos: {x: -0.92, y: -0.35, z: 0}
     scale: {x: 0.81, y: 0.81, z: 0.81}
   player2Pose:
-    seatIdx: 1
+    seatIdx: 2
     pos: {x: 0.92, y: -0.35, z: 0}
+    scale: {x: -0.81, y: 0.81, z: 0.81}
+  spectator1pose:
+    seatIdx: 3
+    pos: {x: -3.7, y: -3.6, z: 0}
+    scale: {x: 0.81, y: 0.81, z: 0.81}
+  spectator2pose:
+    seatIdx: 4
+    pos: {x: 3.7, y: -3.6, z: 0}
     scale: {x: -0.81, y: 0.81, z: 0.81}
 --- !u!4 &1429538793
 Transform:

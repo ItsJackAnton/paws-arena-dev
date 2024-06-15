@@ -65,7 +65,7 @@ public class SyncPlatformsBehaviour : MonoSingleton<SyncPlatformsBehaviour>
         go.GetComponent<SyncPlayerPlatformBehaviour>().isBot = true;
         go.GetComponent<SyncPlayerPlatformBehaviour>().punRoomUtils = punRoomUtils;
     }
-    public PlatformPose GetMySeatPosition(PhotonView photonView, bool isBot)
+    public virtual PlatformPose GetMySeatPosition(PhotonView photonView, bool isBot)
     {
         if (isBot)
         {
