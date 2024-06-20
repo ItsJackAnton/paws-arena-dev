@@ -1,3 +1,4 @@
+using System.Collections;
 using Photon.Pun;
 using Photon.Realtime;
 using System.Linq;
@@ -87,14 +88,21 @@ public class SyncPlayerPlatformBehaviour : MonoBehaviour
 
         if (CreateFriendlyMatch.AllowSpectators)
         {
-            if (pose.seatIdx<=2)
-            {
-                TurnOffLights();
-            }
-            else
-            {
-                TurnOnLights();
-            }
+            TurnOffLights();
+            StartCoroutine(TurnLightsOff());
+        }
+    }
+
+    private IEnumerator TurnLightsOff()
+    {
+        yield return new WaitForSeconds(1);
+        if (int.Parse(PhotonNetwork.LocalPlayer.CustomProperties[PhotonManager.SEAT].ToString())<=2)
+        {
+            TurnOffLights();
+        }
+        else
+        {
+            TurnOnLights();
         }
     }
 

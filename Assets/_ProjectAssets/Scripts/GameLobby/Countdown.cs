@@ -29,7 +29,8 @@ public class Countdown : MonoBehaviour
     public void StartCountDown(Action callback)
     {
         _text = GetComponent<TextMeshProUGUI>();
-        StartCoroutine(CountdownAnimation(8, callback));   
+        int _countdown = CreateFriendlyMatch.IsFriendly ? 4 : 8;
+        StartCoroutine(CountdownAnimation(_countdown, callback));   
     }
 
     private IEnumerator CountdownAnimation(int seconds, Action callback)

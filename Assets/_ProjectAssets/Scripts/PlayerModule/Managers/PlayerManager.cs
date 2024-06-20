@@ -118,12 +118,12 @@ public class PlayerManager : MonoSingleton<PlayerManager>
             return true;
         }
 
-        if (PhotonNetwork.LocalPlayer.IsMasterClient)
-        {
-            return true;
-        }
+        return AmIPlayer1Multiplayer();
+    }
 
-        return false;
+    protected virtual bool AmIPlayer1Multiplayer()
+    {
+        return PhotonNetwork.LocalPlayer.IsMasterClient;
     }
 
     public GameResolveState GetWinnerByHealth()
@@ -141,7 +141,7 @@ public class PlayerManager : MonoSingleton<PlayerManager>
 
     public GameResolveState GetWinnerByLoserIndex(int idx)
     {
-        if (idx == 0)
+        if (idx == 0 || idx == 3)
         {
             return GameResolveState.PLAYER_2_WIN;
         }

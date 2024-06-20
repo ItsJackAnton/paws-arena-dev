@@ -160,4 +160,5 @@ public class PhotonManager : MonoBehaviourPunCallbacks
         OnRoomLeft?.Invoke();
     }
     #endregion
+    
 }

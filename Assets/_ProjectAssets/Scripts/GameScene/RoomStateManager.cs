@@ -4,7 +4,6 @@ using com.colorfulcoding.GameScene;
 using Photon.Pun;
 using System;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 
 public class RoomStateManager : MonoSingleton<RoomStateManager>
 {
@@ -109,7 +108,7 @@ public class RoomStateManager : MonoSingleton<RoomStateManager>
         OnStateUpdated?.Invoke(state);
     }
 
-    public void SetFirstPlayerTurn()
+    public virtual void SetFirstPlayerTurn()
     {
         roundNumber++;
         if (LuckyWheelWhoPlaysFirst.DoIPlayFirst)
@@ -127,7 +126,7 @@ public class RoomStateManager : MonoSingleton<RoomStateManager>
         }
     }
 
-    public bool WasMyRound()
+    public virtual bool WasMyRound()
     {
         if (!isMultiplayer)
             return true;
@@ -153,7 +152,7 @@ public class RoomStateManager : MonoSingleton<RoomStateManager>
 
     public void TryStartNextRound()
     {
-        if (!isMultiplayer || PhotonNetwork.IsMasterClient)
+        if (!isMultiplayer || IsMasterClient())
         {
             GameResolveState resolveState = PlayerManager.Instance.GetWinnerByDeath();
             if (resolveState != GameResolveState.NO_WIN)
@@ -197,7 +196,7 @@ public class RoomStateManager : MonoSingleton<RoomStateManager>
                         false,
                         "StartNextRound",
                         RpcTarget.All,
-                        0,
+                        CreateFriendlyMatch.AllowSpectators ? 3 : 0,
                         nextRound
                     );
                 }
@@ -209,7 +208,7 @@ public class RoomStateManager : MonoSingleton<RoomStateManager>
                         false,
                         "StartNextRound",
                         RpcTarget.All,
-                        (lastPlayerRound + 1) % 2,
+                        CreateFriendlyMatch.AllowSpectators ?lastPlayerRound==3 ? 4 : 3 :(lastPlayerRound + 1) % 2,
                         nextRound
                     );
                 }
@@ -245,7 +244,7 @@ public class RoomStateManager : MonoSingleton<RoomStateManager>
         );
     }
 
-    public void SendRetreatRPC()
+    public virtual void SendRetreatRPC()
     {
         int isMaster = !isMultiplayer ? 0 : (PhotonNetwork.LocalPlayer.IsMasterClient ? 0 : 1);
         SingleAndMultiplayerUtils.RpcOrLocal(
@@ -265,7 +264,7 @@ public class RoomStateManager : MonoSingleton<RoomStateManager>
 
     public void LoadAfterGameScene(GameResolveState state)
     {
-        if (PhotonNetwork.LocalPlayer.IsMasterClient)
+        if (IsMasterClient())
         {
             SceneManager.Instance.LoadAfterGame();
         }
@@ -319,7 +318,12 @@ public class RoomStateManager : MonoSingleton<RoomStateManager>
             return;
         }
 
-        if (playerNumber == 0)
+        HandleNextRoundMultiplayer(playerNumber);
+    }
+
+    protected virtual void HandleNextRoundMultiplayer(int _playerNumber)
+    {
+        if (_playerNumber == 0)
         {
             SetState(
                 PhotonNetwork.LocalPlayer.IsMasterClient
@@ -340,19 +344,24 @@ public class RoomStateManager : MonoSingleton<RoomStateManager>
     [PunRPC]
     public void OnPlayerSceneLoaded()
     {
-        if (PhotonNetwork.LocalPlayer.IsMasterClient)
+        if (IsMasterClient())
         {
             sceneInfo.usersInScene++;
 
             Debug.Log(
                 $"Players in scene: {sceneInfo.usersInScene} / {PhotonNetwork.CurrentRoom.PlayerCount}"
             );
-            if (sceneInfo.usersInScene == PhotonNetwork.CurrentRoom.PlayerCount)
+            if (sceneInfo.usersInScene == ExpectedAmountOfPlayers())
             {
                 Debug.Log("All players joined scene");
                 photonView.RPC("OnAllPlayersJoinedScene", RpcTarget.All);
             }
         }
+    }
+
+    protected virtual int ExpectedAmountOfPlayers()
+    {
+        return PhotonNetwork.CurrentRoom.PlayerCount;
     }
 
     private void OnPlayerSceneLoaded_SinglePlayer()
@@ -400,5 +409,10 @@ public class RoomStateManager : MonoSingleton<RoomStateManager>
             RpcTarget.All,
             resolveState
         );
+    }
+
+    protected virtual bool IsMasterClient()
+    {
+        return PhotonNetwork.IsMasterClient;
     }
 }

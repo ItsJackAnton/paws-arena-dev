@@ -16,7 +16,7 @@ public class GameMatchingScreenSpectator : GameMatchingScreen
         notices.SetActive(false);
         SetSeats();
 
-        startButton.gameObject.SetActive(true);
+        startButton.gameObject.SetActive(false);
 
         if (!PhotonNetwork.LocalPlayer.IsMasterClient)
         {
@@ -75,7 +75,7 @@ public class GameMatchingScreenSpectator : GameMatchingScreen
             
             Debug.Log($"{_opponentNickname}: {_userId} = {_playerIndex}");
         
-            OccupySeat(seats[_playerIndex], _player.CustomProperties[PhotonManager.NAME].ToString());
+            OccupySeat(seats[_playerIndex-1], _player.CustomProperties[PhotonManager.NAME].ToString());
         }
     }
 }

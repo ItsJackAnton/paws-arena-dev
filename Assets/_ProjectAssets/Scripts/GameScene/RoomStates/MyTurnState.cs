@@ -11,7 +11,14 @@ public class MyTurnState : IRoomState
         }
         else
         {
-            context.lastPlayerRound = PhotonNetwork.LocalPlayer.IsMasterClient ? 0 : 1;
+            if (CreateFriendlyMatch.AllowSpectators)
+            {
+                context.lastPlayerRound = RoomStateManagerSpectator.IsMasterInSpectator ? 3 : 4;
+            }
+            else
+            {
+                context.lastPlayerRound = PhotonNetwork.LocalPlayer.IsMasterClient ? 0 : 1;
+            }
         }
     }
 

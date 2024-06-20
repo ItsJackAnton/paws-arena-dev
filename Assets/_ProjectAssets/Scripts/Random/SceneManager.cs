@@ -14,6 +14,7 @@ public class SceneManager : MonoBehaviour
     public const string GAME_SCENE = "GameScene";
     public const string SINGLE_PLAYER_GAME = "SinglePlayerGame";
     public const string GUILDS = "Guilds";
+    public const string GAME_SPECTATOR = "GameSpectator";
     public static SceneManager Instance;
 
     private void Awake()

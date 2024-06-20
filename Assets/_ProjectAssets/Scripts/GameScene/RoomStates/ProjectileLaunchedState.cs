@@ -39,9 +39,19 @@ public class ProjectileLaunchedState : IRoomState
         {
             context.trajectory.StopRecording();
         }
-        if (!ConfigurationManager.Instance.Config.GetIsMultiplayer() || PhotonNetwork.LocalPlayer.IsMasterClient)
+        if (!ConfigurationManager.Instance.Config.GetIsMultiplayer() || IsMasterClient())
         {
             context.TryStartNextRound();
         }
+    }
+
+    private bool IsMasterClient()
+    {
+        if (CreateFriendlyMatch.AllowSpectators)
+        {
+            return RoomStateManagerSpectator.IsMasterInSpectator;
+        }
+
+        return PhotonNetwork.LocalPlayer.IsMasterClient;
     }
 }

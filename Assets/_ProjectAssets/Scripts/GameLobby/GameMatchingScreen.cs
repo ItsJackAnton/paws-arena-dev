@@ -285,7 +285,10 @@ public class GameMatchingScreen : MonoBehaviour
         notices.SetActive(false);
         FreeSeat(seats[otherSeat]);
         MakeRoomVisible();
-        searchingForOpponent.SetActive(true);
+        if (searchingForOpponent)
+        {
+            searchingForOpponent.SetActive(true);
+        }
     }
 
     private IEnumerator TryExitRoomAfterSeconds(float seconds)
@@ -322,8 +325,21 @@ public class GameMatchingScreen : MonoBehaviour
     [PunRPC]
     public void StartGameRoutine()
     {
-        searchingForOpponent.SetActive(false);
-        StartCountdown(SceneManager.GAME_SCENE);
+        if (searchingForOpponent)
+        {
+            searchingForOpponent.SetActive(false);
+        }
+
+        string _scene;
+        if (CreateFriendlyMatch.AllowSpectators)
+        {
+            _scene = SceneManager.GAME_SPECTATOR;
+        }
+        else
+        {
+            _scene = SceneManager.GAME_SCENE;
+        }
+        StartCountdown(_scene);
     }
     
     [PunRPC]
@@ -334,16 +350,24 @@ public class GameMatchingScreen : MonoBehaviour
 
     private void StartCountdown(string _sceneName)
     {
-        searchingForOpponent.SetActive(false);
-        wheelHolder.SetActive(true);
+        if (searchingForOpponent)
+        {
+            searchingForOpponent.SetActive(false);
+        }
+
+        if (wheelHolder)
+        {
+            wheelHolder.SetActive(true);
+        }
+        
         countdown.StartCountDown(() =>
         {
-            if (PhotonNetwork.LocalPlayer.IsMasterClient)
+            if (!PhotonNetwork.LocalPlayer.IsMasterClient)
             {
-                PhotonNetwork.IsMessageQueueRunning = false;
-                PhotonNetwork.LoadLevel(_sceneName);
+                return;
             }
-
+            PhotonNetwork.IsMessageQueueRunning = false;
+            PhotonNetwork.LoadLevel(_sceneName);
         });
     }
 }

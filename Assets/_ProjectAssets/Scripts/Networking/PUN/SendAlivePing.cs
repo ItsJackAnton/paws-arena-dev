@@ -1,6 +1,4 @@
 using Photon.Pun;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class SendAlivePing : MonoBehaviour
@@ -9,8 +7,14 @@ public class SendAlivePing : MonoBehaviour
 
     private void OnEnable()
     {
-        _photonView = GetComponent<PhotonView>();
+        return;
+        _photonView = GetPhoton();
         InvokeRepeating("SendPing", 0, 1);
+    }
+
+    protected virtual PhotonView GetPhoton()
+    {
+        return GetComponent<PhotonView>();
     }
 
     private void OnDisable()
