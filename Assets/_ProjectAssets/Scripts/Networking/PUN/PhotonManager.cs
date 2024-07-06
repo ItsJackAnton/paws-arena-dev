@@ -125,11 +125,6 @@ public class PhotonManager : MonoBehaviourPunCallbacks
 
     public override void OnJoinedRoom()
     {
-        if (PhotonNetwork.CurrentRoom.CustomProperties[ALLOW_SPECTATORS] != null)
-        {
-            CreateFriendlyMatch.AllowSpectators = Convert.ToInt32(PhotonNetwork.CurrentRoom.CustomProperties[ALLOW_SPECTATORS]) == 1;
-        }
-        
         if (isRoomCreated)
         {
             if (!isSinglePlayer)

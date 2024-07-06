@@ -11,6 +11,14 @@ public class GameMatchingScreenSpectator : GameMatchingScreen
 {
     [SerializeField] private Button startButton;
 
+    private void Awake()
+    {
+        if (PhotonNetwork.CurrentRoom.CustomProperties[PhotonManager.ALLOW_SPECTATORS] != null)
+        {
+            CreateFriendlyMatch.AllowSpectators = Convert.ToInt32(PhotonNetwork.CurrentRoom.CustomProperties[PhotonManager.ALLOW_SPECTATORS]) == 1;
+        }
+    }
+
     protected override void Init()
     {
         notices.SetActive(false);
@@ -77,5 +85,10 @@ public class GameMatchingScreenSpectator : GameMatchingScreen
         
             OccupySeat(seats[_playerIndex-1], _player.CustomProperties[PhotonManager.NAME].ToString());
         }
+    }
+
+    protected override void HandleStartButton()
+    {
+        startButton.gameObject.SetActive(false);
     }
 }

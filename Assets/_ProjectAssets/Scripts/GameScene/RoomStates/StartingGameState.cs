@@ -24,7 +24,12 @@ public class StartingGameState : IRoomState
         {
             if (int.Parse(PhotonNetwork.LocalPlayer.CustomProperties[PhotonManager.SEAT].ToString())>=3)
             {
+                Debug.Log("Spawn me");
                 InstantiatePlayer(context);
+            }
+            else
+            {
+                Debug.Log("Don't spawn me");
             }
         }
         else

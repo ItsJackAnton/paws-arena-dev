@@ -6,7 +6,6 @@ using System.Collections.Generic;
 using System.Linq;
 using TMPro;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 using Random = UnityEngine.Random;
 
 [System.Serializable]
@@ -325,6 +324,7 @@ public class GameMatchingScreen : MonoBehaviour
     [PunRPC]
     public void StartGameRoutine()
     {
+        HandleStartButton();
         if (searchingForOpponent)
         {
             searchingForOpponent.SetActive(false);
@@ -340,6 +340,11 @@ public class GameMatchingScreen : MonoBehaviour
             _scene = SceneManager.GAME_SCENE;
         }
         StartCountdown(_scene);
+    }
+
+    protected virtual void HandleStartButton()
+    {
+        
     }
     
     [PunRPC]

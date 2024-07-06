@@ -6,7 +6,7 @@ public class SyncPlatformsBehaviourSpectator : SyncPlatformsBehaviour
 {
     [SerializeField] private PlatformPose spectator1pose;
     [SerializeField] private PlatformPose spectator2pose;
-    
+
     public override PlatformPose GetMySeatPosition(PhotonView _photonView, bool _isBot)
     {
         foreach (var (_number,_player) in PhotonNetwork.CurrentRoom.Players)

@@ -1,12 +1,8 @@
-using System.Collections;
 using Photon.Pun;
-using Photon.Realtime;
-using System.Linq;
 using UnityEngine;
 
 public class SyncPlayerPlatformBehaviour : MonoBehaviour
 {
-
     [SerializeField]
     private PlayerCustomization playerCustomization;
 
@@ -22,6 +18,10 @@ public class SyncPlayerPlatformBehaviour : MonoBehaviour
     private void Awake()
     {
         transform.position = new Vector3(-100, 0, 0);
+        if (CreateFriendlyMatch.AllowSpectators)
+        {
+            DoTurnOffLights();
+        }
     }
 
     private async void Start()
@@ -30,11 +30,7 @@ public class SyncPlayerPlatformBehaviour : MonoBehaviour
 
         if (photonView.IsMine && !isBot)
         {
-            var config = playerCustomization.SetCat(GameState.selectedNFT.imageUrl, GameState.selectedNFT.ids);
-            string serializedConfig = JsonUtility.ToJson(config.GetSerializableObject());
-
-            photonView.RPC("SetCatStyle", RpcTarget.Others, GameState.selectedNFT.imageUrl, serializedConfig);
-
+            ShowCat();
             PUNRoomUtils.onPlayerJoined += OnPlayerJoined;
             SyncPlatformsBehaviour.onPlayersChanged += Reposition;
         }
@@ -57,6 +53,19 @@ public class SyncPlayerPlatformBehaviour : MonoBehaviour
             playerCustomization.wrapper.SetActive(true);
             playerCustomization.SetTransientCat(nft.imageUrl, nft.ids);
         }
+        
+        if (CreateFriendlyMatch.AllowSpectators)
+        {
+            DoTurnOffLights();
+        }
+    }
+
+    private void ShowCat()
+    {
+        var config = playerCustomization.SetCat(GameState.selectedNFT.imageUrl, GameState.selectedNFT.ids);
+        string serializedConfig = JsonUtility.ToJson(config.GetSerializableObject());
+
+        photonView.RPC("SetCatStyle", RpcTarget.Others, GameState.selectedNFT.imageUrl, serializedConfig);
     }
 
     private void OnDestroy()
@@ -65,7 +74,7 @@ public class SyncPlayerPlatformBehaviour : MonoBehaviour
         SyncPlatformsBehaviour.onPlayersChanged -= Reposition;
     }
 
-    protected virtual void Reposition()
+    protected void Reposition()
     {
         PlatformPose pose = SyncPlatformsBehaviour.Instance.GetMySeatPosition(photonView, isBot);
         transform.position = pose.pos;
@@ -77,50 +86,44 @@ public class SyncPlayerPlatformBehaviour : MonoBehaviour
             punRoomUtils.AddPlayerCustomProperty("seat", "" + pose.seatIdx);
         }
 
-        if (pose.seatIdx>1)
-        {
-            TurnOffLights();
-        }
-        else
-        {
-            TurnOnLights();
-        }
-
         if (CreateFriendlyMatch.AllowSpectators)
         {
-            TurnOffLights();
-            StartCoroutine(TurnLightsOff());
-        }
-    }
-
-    private IEnumerator TurnLightsOff()
-    {
-        yield return new WaitForSeconds(1);
-        if (int.Parse(PhotonNetwork.LocalPlayer.CustomProperties[PhotonManager.SEAT].ToString())<=2)
-        {
-            TurnOffLights();
+            if (pose.seatIdx<=2)
+            {
+                TurnOffLights();
+            }
+            else
+            {
+                TurnOnLights();
+            }
         }
         else
         {
-            TurnOnLights();
+            if (pose.seatIdx>1)
+            {
+                TurnOffLights();
+            }
+            else
+            {
+                TurnOnLights();
+            }
         }
     }
 
     private void OnPlayerJoined(string nickname, string userId)
     {
-        Player player = PhotonNetwork.PlayerList.First(player => player.UserId == userId);
         string serializedConfig = JsonUtility.ToJson(KittiesCustomizationService.GetCustomization(GameState.selectedNFT.imageUrl).GetSerializableObject());
-        photonView.RPC("SetCatStyle", player, GameState.selectedNFT.imageUrl, serializedConfig);
+        photonView.RPC("SetCatStyle", RpcTarget.Others, GameState.selectedNFT.imageUrl, serializedConfig);
     }
 
     public void TurnOffLights()
     {
-        photonView.RPC(nameof(DoTurnOffLights), RpcTarget.All);
+        photonView.RPC(nameof(DoTurnOffLights), RpcTarget.AllBuffered);
     }
     
     public void TurnOnLights()
     {
-        photonView.RPC(nameof(DoTurnOnLights), RpcTarget.All);
+        photonView.RPC(nameof(DoTurnOnLights), RpcTarget.AllBuffered);
     }
 
     [PunRPC]
