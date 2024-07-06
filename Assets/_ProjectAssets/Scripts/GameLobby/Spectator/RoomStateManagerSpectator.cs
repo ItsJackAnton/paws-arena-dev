@@ -1,4 +1,6 @@
+using System;
 using Photon.Pun;
+using UnityEngine;
 
 public class RoomStateManagerSpectator : RoomStateManager
 {
@@ -42,21 +44,43 @@ public class RoomStateManagerSpectator : RoomStateManager
     
     protected override void HandleNextRoundMultiplayer(int _playerNumber)
     {
-        if (_playerNumber == 3)
+        int _mySeat = Convert.ToInt32(PhotonNetwork.LocalPlayer.CustomProperties[PhotonManager.SEAT]);
+        switch (_mySeat)
         {
-            SetState(
-                IsMasterClient()
-                    ? new MyTurnState()
-                    : new OtherPlayerTurnState()
-            );
+            case 1:
+                SetState(new OtherPlayerTurnState());
+                break;
+            case 2:
+                SetState(new OtherPlayerTurnState());
+                break;
+            case 3:
+                DoSetState();
+                break;
+            case 4:
+                DoSetState();
+                break;
+            
         }
-        else
+
+
+        void DoSetState()
         {
-            SetState(
-                IsMasterClient()
-                    ? new OtherPlayerTurnState()
-                    : new MyTurnState()
-            );
+            if (_playerNumber == 3)
+            {
+                SetState(
+                    IsMasterClient()
+                        ? new MyTurnState()
+                        : new OtherPlayerTurnState()
+                );
+            }
+            else
+            {
+                SetState(
+                    IsMasterClient()
+                        ? new OtherPlayerTurnState()
+                        : new MyTurnState()
+                );
+            }
         }
     }
 

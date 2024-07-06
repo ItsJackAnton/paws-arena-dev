@@ -1,4 +1,5 @@
 using Photon.Pun;
+using UnityEngine;
 
 public class OtherPlayerTurnState : IRoomState
 {
@@ -6,7 +7,7 @@ public class OtherPlayerTurnState : IRoomState
     {
         if (CreateFriendlyMatch.AllowSpectators)
         {
-            context.lastPlayerRound = RoomStateManagerSpectator.IsMasterInSpectator ? 3 : 4;
+            context.lastPlayerRound = RoomStateManagerSpectator.IsMasterInSpectator ? 4 : 3;
         }
         else
         {

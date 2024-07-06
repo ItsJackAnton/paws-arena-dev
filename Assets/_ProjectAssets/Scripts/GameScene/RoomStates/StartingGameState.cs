@@ -95,7 +95,7 @@ public class StartingGameState : IRoomState
             GameObject.Destroy(go.GetComponent<PhotonView>());
         }
 
-        go.GetComponent<BasePlayerComponent>().playerSeat = seat;
+        go.GetComponent<BasePlayerComponent>().playerSeat = CreateFriendlyMatch.AllowSpectators ? _actualSeat : seat;
         SingleAndMultiplayerUtils.Instantiate(context.playerUIPrefab.name, Vector3.zero, Quaternion.identity);
     }
 }

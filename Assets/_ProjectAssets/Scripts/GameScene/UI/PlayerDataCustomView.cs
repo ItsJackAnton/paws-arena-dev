@@ -54,7 +54,15 @@ public class PlayerDataCustomView : MonoBehaviour
         rt.SetParent(GameObject.Find(parentPath).transform);
         rt.localScale = Vector3.one;
 
-        int myseat = isMultiplayer ? PUNGameRoomManager.Instance.GetMySeat() : 0;
+        int myseat;
+        if (CreateFriendlyMatch.AllowSpectators)
+        {
+            myseat = isMultiplayer ? 1 : 0;
+        }
+        else
+        {
+            myseat = isMultiplayer ? PUNGameRoomManager.Instance.GetMySeat() : 0;
+        }
 
         bool isMyPlayer = !isForNPC && (!isMultiplayer || (myseat == 0 && photonview.IsMine || myseat == 1 && !photonview.IsMine));
         rt.anchorMin = rt.anchorMax = rt.pivot = isMyPlayer ? new Vector2(0, 1) : new Vector2(1, 1);

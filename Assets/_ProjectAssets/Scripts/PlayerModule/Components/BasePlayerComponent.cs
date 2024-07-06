@@ -104,6 +104,7 @@ public class BasePlayerComponent : MonoBehaviour
             idx = -1;
             state.SetHasWeaponOut(idx);
         }
+        Debug.Log($"player seat: {playerSeat}, lastPlayerRound: {RoomStateManager.Instance.lastPlayerRound}");
         if (playerSeat == RoomStateManager.Instance.lastPlayerRound)
         {
             state.SetHasWeaponOut(idx);

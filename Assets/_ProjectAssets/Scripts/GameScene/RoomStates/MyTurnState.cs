@@ -1,5 +1,6 @@
 using Anura.ConfigurationModule.Managers;
 using Photon.Pun;
+using UnityEngine;
 
 public class MyTurnState : IRoomState
 {

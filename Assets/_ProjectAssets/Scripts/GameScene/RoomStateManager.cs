@@ -208,11 +208,31 @@ public class RoomStateManager : MonoSingleton<RoomStateManager>
                         false,
                         "StartNextRound",
                         RpcTarget.All,
-                        CreateFriendlyMatch.AllowSpectators ?lastPlayerRound==3 ? 4 : 3 :(lastPlayerRound + 1) % 2,
+                        GetNextPlayer,
                         nextRound
                     );
                 }
             }
+        }
+    }
+    
+    private int GetNextPlayer
+    {
+        get
+        {
+            Debug.Log("Last round player: "+lastPlayerRound);
+            
+            if (CreateFriendlyMatch.AllowSpectators)
+            {
+                if (lastPlayerRound == 3)
+                {
+                    return 4;
+                }
+
+                return 3;
+            }
+
+            return (lastPlayerRound + 1) % 2;
         }
     }
 
@@ -295,7 +315,6 @@ public class RoomStateManager : MonoSingleton<RoomStateManager>
     public void StartNextRound(int playerNumber, int roundNumber)
     {
         this.roundNumber = roundNumber;
-
         if (
             ConfigurationManager.Instance.Config.GetGameType()
             == Anura.ConfigurationModule.ScriptableObjects.GameType.TUTORIAL
