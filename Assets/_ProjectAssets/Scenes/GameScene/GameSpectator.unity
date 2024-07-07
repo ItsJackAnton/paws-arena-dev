@@ -252,10 +252,38 @@ PrefabInstance:
       propertyPath: sceneViewId
       value: 5
       objectReference: {fileID: 0}
+    - target: {fileID: 710578837593593571, guid: 382174298f228e442aa19910d18bcf3c, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 710578838670350860, guid: 382174298f228e442aa19910d18bcf3c, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
       objectReference: {fileID: 1656311511}
+    - target: {fileID: 710578838758996310, guid: 382174298f228e442aa19910d18bcf3c, type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 710578838758996310, guid: 382174298f228e442aa19910d18bcf3c, type: 3}
+      propertyPath: m_AnchorMin.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 710578838758996310, guid: 382174298f228e442aa19910d18bcf3c, type: 3}
+      propertyPath: m_SizeDelta.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 710578838758996310, guid: 382174298f228e442aa19910d18bcf3c, type: 3}
+      propertyPath: m_SizeDelta.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 710578838758996310, guid: 382174298f228e442aa19910d18bcf3c, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 710578838758996310, guid: 382174298f228e442aa19910d18bcf3c, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 799673126373804891, guid: 382174298f228e442aa19910d18bcf3c, type: 3}
       propertyPath: m_Pivot.x
       value: 0.5
@@ -1848,7 +1876,7 @@ MonoBehaviour:
   photonManager: {fileID: 1656311510}
   httpCommunication: {fileID: 137215786}
   playerPrefab: {fileID: 755019818390496622, guid: 5e51eb25aed27f546b65a1207b944ac9, type: 3}
-  playerUIPrefab: {fileID: 3779674071407529552, guid: 3134da00638c87b429fec23ba637362c, type: 3}
+  playerUIPrefab: {fileID: 3779674071407529552, guid: 14ce84dd336b93243baaf0eb5cb78187, type: 3}
   botPlayerPrefab: {fileID: 0}
   playerUIParent: {fileID: 0}
   trajectory: {fileID: 1582121529}

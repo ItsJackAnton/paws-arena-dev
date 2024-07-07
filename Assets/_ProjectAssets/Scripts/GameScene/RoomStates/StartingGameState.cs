@@ -96,6 +96,14 @@ public class StartingGameState : IRoomState
         }
 
         go.GetComponent<BasePlayerComponent>().playerSeat = CreateFriendlyMatch.AllowSpectators ? _actualSeat : seat;
+
+        if (CreateFriendlyMatch.AllowSpectators)
+        {
+            if (_actualSeat<=2)
+            {
+                return;
+            }
+        }
         SingleAndMultiplayerUtils.Instantiate(context.playerUIPrefab.name, Vector3.zero, Quaternion.identity);
     }
 }

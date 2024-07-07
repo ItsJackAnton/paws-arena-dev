@@ -1,25 +1,21 @@
 using Anura.ConfigurationModule.Managers;
-using Cysharp.Threading.Tasks;
 using Photon.Pun;
-using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class PlayerDataCustomView : MonoBehaviour
 {
     public static PlayerDataCustomView npcBar;
     [SerializeField]
-    private TMPro.TextMeshProUGUI nicknameText;
+    protected TMPro.TextMeshProUGUI nicknameText;
 
     [SerializeField]
-    private HealthUIBehaviour healthUIBehaviour;
+    protected HealthUIBehaviour healthUIBehaviour;
 
     [SerializeField]
-    private string parentPath;
+    protected string parentPath;
 
     [SerializeField]
-    private PhotonView photonview;
+    protected PhotonView photonview;
 
     [SerializeField]
     public bool isForNPC = false;
@@ -48,21 +44,13 @@ public class PlayerDataCustomView : MonoBehaviour
         Init();
     }
 
-    public void Init()
+    protected virtual void Init()
     {
         RectTransform rt = GetComponent<RectTransform>();
         rt.SetParent(GameObject.Find(parentPath).transform);
         rt.localScale = Vector3.one;
 
-        int myseat;
-        if (CreateFriendlyMatch.AllowSpectators)
-        {
-            myseat = isMultiplayer ? 1 : 0;
-        }
-        else
-        {
-            myseat = isMultiplayer ? PUNGameRoomManager.Instance.GetMySeat() : 0;
-        }
+        int myseat = isMultiplayer ? PUNGameRoomManager.Instance.GetMySeat() : 0;
 
         bool isMyPlayer = !isForNPC && (!isMultiplayer || (myseat == 0 && photonview.IsMine || myseat == 1 && !photonview.IsMine));
         rt.anchorMin = rt.anchorMax = rt.pivot = isMyPlayer ? new Vector2(0, 1) : new Vector2(1, 1);
