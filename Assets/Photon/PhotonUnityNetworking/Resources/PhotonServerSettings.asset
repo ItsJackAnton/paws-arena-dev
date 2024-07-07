@@ -74,6 +74,10 @@ MonoBehaviour:
   - DoTurnOffLights
   - DoTurnOnLights
   - TryDisableRoomEntries
+  - SetOnRight
+  - LetMasterLoadEndScene
+  - ShowWinner
+  - SetWinnerKitty
   DisableAutoOpenWizard: 1
   ShowSettings: 1
   DevRegionSetOnce: 1

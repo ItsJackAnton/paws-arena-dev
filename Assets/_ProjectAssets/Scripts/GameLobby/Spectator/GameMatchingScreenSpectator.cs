@@ -11,12 +11,20 @@ public class GameMatchingScreenSpectator : GameMatchingScreen
 {
     [SerializeField] private Button startButton;
 
-    protected void Init()
+    private void Awake()
+    {
+        if (PhotonNetwork.CurrentRoom.CustomProperties[PhotonManager.ALLOW_SPECTATORS] != null)
+        {
+            CreateFriendlyMatch.AllowSpectators = Convert.ToInt32(PhotonNetwork.CurrentRoom.CustomProperties[PhotonManager.ALLOW_SPECTATORS]) == 1;
+        }
+    }
+
+    protected override void Init()
     {
         notices.SetActive(false);
         SetSeats();
 
-        startButton.gameObject.SetActive(Convert.ToInt32(PhotonNetwork.LocalPlayer.CustomProperties[PhotonManager.SEAT])>1);
+        startButton.gameObject.SetActive(false);
 
         if (!PhotonNetwork.LocalPlayer.IsMasterClient)
         {
@@ -26,7 +34,7 @@ public class GameMatchingScreenSpectator : GameMatchingScreen
         punRoomUtils.AddRoomCustomProperty("mapIdx", _mapIdx);
     }
 
-    public void SetSeats()
+    public override void SetSeats()
     {
         foreach (SeatGameobject seat in seats)
         {
@@ -45,16 +53,14 @@ public class GameMatchingScreenSpectator : GameMatchingScreen
             
             int _seat = Convert.ToInt32(_photonPlayer.CustomProperties[PhotonManager.SEAT]);
             string _name = _photonPlayer.CustomProperties[PhotonManager.NAME].ToString();
-            //OccupySeat(seats[_seat], _name);
+            OccupySeat(seats[_seat], _name);
         }
+        
+        startButton.gameObject.SetActive(Convert.ToInt32(PhotonNetwork.LocalPlayer.CustomProperties[PhotonManager.SEAT])<=2 && PhotonNetwork
+        .CurrentRoom.Players.Count==4);
     }
 
-    protected void FreeSeat(SeatGameobject _seat)
-    {
-        _seat.occupierNickname.text = string.Empty;
-    }
-
-    protected void OnPlayerJoined(string _opponentNickname, string _userId)
+    protected override void OnPlayerJoined(string _opponentNickname, string _userId)
     {
         StartCoroutine(OnPlayerJoinedRoutine());
         
@@ -63,14 +69,6 @@ public class GameMatchingScreenSpectator : GameMatchingScreen
             yield return new WaitForSeconds(2);
             int _playerIndex = -1;
             Player _player = null;
-            
-            if (!PhotonManager.AllowSpectators)
-            {
-                if (PhotonNetwork.CurrentRoom.PlayerCount == 2)
-                {
-                    startButton.gameObject.SetActive(true);
-                }
-            }
 
             foreach (var (_index,_playerInRoom) in PhotonNetwork.CurrentRoom.Players)
             {
@@ -85,12 +83,12 @@ public class GameMatchingScreenSpectator : GameMatchingScreen
             
             Debug.Log($"{_opponentNickname}: {_userId} = {_playerIndex}");
         
-            //OccupySeat(seats[_playerIndex], _player.CustomProperties[PhotonManager.NAME].ToString());
+            OccupySeat(seats[_playerIndex-1], _player.CustomProperties[PhotonManager.NAME].ToString());
         }
     }
 
-    protected void OnPlayerLeft()
+    protected override void HandleStartButton()
     {
-        SetSeats();
+        startButton.gameObject.SetActive(false);
     }
 }

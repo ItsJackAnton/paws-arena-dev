@@ -3,8 +3,9 @@ using Anura.Templates.MonoSingleton;
 using com.colorfulcoding.GameScene;
 using Photon.Pun;
 using System;
+using System.Collections;
+using Newtonsoft.Json;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 
 public class RoomStateManager : MonoSingleton<RoomStateManager>
 {
@@ -109,7 +110,7 @@ public class RoomStateManager : MonoSingleton<RoomStateManager>
         OnStateUpdated?.Invoke(state);
     }
 
-    public void SetFirstPlayerTurn()
+    public virtual void SetFirstPlayerTurn()
     {
         roundNumber++;
         if (LuckyWheelWhoPlaysFirst.DoIPlayFirst)
@@ -127,7 +128,7 @@ public class RoomStateManager : MonoSingleton<RoomStateManager>
         }
     }
 
-    public bool WasMyRound()
+    public virtual bool WasMyRound()
     {
         if (!isMultiplayer)
             return true;
@@ -153,7 +154,7 @@ public class RoomStateManager : MonoSingleton<RoomStateManager>
 
     public void TryStartNextRound()
     {
-        if (!isMultiplayer || PhotonNetwork.IsMasterClient)
+        if (!isMultiplayer || IsMasterClient())
         {
             GameResolveState resolveState = PlayerManager.Instance.GetWinnerByDeath();
             if (resolveState != GameResolveState.NO_WIN)
@@ -197,7 +198,7 @@ public class RoomStateManager : MonoSingleton<RoomStateManager>
                         false,
                         "StartNextRound",
                         RpcTarget.All,
-                        0,
+                        CreateFriendlyMatch.AllowSpectators ? 3 : 0,
                         nextRound
                     );
                 }
@@ -209,11 +210,31 @@ public class RoomStateManager : MonoSingleton<RoomStateManager>
                         false,
                         "StartNextRound",
                         RpcTarget.All,
-                        (lastPlayerRound + 1) % 2,
+                        GetNextPlayer,
                         nextRound
                     );
                 }
             }
+        }
+    }
+    
+    private int GetNextPlayer
+    {
+        get
+        {
+            Debug.Log("Last round player: "+lastPlayerRound);
+            
+            if (CreateFriendlyMatch.AllowSpectators)
+            {
+                if (lastPlayerRound == 3)
+                {
+                    return 4;
+                }
+
+                return 3;
+            }
+
+            return (lastPlayerRound + 1) % 2;
         }
     }
 
@@ -245,7 +266,7 @@ public class RoomStateManager : MonoSingleton<RoomStateManager>
         );
     }
 
-    public void SendRetreatRPC()
+    public virtual void SendRetreatRPC()
     {
         int isMaster = !isMultiplayer ? 0 : (PhotonNetwork.LocalPlayer.IsMasterClient ? 0 : 1);
         SingleAndMultiplayerUtils.RpcOrLocal(
@@ -265,14 +286,57 @@ public class RoomStateManager : MonoSingleton<RoomStateManager>
 
     public void LoadAfterGameScene(GameResolveState state)
     {
-        if (PhotonNetwork.LocalPlayer.IsMasterClient)
+        if (IsMasterClient())
         {
-            SceneManager.Instance.LoadAfterGame();
+            if (CreateFriendlyMatch.AllowSpectators)
+            {
+                StartCoroutine(EndSpectatorGame());
+            }
+            else
+            {
+                SceneManager.Instance.LoadAfterGame();
+            }
         }
         else if (!isMultiplayer)
         {
             SinglePlayerReturnMainMenu();
         }
+    }
+
+    private IEnumerator EndSpectatorGame()
+    {
+        photonView.RPC(nameof(SetWinnerKitty), RpcTarget.All);
+        yield return new WaitForSeconds(2);
+        photonView.RPC(nameof(LetMasterLoadEndScene), RpcTarget.All);
+    }
+
+    [PunRPC]
+    protected void SetWinnerKitty()
+    {
+        int _seat = PUNGameRoomManager.Instance.GetMySeat();
+        if (_seat<=2)
+        {
+            return;
+        }
+
+        if (GameResolveStateUtils.CheckIfIWon(PlayerManager.Instance.GetWinnerByDeath())!=1)
+        {
+            return;
+        }
+        
+        PhotonManager.SetRoomProperties(PhotonManager.ROOM_WINNER, GameState.selectedNFT.imageUrl);
+        PhotonManager.SetRoomProperties(PhotonManager.ROOM_WINNER_IDS, JsonConvert.SerializeObject(GameState.selectedNFT.ids));
+    }
+
+    [PunRPC]
+    protected void LetMasterLoadEndScene()
+    {
+        if (!PhotonNetwork.IsMasterClient)
+        {
+            return;
+        }
+        
+        SceneManager.Instance.LoadAfterGameSpectator();
     }
 
     [PunRPC]
@@ -296,7 +360,6 @@ public class RoomStateManager : MonoSingleton<RoomStateManager>
     public void StartNextRound(int playerNumber, int roundNumber)
     {
         this.roundNumber = roundNumber;
-
         if (
             ConfigurationManager.Instance.Config.GetGameType()
             == Anura.ConfigurationModule.ScriptableObjects.GameType.TUTORIAL
@@ -319,7 +382,12 @@ public class RoomStateManager : MonoSingleton<RoomStateManager>
             return;
         }
 
-        if (playerNumber == 0)
+        HandleNextRoundMultiplayer(playerNumber);
+    }
+
+    protected virtual void HandleNextRoundMultiplayer(int _playerNumber)
+    {
+        if (_playerNumber == 0)
         {
             SetState(
                 PhotonNetwork.LocalPlayer.IsMasterClient
@@ -340,19 +408,24 @@ public class RoomStateManager : MonoSingleton<RoomStateManager>
     [PunRPC]
     public void OnPlayerSceneLoaded()
     {
-        if (PhotonNetwork.LocalPlayer.IsMasterClient)
+        if (IsMasterClient())
         {
             sceneInfo.usersInScene++;
 
             Debug.Log(
                 $"Players in scene: {sceneInfo.usersInScene} / {PhotonNetwork.CurrentRoom.PlayerCount}"
             );
-            if (sceneInfo.usersInScene == PhotonNetwork.CurrentRoom.PlayerCount)
+            if (sceneInfo.usersInScene == ExpectedAmountOfPlayers())
             {
                 Debug.Log("All players joined scene");
                 photonView.RPC("OnAllPlayersJoinedScene", RpcTarget.All);
             }
         }
+    }
+
+    protected virtual int ExpectedAmountOfPlayers()
+    {
+        return PhotonNetwork.CurrentRoom.PlayerCount;
     }
 
     private void OnPlayerSceneLoaded_SinglePlayer()
@@ -400,5 +473,10 @@ public class RoomStateManager : MonoSingleton<RoomStateManager>
             RpcTarget.All,
             resolveState
         );
+    }
+
+    protected virtual bool IsMasterClient()
+    {
+        return PhotonNetwork.IsMasterClient;
     }
 }

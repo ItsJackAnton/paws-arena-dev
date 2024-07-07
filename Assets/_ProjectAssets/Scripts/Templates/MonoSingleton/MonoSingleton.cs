@@ -61,8 +61,6 @@ namespace Anura.Templates.MonoSingleton
 
         private static T CreateInstance(Transform newParent)
         {
-            Debug.LogError(typeof(T) + " doesn't exist.");
-
             var instanceGameObject = new GameObject(typeof(T) + " - MonoSingleton", typeof(T));
             instanceGameObject.transform.parent = newParent.transform;
             return instanceGameObject.GetComponent<T>();

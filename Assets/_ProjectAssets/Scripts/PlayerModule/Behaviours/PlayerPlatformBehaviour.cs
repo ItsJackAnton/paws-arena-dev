@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class PlayerPlatformBehaviour : MonoBehaviour
@@ -7,7 +5,7 @@ public class PlayerPlatformBehaviour : MonoBehaviour
     public PlayerCustomization playerCustomization;
     public bool isMyCat = true;
 
-    private void OnEnable()
+    protected virtual void OnEnable()
     {
         if (isMyCat)
         {

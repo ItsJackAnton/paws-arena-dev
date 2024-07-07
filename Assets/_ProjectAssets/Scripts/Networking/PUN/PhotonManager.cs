@@ -9,6 +9,9 @@ public class PhotonManager : MonoBehaviourPunCallbacks
 {
     public const string NAME = "Name";
     public const string SEAT = "Seat";
+    public const string ALLOW_SPECTATORS = "AllowSpectators";
+    public const string ROOM_WINNER = "RoomWinner";
+    public const string ROOM_WINNER_IDS = "RoomWinnerIds";
     
     public event Action OnStartedConnection;
     public event Action OnConnectedServer;
@@ -25,7 +28,6 @@ public class PhotonManager : MonoBehaviourPunCallbacks
     private bool isRoomCreated = false;
     private bool isSinglePlayer = false;
     private string friendlyRoomName;
-    public static bool AllowSpectators;
     public static bool IsFriendly;
 
 
@@ -56,9 +58,8 @@ public class PhotonManager : MonoBehaviourPunCallbacks
         PhotonNetwork.LeaveRoom();
     }
 
-    public void JoinFriendlyRoom(string _roomName, bool _allowSpectators)
+    public void JoinFriendlyRoom(string _roomName)
     {
-        AllowSpectators = _allowSpectators;
         friendlyRoomName = _roomName;
         PhotonNetwork.JoinRoom(friendlyRoomName);
     }
@@ -88,7 +89,7 @@ public class PhotonManager : MonoBehaviourPunCallbacks
         isRoomCreated = true;
 
         string roomName = Guid.NewGuid().ToString();
-        PhotonNetwork.CreateRoom(roomName, new RoomOptions{ MaxPlayers = maxPlayersPerRoom });
+        PhotonNetwork.CreateRoom(roomName, new RoomOptions{ MaxPlayers = maxPlayersPerRoom,  });
         GameState.roomName = roomName;
         OnCreatingRoom?.Invoke();
     }
@@ -101,7 +102,11 @@ public class PhotonManager : MonoBehaviourPunCallbacks
             new RoomOptions
             {
                 IsVisible = false,
-                MaxPlayers = AllowSpectators ? maxPlayersPerSpectatorRoom : maxPlayersPerRoom,
+                MaxPlayers = CreateFriendlyMatch.AllowSpectators ? maxPlayersPerSpectatorRoom : maxPlayersPerRoom,
+                CustomRoomProperties = new Hashtable()
+                {
+                    [ALLOW_SPECTATORS] = CreateFriendlyMatch.AllowSpectators ? 1: 0,
+                }
             });
         GameState.roomName = friendlyRoomName;
         OnCreatingRoom?.Invoke();
@@ -126,7 +131,7 @@ public class PhotonManager : MonoBehaviourPunCallbacks
         {
             if (!isSinglePlayer)
             {
-                PhotonNetwork.LoadLevel(AllowSpectators ? SceneManager.GAME_ROOM_SPECTATOR : SceneManager.GAME_ROOM);
+                PhotonNetwork.LoadLevel(CreateFriendlyMatch.AllowSpectators ? SceneManager.GAME_ROOM_SPECTATOR : SceneManager.GAME_ROOM);
             }
             else
             {
@@ -152,4 +157,16 @@ public class PhotonManager : MonoBehaviourPunCallbacks
         OnRoomLeft?.Invoke();
     }
     #endregion
+    
+    public static void SetRoomProperties(string _key, string _value)
+    {
+        if (PhotonNetwork.CurrentRoom == null)
+        {
+            return;
+        }
+
+        Hashtable _propertiesToSet = new Hashtable { [_key] = _value };
+        PhotonNetwork.CurrentRoom.SetCustomProperties(_propertiesToSet);
+    }
+    
 }

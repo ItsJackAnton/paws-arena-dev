@@ -13,6 +13,7 @@ public class CreateFriendlyMatch : MonoBehaviour
     [SerializeField] private Toggle allowSpectators;
 
     public static bool IsFriendly;
+    public static bool AllowSpectators;
 
     private void OnEnable()
     {
@@ -23,6 +24,7 @@ public class CreateFriendlyMatch : MonoBehaviour
         PhotonManager.OnJoinedFriendlyRoom += ShowConnecting;
 
         allowSpectators.isOn = false;
+        AllowSpectators = false;
         IsFriendly = false;
     }
 
@@ -56,7 +58,8 @@ public class CreateFriendlyMatch : MonoBehaviour
         
         ManageInteractables(false);
         IsFriendly = true;
-        mainMenuUI.TryConnectToFriendlyRoom(_roomName, allowSpectators.isOn);
+        AllowSpectators = allowSpectators.isOn;
+        mainMenuUI.TryConnectToFriendlyRoom(_roomName);
     }
 
     private bool ValidateName(string _roomName)

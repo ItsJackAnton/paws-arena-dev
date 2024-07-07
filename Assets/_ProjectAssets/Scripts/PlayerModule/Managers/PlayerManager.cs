@@ -112,18 +112,22 @@ public class PlayerManager : MonoSingleton<PlayerManager>
 
     private bool CheckIAmPlayer1()
     {
+        if (CreateFriendlyMatch.AllowSpectators)
+        {
+            return RoomStateManagerSpectator.IsMasterInSpectator;
+        }
         if(ConfigurationManager.Instance.Config.GetGameType() == Anura.ConfigurationModule.ScriptableObjects.GameType.TUTORIAL 
             || ConfigurationManager.Instance.Config.GetGameType() == Anura.ConfigurationModule.ScriptableObjects.GameType.SINGLEPLAYER)
         {
             return true;
         }
 
-        if (PhotonNetwork.LocalPlayer.IsMasterClient)
-        {
-            return true;
-        }
+        return AmIPlayer1Multiplayer();
+    }
 
-        return false;
+    protected virtual bool AmIPlayer1Multiplayer()
+    {
+        return PhotonNetwork.LocalPlayer.IsMasterClient;
     }
 
     public GameResolveState GetWinnerByHealth()
@@ -141,7 +145,7 @@ public class PlayerManager : MonoSingleton<PlayerManager>
 
     public GameResolveState GetWinnerByLoserIndex(int idx)
     {
-        if (idx == 0)
+        if (idx == 0 || idx == 3)
         {
             return GameResolveState.PLAYER_2_WIN;
         }

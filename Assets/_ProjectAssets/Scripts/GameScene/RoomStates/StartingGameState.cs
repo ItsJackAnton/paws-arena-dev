@@ -20,7 +20,23 @@ public class StartingGameState : IRoomState
     {
         yield return new WaitForSeconds(1.5f);
 
-        InstantiatePlayer(context);
+        if (CreateFriendlyMatch.AllowSpectators)
+        {
+            if (int.Parse(PhotonNetwork.LocalPlayer.CustomProperties[PhotonManager.SEAT].ToString())>=3)
+            {
+                Debug.Log("Spawn me");
+                InstantiatePlayer(context);
+            }
+            else
+            {
+                Debug.Log("Don't spawn me");
+            }
+        }
+        else
+        {
+            InstantiatePlayer(context);
+        }
+        
         TryInstantiateBot(context);
 
         yield return new WaitForSeconds(3f);
@@ -54,10 +70,22 @@ public class StartingGameState : IRoomState
     private void InstantiatePlayer(RoomStateManager context)
     {
         int seat = 0;
+        int _actualSeat=0;
         if (ConfigurationManager.Instance.Config.GetIsMultiplayer())
         {
             seat = context.photonManager.GetMySeat();
+            if (CreateFriendlyMatch.AllowSpectators)
+            {
+                _actualSeat = int.Parse(PhotonNetwork.LocalPlayer.CustomProperties[PhotonManager.SEAT].ToString());
+                seat =  _actualSeat == 3 ? 0 : 1;
+            }
         }
+
+        if (_actualSeat<=2 && CreateFriendlyMatch.AllowSpectators)
+        {
+            return;   
+        }
+        
         Vector2 spawnPos = seat == 0 ? PlayerManager.Instance.GetPlayer1SpawnPos() : PlayerManager.Instance.GetPlayer2SpawnPos();
 
         var go = SingleAndMultiplayerUtils.Instantiate(context.playerPrefab.name, spawnPos, Quaternion.identity);
@@ -67,7 +95,15 @@ public class StartingGameState : IRoomState
             GameObject.Destroy(go.GetComponent<PhotonView>());
         }
 
-        go.GetComponent<BasePlayerComponent>().playerSeat = seat;
+        go.GetComponent<BasePlayerComponent>().playerSeat = CreateFriendlyMatch.AllowSpectators ? _actualSeat : seat;
+
+        if (CreateFriendlyMatch.AllowSpectators)
+        {
+            if (_actualSeat<=2)
+            {
+                return;
+            }
+        }
         SingleAndMultiplayerUtils.Instantiate(context.playerUIPrefab.name, Vector3.zero, Quaternion.identity);
     }
 }

@@ -1,6 +1,4 @@
-using System;
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 namespace com.colorfulcoding.AfterGame
@@ -16,12 +14,17 @@ namespace com.colorfulcoding.AfterGame
 
         private IEnumerator CharacterAnimationCoroutine()
         {
-            int checkIfIWon = GameResolveStateUtils.CheckIfIWon(GameState.gameResolveState);
+            int checkIfIWon = DidIWin();
             yield return new WaitForSeconds(1.5f);
             if (checkIfIWon < 0)
             {
                 animator.SetBool("isDead", true);
             }
+        }
+
+        protected virtual int DidIWin()
+        {
+            return GameResolveStateUtils.CheckIfIWon(GameState.gameResolveState);
         }
     }
 }

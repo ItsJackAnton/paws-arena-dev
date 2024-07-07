@@ -7,6 +7,7 @@ public class SceneManager : MonoBehaviour
     private const string LEADERBOARD = "Leaderboard";
     private const string TUTORIAL = "Tutorial";
     private const string AFTER_GAME = "AfterGame";
+    private const string AFTER_GAME_SPECTATOR = "AfterGameSpectator";
     private const string LOGIN_SCENE = "Login";
     public const string GAME_ROOM = "GameRoom";
     public const string GAME_ROOM_SPECTATOR = "GameRoomSpectator";
@@ -14,6 +15,7 @@ public class SceneManager : MonoBehaviour
     public const string GAME_SCENE = "GameScene";
     public const string SINGLE_PLAYER_GAME = "SinglePlayerGame";
     public const string GUILDS = "Guilds";
+    public const string GAME_SPECTATOR = "GameSpectator";
     public static SceneManager Instance;
 
     private void Awake()
@@ -64,6 +66,11 @@ public class SceneManager : MonoBehaviour
         LoadScene(AFTER_GAME);
     }
 
+    public void LoadAfterGameSpectator()
+    {
+        LoadScene(AFTER_GAME_SPECTATOR);
+    }
+    
     public void Reload()
     {
         LoadScene(UnityEngine.SceneManagement.SceneManager.GetActiveScene().name);

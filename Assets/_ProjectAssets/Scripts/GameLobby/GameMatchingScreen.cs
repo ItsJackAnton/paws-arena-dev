@@ -6,7 +6,6 @@ using System.Collections.Generic;
 using System.Linq;
 using TMPro;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 using Random = UnityEngine.Random;
 
 [System.Serializable]
@@ -43,7 +42,7 @@ public class GameMatchingScreen : MonoBehaviour
         PUNRoomUtils.onPlayerLeft -= OnPlayerLeft;
     }
 
-    private void Init()
+    protected virtual void Init()
     {
         notices.SetActive(false);
 
@@ -82,7 +81,7 @@ public class GameMatchingScreen : MonoBehaviour
         }
     }
 
-    public void SetSeats()
+    public virtual void SetSeats()
     {
         foreach (SeatGameobject seat in seats)
         {
@@ -225,17 +224,17 @@ public class GameMatchingScreen : MonoBehaviour
         return _bots[_index];
     }
 
-    private void OccupySeat(SeatGameobject seat, string nickName)
+    protected void OccupySeat(SeatGameobject seat, string nickName)
     {
         seat.occupierNickname.text = nickName;
     }
 
-    private void FreeSeat(SeatGameobject seat)
+    protected void FreeSeat(SeatGameobject seat)
     {
         seat.occupierNickname.text = "-";
     }
 
-    private void OnPlayerJoined(string opponentNickname, string userId)
+    protected virtual void OnPlayerJoined(string opponentNickname, string userId)
     {
         int mySeat = Int32.Parse(PhotonNetwork.LocalPlayer.CustomProperties["seat"].ToString());
         int otherSeat = (mySeat + 1) % 2;
@@ -285,7 +284,10 @@ public class GameMatchingScreen : MonoBehaviour
         notices.SetActive(false);
         FreeSeat(seats[otherSeat]);
         MakeRoomVisible();
-        searchingForOpponent.SetActive(true);
+        if (searchingForOpponent)
+        {
+            searchingForOpponent.SetActive(true);
+        }
     }
 
     private IEnumerator TryExitRoomAfterSeconds(float seconds)
@@ -322,8 +324,27 @@ public class GameMatchingScreen : MonoBehaviour
     [PunRPC]
     public void StartGameRoutine()
     {
-        searchingForOpponent.SetActive(false);
-        StartCountdown(SceneManager.GAME_SCENE);
+        HandleStartButton();
+        if (searchingForOpponent)
+        {
+            searchingForOpponent.SetActive(false);
+        }
+
+        string _scene;
+        if (CreateFriendlyMatch.AllowSpectators)
+        {
+            _scene = SceneManager.GAME_SPECTATOR;
+        }
+        else
+        {
+            _scene = SceneManager.GAME_SCENE;
+        }
+        StartCountdown(_scene);
+    }
+
+    protected virtual void HandleStartButton()
+    {
+        
     }
     
     [PunRPC]
@@ -334,16 +355,24 @@ public class GameMatchingScreen : MonoBehaviour
 
     private void StartCountdown(string _sceneName)
     {
-        searchingForOpponent.SetActive(false);
-        wheelHolder.SetActive(true);
+        if (searchingForOpponent)
+        {
+            searchingForOpponent.SetActive(false);
+        }
+
+        if (wheelHolder)
+        {
+            wheelHolder.SetActive(true);
+        }
+        
         countdown.StartCountDown(() =>
         {
-            if (PhotonNetwork.LocalPlayer.IsMasterClient)
+            if (!PhotonNetwork.LocalPlayer.IsMasterClient)
             {
-                PhotonNetwork.IsMessageQueueRunning = false;
-                PhotonNetwork.LoadLevel(_sceneName);
+                return;
             }
-
+            PhotonNetwork.IsMessageQueueRunning = false;
+            PhotonNetwork.LoadLevel(_sceneName);
         });
     }
 }

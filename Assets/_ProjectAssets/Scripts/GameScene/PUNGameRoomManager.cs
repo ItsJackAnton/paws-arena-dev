@@ -34,6 +34,10 @@ public class PUNGameRoomManager : MonoBehaviourPunCallbacks
     #endregion
     public int GetMySeat()
     {
+        if (CreateFriendlyMatch.AllowSpectators)
+        {
+            return int.Parse(PhotonNetwork.LocalPlayer.CustomProperties[PhotonManager.SEAT].ToString());
+        }
         if (!PhotonNetwork.LocalPlayer.CustomProperties.ContainsKey(playerKey_seat))
         {
             return 0;
@@ -49,5 +53,15 @@ public class PUNGameRoomManager : MonoBehaviourPunCallbacks
         //if (propertiesThatChanged.TryGetValue(roomKey_usersInScene, out object userCountObject))
         //{
         //}
+    }
+    
+        
+    public int GetLocalPlayerProperty(string _key)
+    {
+        if (CreateFriendlyMatch.AllowSpectators)
+        {
+            return int.Parse(PhotonNetwork.LocalPlayer.CustomProperties[PhotonManager.SEAT].ToString());
+        }
+        return int.Parse(PhotonNetwork.LocalPlayer.CustomProperties[_key].ToString());
     }
 }
