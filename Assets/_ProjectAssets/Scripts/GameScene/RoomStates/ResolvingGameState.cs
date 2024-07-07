@@ -17,7 +17,14 @@ public class ResolvingGameState : IRoomState
     public void Init(RoomStateManager context)
     {
         this.context = context;
-        EndingCoroutine();
+        if (CreateFriendlyMatch.AllowSpectators)
+        {
+            EndGame();
+        }
+        else
+        {
+            EndingCoroutine();
+        }
     }
 
     private async void EndingCoroutine()
@@ -37,6 +44,18 @@ public class ResolvingGameState : IRoomState
         }
         await UniTask.Delay(TimeSpan.FromSeconds(3));
         context.LoadAfterGameScene(state);
+    }
+
+    private void EndGame()
+    {
+        GameState.gameResolveState = state;
+        Debug.Log(state);
+        context.StartCoroutine(EndGameRoutine());
+        IEnumerator EndGameRoutine()
+        {
+            yield return new WaitForSeconds(3);
+            context.LoadAfterGameScene(state);
+        }
     }
 
     public void OnExit()

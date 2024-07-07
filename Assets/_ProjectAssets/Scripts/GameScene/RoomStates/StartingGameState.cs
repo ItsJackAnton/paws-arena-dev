@@ -81,7 +81,7 @@ public class StartingGameState : IRoomState
             }
         }
 
-        if (_actualSeat<=2)
+        if (_actualSeat<=2 && CreateFriendlyMatch.AllowSpectators)
         {
             return;   
         }

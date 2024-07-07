@@ -67,7 +67,12 @@ public class BasePlayerComponent : MonoBehaviour
 
     private void PushPlayer(float force, Vector2 direction)
     {
-        GetComponent<Rigidbody2D>().AddForce(direction.normalized * force, ForceMode2D.Impulse);
+        var _rb = GetComponent<Rigidbody2D>();
+        if (_rb==null)
+        {
+            return;
+        }
+        _rb.AddForce(direction.normalized * force, ForceMode2D.Impulse);
     }
 
     private void Awake()

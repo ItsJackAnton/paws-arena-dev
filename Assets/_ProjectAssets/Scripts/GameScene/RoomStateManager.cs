@@ -3,6 +3,8 @@ using Anura.Templates.MonoSingleton;
 using com.colorfulcoding.GameScene;
 using Photon.Pun;
 using System;
+using System.Collections;
+using Newtonsoft.Json;
 using UnityEngine;
 
 public class RoomStateManager : MonoSingleton<RoomStateManager>
@@ -286,12 +288,55 @@ public class RoomStateManager : MonoSingleton<RoomStateManager>
     {
         if (IsMasterClient())
         {
-            SceneManager.Instance.LoadAfterGame();
+            if (CreateFriendlyMatch.AllowSpectators)
+            {
+                StartCoroutine(EndSpectatorGame());
+            }
+            else
+            {
+                SceneManager.Instance.LoadAfterGame();
+            }
         }
         else if (!isMultiplayer)
         {
             SinglePlayerReturnMainMenu();
         }
+    }
+
+    private IEnumerator EndSpectatorGame()
+    {
+        photonView.RPC(nameof(SetWinnerKitty), RpcTarget.All);
+        yield return new WaitForSeconds(2);
+        photonView.RPC(nameof(LetMasterLoadEndScene), RpcTarget.All);
+    }
+
+    [PunRPC]
+    protected void SetWinnerKitty()
+    {
+        int _seat = PUNGameRoomManager.Instance.GetMySeat();
+        if (_seat<=2)
+        {
+            return;
+        }
+
+        if (GameResolveStateUtils.CheckIfIWon(PlayerManager.Instance.GetWinnerByDeath())!=1)
+        {
+            return;
+        }
+        
+        PhotonManager.SetRoomProperties(PhotonManager.ROOM_WINNER, GameState.selectedNFT.imageUrl);
+        PhotonManager.SetRoomProperties(PhotonManager.ROOM_WINNER_IDS, JsonConvert.SerializeObject(GameState.selectedNFT.ids));
+    }
+
+    [PunRPC]
+    protected void LetMasterLoadEndScene()
+    {
+        if (!PhotonNetwork.IsMasterClient)
+        {
+            return;
+        }
+        
+        SceneManager.Instance.LoadAfterGameSpectator();
     }
 
     [PunRPC]

@@ -10,6 +10,8 @@ public class PhotonManager : MonoBehaviourPunCallbacks
     public const string NAME = "Name";
     public const string SEAT = "Seat";
     public const string ALLOW_SPECTATORS = "AllowSpectators";
+    public const string ROOM_WINNER = "RoomWinner";
+    public const string ROOM_WINNER_IDS = "RoomWinnerIds";
     
     public event Action OnStartedConnection;
     public event Action OnConnectedServer;
@@ -155,5 +157,16 @@ public class PhotonManager : MonoBehaviourPunCallbacks
         OnRoomLeft?.Invoke();
     }
     #endregion
+    
+    public static void SetRoomProperties(string _key, string _value)
+    {
+        if (PhotonNetwork.CurrentRoom == null)
+        {
+            return;
+        }
+
+        Hashtable _propertiesToSet = new Hashtable { [_key] = _value };
+        PhotonNetwork.CurrentRoom.SetCustomProperties(_propertiesToSet);
+    }
     
 }

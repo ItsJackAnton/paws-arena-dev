@@ -112,6 +112,10 @@ public class PlayerManager : MonoSingleton<PlayerManager>
 
     private bool CheckIAmPlayer1()
     {
+        if (CreateFriendlyMatch.AllowSpectators)
+        {
+            return RoomStateManagerSpectator.IsMasterInSpectator;
+        }
         if(ConfigurationManager.Instance.Config.GetGameType() == Anura.ConfigurationModule.ScriptableObjects.GameType.TUTORIAL 
             || ConfigurationManager.Instance.Config.GetGameType() == Anura.ConfigurationModule.ScriptableObjects.GameType.SINGLEPLAYER)
         {
