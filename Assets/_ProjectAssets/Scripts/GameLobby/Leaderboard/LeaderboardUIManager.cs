@@ -1,6 +1,9 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using BoomDaoWrapper;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -20,6 +23,8 @@ public class LeaderboardUIManager : MonoBehaviour
     public PlayerPlatformBehaviour firstPlayer;
     public PlayerPlatformBehaviour secondPlayer;
     public PlayerPlatformBehaviour thirdPlayer;
+
+    [SerializeField] private LeaderboardFromApi leaderboardFromApi;
 
     public List<Sprite> stars;
 
@@ -54,13 +59,13 @@ public class LeaderboardUIManager : MonoBehaviour
     {
         try
         {
-            // LeaderboardData _data = DataManager.Instance.GameData.GetLeaderboard;
-            // PopulateLeaderboardData(_data);
+            LeaderboardData _data = DataManager.Instance.GameData.GetLeaderboard;
+            PopulateLeaderboardData(_data);
         }
         catch (Exception _exception)
         {
             Debug.Log($"Exception occured during loading leadeboard data{_exception.Message} {_exception.StackTrace}");
-            throw;
+            leaderboardFromApi.GetLeaderboard(PopulateLeaderboardData);
         }
     }
 
