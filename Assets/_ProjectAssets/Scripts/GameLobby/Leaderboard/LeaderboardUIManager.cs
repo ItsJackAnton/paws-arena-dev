@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using BoomDaoWrapper;
 using TMPro;
@@ -51,8 +52,20 @@ public class LeaderboardUIManager : MonoBehaviour
 
     private void PopulateLeaderboard()
     {
-        LeaderboardData _data = DataManager.Instance.GameData.GetLeaderboard;
+        try
+        {
+            // LeaderboardData _data = DataManager.Instance.GameData.GetLeaderboard;
+            // PopulateLeaderboardData(_data);
+        }
+        catch (Exception _exception)
+        {
+            Debug.Log($"Exception occured during loading leadeboard data{_exception.Message} {_exception.StackTrace}");
+            throw;
+        }
+    }
 
+    private void PopulateLeaderboardData(LeaderboardData _data)
+    {
         int _idx = 0;
         foreach(LeaderboardEntries _playerStats in _data.Entries)
         {
