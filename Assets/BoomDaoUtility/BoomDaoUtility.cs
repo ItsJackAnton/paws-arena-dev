@@ -514,6 +514,12 @@ namespace BoomDaoWrapper
 
         public int ConvertToInt(string _string)
         {
+            if (_string.Contains("."))
+            {
+                _string = _string.Split(".")[0];
+                Debug.Log("String separated to: "+_string);
+            }
+            
             try
             {
                 return Convert.ToInt32(_string, culture);

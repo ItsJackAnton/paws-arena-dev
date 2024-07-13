@@ -119,9 +119,17 @@ public class GameData
                 string _levelString = _worldEntry.GetProperty(PlayerData.SEASON_LEVEL);
                 if (string.IsNullOrEmpty(_levelString))
                 {
+                    Debug.Log("Levels is empty");
                     _levelString = "0";
                 }
+
+                if (string.IsNullOrEmpty(_pointsString))
+                {
+                    Debug.Log("Points is empty");
+                    _pointsString = "0";
+                }
              
+                Debug.Log($"Points: {_pointsString}\tLevel: {_levelString}");
                 int _points = BoomDaoUtility.Instance.ConvertToInt(_pointsString);
                 int _level = BoomDaoUtility.Instance.ConvertToInt(_levelString);
                 
