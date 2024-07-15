@@ -42,7 +42,7 @@ public class GuildMy : MonoBehaviour
         foreach (var _player in _guild.Players)
         {
             var _display = Instantiate(guildPlayerPrefab, playersHolder);
-            _display.Setup(_player, _amIOwner);
+            _display.Setup(_player, _amIOwner, _player.Points);
             shownObjects.Add(_display.gameObject);
         }
 

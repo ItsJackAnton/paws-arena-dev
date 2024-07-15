@@ -6,6 +6,7 @@ using Boom;
 using Boom.Patterns.Broadcasts;
 using Boom.Values;
 using Candid.World.Models;
+using NaughtyAttributes;
 using UnityEngine;
 using WebSocketSharp;
 using Action = System.Action;
@@ -476,8 +477,7 @@ namespace BoomDaoWrapper
         }
 
         #endregion
-        
-        
+
         public double ConvertToDouble(string _string)
         {
             try
@@ -514,10 +514,14 @@ namespace BoomDaoWrapper
 
         public int ConvertToInt(string _string)
         {
+            if (string.IsNullOrEmpty(_string))
+            {
+                return 0;
+            }
+            
             if (_string.Contains("."))
             {
                 _string = _string.Split(".")[0];
-                Debug.Log("String separated to: "+_string);
             }
             
             try

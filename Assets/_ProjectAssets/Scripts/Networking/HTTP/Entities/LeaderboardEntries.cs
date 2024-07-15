@@ -8,4 +8,5 @@ public class LeaderboardEntries
     public string KittyUrl;
     public int Points;
     public int Level;
+    public int GuildBattlePoints;
 }

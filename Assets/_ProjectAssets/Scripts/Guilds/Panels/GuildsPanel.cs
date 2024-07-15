@@ -75,15 +75,22 @@ public class GuildsPanel : MonoBehaviour
    {
       CloseAll();
       guildBattle.image.sprite = selectedOption;
-      
-      if (DataManager.Instance.PlayerData.IsInAGuild)
+
+      if (!DataManager.Instance.PlayerData.IsInAGuild)
       {
-         guildPanel.Setup();
+         ShowMessage("You are not in a guild,\nplease join one in order to participate in guild battles");
+         ShowSearchGuilds();  
          return;
       }
 
-      ShowMessage("You are not in a guild,\nplease join one in order to participate in guild battles");
-      ShowSearchGuilds();
+      if (!DataManager.Instance.GameData.GuildBattles.IsActive)
+      {
+         ShowMessage("There is a peace among kingdoms!");
+         ShowMyGuild();
+         return;
+      }
+      
+      guildBattles.Setup();
    }
 
    private void ShowTopGuilds()

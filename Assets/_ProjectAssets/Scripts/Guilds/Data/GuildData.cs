@@ -16,8 +16,9 @@ public class GuildData
     public List<int> BattlesHistory = new ();
     public List<GuildPlayerData> Players = new ();
     public bool IsFull => Players.Count >= DataManager.Instance.GameData.MaxGuildPlayers;
-    public GuildBattle GuildBattle = new ();
     public int BattlesWon;
+    public string GuildBattleId;
+    public GuildBattle GuildBattle = new ();
 
     [JsonIgnore] public Sprite Badge => AssetsManager.Instance.GetChallengeBadgeSprite(BadgeName);
     [JsonIgnore] public Sprite Kingdom => AssetsManager.Instance.GetChallengeKingdomSprite(KingdomName);

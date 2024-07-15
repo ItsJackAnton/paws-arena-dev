@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using BoomDaoWrapper;
 using Newtonsoft.Json;
 using TMPro;
 using UnityEngine;
@@ -39,17 +40,31 @@ public class GuildBattlesPanel : MonoBehaviour
         battleHolder.SetActive(true);
         var _myGuild = DataManager.Instance.PlayerData.Guild;
         var _opponentGuild = DataManager.Instance.PlayerData.Guild.GuildBattle.Opponent;
-        myGuild.Setup(_myGuild.Badge, _myGuild.Name, _myGuild.GuildBattle.Points.ToString(), AssetsManager.Instance.GetKingdomColor(_myGuild.Kingdom));
-        opponentGuild.Setup(_opponentGuild.Badge, _opponentGuild.Name, _opponentGuild.GuildBattle.Points.ToString(), AssetsManager.Instance.GetKingdomColor(_opponentGuild
+        myGuild.Setup(_myGuild.Badge, _myGuild.Name, _myGuild.GuildBattle.Points(true).ToString(), AssetsManager.Instance.GetKingdomColor(_myGuild
+        .Kingdom));
+        opponentGuild.Setup(_opponentGuild.Badge, _opponentGuild.Name, _opponentGuild.GuildBattle.Points(false).ToString(), AssetsManager.Instance
+        .GetKingdomColor(_opponentGuild
         .Kingdom));
         history.Setup(DataManager.Instance.PlayerData.Guild.BattlesHistory);
         foreach (var _entry in _myGuild.GuildBattle.BattleEntries)
         {
-            GuildPlayerDisplay _display = Instantiate(guildPlayerPrefab, playersHolder);
             GuildPlayerData _playerData =
                 JsonConvert.DeserializeObject<GuildPlayerData>(JsonConvert.SerializeObject(_myGuild.Players.Find(_player => _player.Principal == _entry
                 .Principal)));
-            _display.Setup(_playerData, false);
+            if (_playerData==null)
+            {
+                _playerData = JsonConvert.DeserializeObject<GuildPlayerData>(JsonConvert.SerializeObject(_myGuild.GuildBattle.Opponent.Players.Find
+                (_player => 
+                _player.Principal == _entry
+                    .Principal)));
+            }
+            if (_playerData==null)
+            {
+                continue;
+            }
+            
+            GuildPlayerDisplay _display = Instantiate(guildPlayerPrefab, playersHolder);
+            _display.Setup(_playerData, false, _playerData.GuildBattlePoints);
             shownObjects.Add(_display.gameObject);
         }
         StartCoroutine(ShowTimer());

@@ -17,7 +17,7 @@ public class GuildPlayerDisplay : MonoBehaviour
     private GuildPlayerData playerData;
 
     
-    public void Setup(GuildPlayerData _playerData, bool _showKickButton)
+    public void Setup(GuildPlayerData _playerData, bool _showKickButton, int _pointsDisplay)
     {
         playerData = _playerData;
         if (BoomDaoUtility.Instance.UserPrincipal==_playerData.Principal)
@@ -28,7 +28,7 @@ public class GuildPlayerDisplay : MonoBehaviour
         leaderIcon.SetActive(_playerData.IsLeader);
         levelDisplay.text = _playerData.Level.ToString();
         nameDisplay.text = _playerData.Name;
-        pointsDisplay.text = _playerData.Points.ToString();
+        pointsDisplay.text = _pointsDisplay.ToString();
         kickButton.gameObject.SetActive(_showKickButton);
     }
 

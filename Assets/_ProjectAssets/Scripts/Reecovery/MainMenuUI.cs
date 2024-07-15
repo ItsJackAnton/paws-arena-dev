@@ -67,7 +67,6 @@ public class MainMenuUI : MonoBehaviour
         SceneManager.Instance.LoadGuilds();
     }
     
-
     private void CheckIfShouldStopRecovering()
     {
         if (GameState.selectedNFT.RecoveryEndDate <= DateTime.UtcNow)

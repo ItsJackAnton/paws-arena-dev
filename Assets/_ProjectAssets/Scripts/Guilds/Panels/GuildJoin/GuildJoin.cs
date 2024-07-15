@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using BoomDaoWrapper;
+using Newtonsoft.Json;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -40,7 +41,7 @@ public class GuildJoin : MonoBehaviour
         foreach (var _player in _guildData.Players)
         {
             var _display = Instantiate(guildPlayerPrefab, playersHolder);
-            _display.Setup(_player, false);
+            _display.Setup(_player, false, _player.Points);
             shownObjects.Add(_display.gameObject);
         }
 
@@ -101,7 +102,6 @@ public class GuildJoin : MonoBehaviour
     {
         GuildsPanel.Instance.ManageInputBlocker(true);
         List<ActionParameter> _parameters = new List<ActionParameter>();
-        _parameters.Add(new () { Key = "playerId", Value = BoomDaoUtility.Instance.UserPrincipal });
         _parameters.Add(new () { Key = GameData.GUILD_ID, Value = guildData.Id });
         BoomDaoUtility.Instance.ExecuteActionWithParameter(JOIN_GUILD, _parameters, HandleJoinGuildFinished);
     }
@@ -110,7 +110,6 @@ public class GuildJoin : MonoBehaviour
     {
         GuildsPanel.Instance.ManageInputBlocker(false);
         DataManager.Instance.PlayerData.GetMyGuild();
-        
         if (DataManager.Instance.PlayerData.IsInAGuild)
         {
             DataManager.Instance.PlayerData.GuildId = guildData.Id;
@@ -120,7 +119,6 @@ public class GuildJoin : MonoBehaviour
 
         GuildsPanel.Instance.ShowMessage("Something went wrong, please try again later");
     }
-
 
     private void Cancel()
     {

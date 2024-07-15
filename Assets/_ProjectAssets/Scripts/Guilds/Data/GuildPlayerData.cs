@@ -9,4 +9,5 @@ public class GuildPlayerData
     public int Level;
     public int Place;
     public bool IsLeader;
+    public int GuildBattlePoints;
 }

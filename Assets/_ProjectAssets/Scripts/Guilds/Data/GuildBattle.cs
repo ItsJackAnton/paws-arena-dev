@@ -1,26 +1,39 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using UnityEngine;
 
 [Serializable]
 public class GuildBattle
 {
-    public string OpponentId;
+    public string Guild1Id;
+    public string Guild2Id;
     public List<GuildBattleEntry> BattleEntries = new ();
-    public int Number;
-    public GuildData Opponent => DataManager.Instance.GameData.Guilds.Find(_guild => _guild.Id == OpponentId);
 
-    public int Points
+    public GuildData Opponent
     {
         get
         {
-            int _points = 0;
+            string _opponentId = DataManager.Instance.PlayerData.GuildId == Guild1Id ? Guild2Id : Guild1Id;
+            return DataManager.Instance.GameData.Guilds.Find(_guild => _guild.Id == _opponentId);
+        }
+    }
 
-            foreach (var _entry in BattleEntries)
+    public int Points(bool _forMyGuild)
+    {
+        int _points = 0;
+        GuildData _guild = _forMyGuild ? DataManager.Instance.PlayerData.Guild : Opponent;
+
+        foreach (var _entry in BattleEntries)
+        {
+            if (_guild.Players.All(_guildPlayer => _guildPlayer.Principal != _entry.Principal))
             {
-                _points += _entry.Points;
+                continue;
             }
             
-            return _points;
+            _points += _entry.Points;
         }
+            
+        return _points;
     }
 }
