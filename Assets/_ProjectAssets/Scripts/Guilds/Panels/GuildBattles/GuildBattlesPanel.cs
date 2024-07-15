@@ -1,7 +1,6 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using BoomDaoWrapper;
 using Newtonsoft.Json;
 using TMPro;
 using UnityEngine;
@@ -74,7 +73,7 @@ public class GuildBattlesPanel : MonoBehaviour
     {
         while (battleHolder.activeSelf)
         {
-            TimeSpan _endTime = DataManager.Instance.GameData.GuildBattles.EndingDate - DataManager.Instance.GameData.GuildBattles.StartingDate;
+            TimeSpan _endTime = DataManager.Instance.GameData.GuildBattles.EndingDate - DateTime.UtcNow;
             string _output = "Ends in\n" + Utilities.TimeSpanToTimer(_endTime);
             if (_endTime.TotalSeconds<0)
             {

@@ -209,11 +209,14 @@ public static class Utilities
     public static string TimeSpanToTimer(TimeSpan _timeLeft)
     {
         string _output = string.Empty;
-        _output += _timeLeft.Hours < 10 ? "0" + _timeLeft.Hours : _timeLeft.Hours;
+        if (_timeLeft.Days > 0) {
+            _output += _timeLeft.Days + "d ";
+        }
+        _output += _timeLeft.Hours < 10 ? "0" + _timeLeft.Hours : _timeLeft.Hours.ToString();
         _output += "h ";
-        _output += _timeLeft.Minutes < 10 ? "0" + _timeLeft.Minutes : _timeLeft.Minutes;
+        _output += _timeLeft.Minutes < 10 ? "0" + _timeLeft.Minutes : _timeLeft.Minutes.ToString();
         _output += "m ";
-        _output += _timeLeft.Seconds < 10 ? "0" + _timeLeft.Seconds : _timeLeft.Seconds;
+        _output += _timeLeft.Seconds < 10 ? "0" + _timeLeft.Seconds : _timeLeft.Seconds.ToString();
         _output += "s ";
         return _output;
     }
