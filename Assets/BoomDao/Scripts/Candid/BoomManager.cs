@@ -111,6 +111,7 @@ namespace Boom
             UserUtil.AddListenerRequestData<DataTypeRequestArgs.ActionState>(FetchHandler);
             UserUtil.AddListenerRequestData<DataTypeRequestArgs.Token>(FetchHandler);
             UserUtil.AddListenerRequestData<DataTypeRequestArgs.NftCollection>(FetchHandler);
+            UserUtil.AddListenerRequestData<DataTypeRequestArgs.StakedNftCollections>(FetchHandler);
 
             UserUtil.AddListenerDataChange<DataTypes.Entity>(SelfDataChangeHandler, new() { invokeOnSet = true }, WORLD_CANISTER_ID);
             UserUtil.AddListenerDataChangeSelf<DataTypes.Entity>(SelfDataChangeHandler, new() { invokeOnSet = true });
@@ -193,6 +194,7 @@ namespace Boom
 
             UserUtil.RemoveListenerRequestData<DataTypeRequestArgs.Token>(FetchHandler);
             UserUtil.RemoveListenerRequestData<DataTypeRequestArgs.NftCollection>(FetchHandler);
+            UserUtil.RemoveListenerRequestData<DataTypeRequestArgs.StakedNftCollections>(FetchHandler);
 
             UserUtil.RemoveListenerDataChange<DataTypes.Entity>(SelfDataChangeHandler, WORLD_CANISTER_ID);
             UserUtil.RemoveListenerDataChangeSelf<DataTypes.Entity>(SelfDataChangeHandler);
@@ -348,7 +350,7 @@ namespace Boom
 
 
                 //Set Login Data
-                UserUtil.UpdateMainData(new MainDataTypes.LoginData(agent, userPrincipal, userAccountIdentity, MainDataTypes.LoginData.State.Logedout, LoginManager.Instance.IsEmbeddedAgent));
+                UserUtil.UpdateMainData(new MainDataTypes.LoginData(agent, userPrincipal, userAccountIdentity, MainDataTypes.LoginData.State.Logedout, LoginManager.Instance.IsEmbeddedAgent, "Null"));
             }
             else
             {
@@ -369,8 +371,21 @@ namespace Boom
                 //HERE: YOU CAN REQUEST FOR THE FIRST TIME ON THE GAME THE USER DATA
 
                 //Set Login Data
-                //UserUtil.Clean<DataTypes.LoginData>(new UserUtil.CleanUpType.All());
-                UserUtil.UpdateMainData(new MainDataTypes.LoginData(agent, userPrincipal, userAccountIdentity, MainDataTypes.LoginData.State.FetchingUserData, LoginManager.Instance.IsEmbeddedAgent));
+
+                //TODO: REMOVE THIS CODE AND UNCOMMENT THE ONE BELOW TO ENABLE FETCHING THE BOOM STAKING TIER
+                string tier = "Null";
+                if (GAMING_GUILDS_CANISTER_ID == Env.CanisterIds.GAMING_GUILDS.STAGING)
+                {
+                    var tierResult = await GuildApiClient.GetUserBoomStakeTier(userPrincipal);
+
+                    tier = tierResult.Tag == Candid.World.Models.Result2Tag.Ok ? tierResult.AsOk() : tierResult.AsErr();
+                }
+                
+                //var tierResult = await GuildApiClient.GetUserBoomStakeTier(userPrincipal);
+
+                //string tier = tierResult.Tag == Candid.World.Models.Result2Tag.Ok? tierResult.AsOk() : tierResult.AsErr();
+
+                UserUtil.UpdateMainData(new MainDataTypes.LoginData(agent, userPrincipal, userAccountIdentity, MainDataTypes.LoginData.State.FetchingUserData, LoginManager.Instance.IsEmbeddedAgent, tier));
 
                 //USER DATA
                 UserUtil.RequestData(new DataTypeRequestArgs.Entity(userPrincipal, WORLD_CANISTER_ID));
@@ -423,6 +438,8 @@ namespace Boom
                 {
                     //TODO: CONNECT WEBSOCKET
                 }
+
+                UserUtil.RequestData(new DataTypeRequestArgs.StakedNftCollections(userPrincipal));
             }
 
             isLoginIn = false;
@@ -505,11 +522,12 @@ namespace Boom
 
             var uids = arg.uids;
 
-            var result = await FetchUtil.GetAllEntities(WORLD_CANISTER_ID, uids);
+            var worldResult = await FetchUtil.GetAllEntities(WORLD_CANISTER_ID, uids);
+            var guildsResult = await FetchUtil.GetAllEntities(GAMING_GUILDS_CANISTER_ID, uids);
 
-            if (result.IsOk)
+            if (worldResult.IsOk)
             {
-                var asOk = result.AsOk();
+                var asOk = worldResult.AsOk();
 
                 asOk.Iterate(user =>
                 {
@@ -521,7 +539,24 @@ namespace Boom
             }
             else
             {
-                $"DATA of type {nameof(DataTypes.Entity)} failed to load. Message: {result.AsErr()}".Error(nameof(BoomManager));
+                $"DATA of type {nameof(DataTypes.Entity)} from World: {WORLD_CANISTER_ID} failed to load. Message: {worldResult.AsErr()}".Error(nameof(BoomManager));
+            }
+
+            if (guildsResult.IsOk)
+            {
+                var asOk = guildsResult.AsOk();
+
+                asOk.Iterate(user =>
+                {
+                    UserUtil.UpdateData(user.Key, user.Value.Map(e=> new DataTypes.Badge(e.wid, e.eid, e.fields)).ToArray());
+                });
+
+                //NEW
+                if (asOk.ContainsKey(principal)) HandleLoginCompletion();
+            }
+            else
+            {
+                $"DATA of type {nameof(DataTypes.Badge)} from BGG: {GAMING_GUILDS_CANISTER_ID} failed to load. Message: {guildsResult.AsErr()}".Error(nameof(BoomManager));
             }
         }
         private async UniTask FetchActionStates(DataTypeRequestArgs.ActionState arg)
@@ -823,6 +858,43 @@ namespace Boom
             }
         }
 
+        //
+
+        private async UniTask FetchStakedNfts(DataTypeRequestArgs.StakedNftCollections arg)
+        {
+            await UniTask.SwitchToMainThread();
+
+            var getAgentResult = UserUtil.GetAgent();
+
+            if (getAgentResult.Tag == UResultTag.Err)
+            {
+                getAgentResult.AsErr().Error();
+                return;
+            }
+
+            var uids = arg.uids;
+
+            //TODO: REMOVE THIS CODE TO ENABLE FETCHING STAKED NFT DATA IN PRODUCTION
+            if(GAMING_GUILDS_CANISTER_ID != Env.CanisterIds.GAMING_GUILDS.STAGING)
+            {
+                UserUtil.UpdateData(uids[0], new DataTypes.StakedNftCollections[0]);
+                return;
+            }
+
+            var result = await FetchUtil.GetAllStakedNFTs(GAMING_GUILDS_CANISTER_ID, uids[0]);
+
+            if (result.IsErr)
+            {
+                Debug.LogError(result.AsErr());
+                return;
+            }
+
+            result.AsOk().Iterate(e =>
+            {
+                UserUtil.UpdateData(e.Key, e.Value.ToArray());
+            });
+        }
+
         #endregion
 
         #region FetchHandlers
@@ -871,6 +943,11 @@ namespace Boom
         private void FetchHandler(FetchDataReq<DataTypeRequestArgs.NftCollection> req)
         {
             FetchNfts(req.arg).Forget();
+        }
+
+        private void FetchHandler(FetchDataReq<DataTypeRequestArgs.StakedNftCollections> req)
+        {
+            FetchStakedNfts(req.arg).Forget();
         }
         #endregion
     }

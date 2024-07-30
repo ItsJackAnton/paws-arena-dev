@@ -1,15 +1,16 @@
-﻿using Newtonsoft.Json;
-
-namespace Boom
+﻿namespace Boom
 {
     using Boom.Utility;
     using Boom.Values;
     using Candid.World.Models;
+    using Newtonsoft.Json;
     using System;
     using System.Collections.Generic;
+    using System.Globalization;
     using System.Linq;
     using System.Text;
     using UnityEngine;
+    using static Boom.EntityFilterPredicate;
 
     // Ignore Spelling: Util
 
@@ -17,6 +18,15 @@ namespace Boom
     {
         public class Base { }
 
+        public class EntityID : Base
+        {
+            public Predicate<string> Predicate { get; private set; }
+
+            public EntityID(Predicate<string> predicate)
+            {
+                Predicate = predicate;
+            }
+        }
         public class Text : Base
         {
             public Predicate<string> Predicate { get; private set; }
@@ -103,6 +113,9 @@ namespace Boom
                             new KeyValue<string, EntityFilterPredicate.Base>("tag", new EntityFilterPredicate.Text(e => e == "room")),
                             new KeyValue<string, EntityFilterPredicate.Base>("userCount", new EntityFilterPredicate.Double(e => e != 0.0)));
 
+            //Get all entities in world with field tag of value "lb"
+            public static EntityFilter.FromWorld worldEntityFieldTagLb = new EntityFilter.FromWorld(new KeyValue<string, EntityFilterPredicate.Base>("tag", new EntityFilterPredicate.Text(e => e == "lb")));
+
             public static EntityFilter.FromSelf ownItems = new EntityFilter.FromSelf(new KeyValue<string, EntityFilterPredicate.Base>("tag", new EntityFilterPredicate.Text(e => e == "item")));
         }
 
@@ -141,28 +154,28 @@ namespace Boom
             return TryGetEntities(principalResult.AsOk().Value, out entities, sourceWorldId);
         }
 
-        public static bool TryQueryEntities(EntityFilter.Base entityFilter, out LinkedList<DataTypes.Entity> entities, string sourceWorldId = default)
+        public static bool TryQueryEntities(EntityFilter.Base query, out LinkedList<DataTypes.Entity> entities)
         {
-            if (string.IsNullOrEmpty(sourceWorldId)) sourceWorldId = BoomManager.Instance.WORLD_CANISTER_ID;
-
+            var userData = UserUtil.GetLogInData(); 
             string principalId = "";
             KeyValue<string, EntityFilterPredicate.Base>[] conditions = null;
 
-            switch (entityFilter)
+            switch (query)
             {
                 case EntityFilter.FromUser e:
                     principalId = e.PrincipalId;
                     conditions = e.fieldsConditions;
                     break;
                 case EntityFilter.FromWorld e:
-                    principalId = e.PrincipalId;
+                    principalId = BoomManager.Instance.WORLD_CANISTER_ID;
                     conditions = e.fieldsConditions;
                     break;
                 case EntityFilter.FromSelf e:
-                    principalId = "self";
+                    principalId = userData.AsOk().principal; ;
                     conditions = e.fieldsConditions;
                     break;
             }
+
 
             entities = default;
 
@@ -178,8 +191,9 @@ namespace Boom
 
                 foreach (var e in elements)
                 {
-                    if (sourceWorldId == e.wid)
-                        entities.AddLast(e);
+                    if (principalId != e.wid) continue;
+
+                    entities.AddLast(e);
                 }
             }
             else
@@ -188,7 +202,7 @@ namespace Boom
 
                 foreach (var entity in entitiesToCheckOn)
                 {
-                    if (sourceWorldId != entity.wid) continue;
+                    if (principalId != entity.wid) continue;
 
                     foreach (var condition in conditions)
                     {
@@ -209,9 +223,15 @@ namespace Boom
                                         break;
                                     case EntityFilterPredicate.Double predicate:
 
-                                        if (value.TryParseValue<double>(out var decimalValue) == false)
+                                        double decimalValue = 0;
+
+                                        try
                                         {
-                                            $"Issue parsing field of id: {condition.key}, from string to double".Error();
+                                            decimalValue = Convert.ToDouble(value, culture);
+                                        }
+                                        catch
+                                        {
+                                            Debug.LogError($"Issue parsing text as double: {value}");
                                             return false;
                                         }
 
@@ -220,9 +240,16 @@ namespace Boom
                                         break;
                                     case EntityFilterPredicate.ULong predicate:
 
-                                        if (value.TryParseValue<ulong>(out var ulongValue) == false)
+
+                                        ulong ulongValue = 0;
+
+                                        try
                                         {
-                                            $"Issue parsing field of id: {condition.key}, from string to ulong".Error();
+                                            ulongValue = Convert.ToUInt64(value, culture);
+                                        }
+                                        catch
+                                        {
+                                            Debug.LogError($"Issue parsing text as ulong: {value}");
                                             return false;
                                         }
 
@@ -231,9 +258,15 @@ namespace Boom
                                         break;
                                     case EntityFilterPredicate.Bool predicate:
 
-                                        if (value.TryParseValue<bool>(out var boolValue) == false)
+                                        bool boolValue = false;
+
+                                        try
                                         {
-                                            $"Issue parsing field of id: {condition.key}, from string to bool".Error();
+                                            boolValue = Convert.ToBoolean(value, culture);
+                                        }
+                                        catch
+                                        {
+                                            Debug.LogError($"Issue parsing text as double: {value}");
                                             return false;
                                         }
 
@@ -254,20 +287,48 @@ namespace Boom
             return true;
         }
 
-        public static bool TryQueryAllEntitiesFeild<T>(EntityFilter.Base entityFilter, out LinkedList<T> allEntityField, Func<DataTypes.Entity, T> getter, string sourceWorldId = default)
+        public static bool TryQueryAllEntitiesFeild<T>(EntityFilter.Base entityFilter, out LinkedList<T> query, Func<DataTypes.Entity, T> getter)
         {
-            allEntityField = default;
+            query = default;
 
-            if (TryQueryEntities(entityFilter, out var entities, sourceWorldId) == false) return false;
+            if (TryQueryEntities(entityFilter, out var entities) == false) return false;
 
-            allEntityField = new();
+            query = new();
 
             foreach (var entity in entities)
             {
-                allEntityField.AddLast(getter(entity));
+                query.AddLast(getter(entity));
             }
             return true;
         }
+
+        public static bool TryQueryEntities(string uid, Predicate<DataTypes.Entity> predicate, out LinkedList<DataTypes.Entity> query, string sourceWorldId = default)
+        {
+            query = default;
+
+            if (string.IsNullOrEmpty(sourceWorldId)) sourceWorldId = BoomManager.Instance.WORLD_CANISTER_ID;
+
+            var result = UserUtil.GetElementsOfType<DataTypes.Entity>(uid);
+
+            if (result.IsErr)
+            {
+                $"{result.AsErr()}".Warning(typeof(EntityUtil).Name);
+
+                return false;
+            }
+
+            var entities = result.AsOk();
+
+            query = new();
+
+            foreach (var entity in entities)
+            {
+                if(entity.wid == sourceWorldId && predicate.Invoke(entity)) query.AddLast(entity);
+            }
+
+            return true;
+        }
+
 
         //Single output
         public static bool TryGetEntity(string uid, string entityId, out DataTypes.Entity entity, string sourceWorldId = default)
@@ -289,75 +350,242 @@ namespace Boom
 
             return true;
         }
-        private static bool TryGetFieldAs<T>(string uid, string entityId, string fieldName, out T outValue, T defaultValue = default, string sourceWorldId = default)
+        private static bool TryGetFieldValue(string uid, string entityId, string fieldName, out string outValue, string sourceWorldId = default)
         {
             if (string.IsNullOrEmpty(sourceWorldId)) sourceWorldId = BoomManager.Instance.WORLD_CANISTER_ID;
 
-            outValue = defaultValue;
+            outValue = "";
 
             if (TryGetEntity(uid, entityId, out var entity, sourceWorldId) == false)
             {
                 return false;
             }
-            
-            if (!entity.fields.TryGetValue(fieldName, out var value)) return false;
 
-            if (value.TryParseValue<T>(out outValue))
-            {
-                return true;
-            }
-            $"Error on \"value\" type, current type: {value.GetType()}, desired type is: {typeof(T)}".Error();
-            return false;
+            return entity.fields.TryGetValue(fieldName, out outValue);
         }
+
+        public static readonly CultureInfo culture = CultureInfo.InvariantCulture;
+
         public static bool TryGetFieldAsText(string uid, string entityId, string fieldName, out string outValue, string defaultValue = default, string sourceWorldId = default)
         {
-            return TryGetFieldAs<string>(uid, entityId, fieldName, out outValue, defaultValue, sourceWorldId);
+            if (TryGetFieldValue(uid, entityId, fieldName, out outValue, sourceWorldId) == false)
+            {
+                outValue = defaultValue;
+
+                return false;
+            }
+
+            return true;
         }
         public static bool TryGetFieldAsDouble(string uid, string entityId, string fieldName, out double outValue, double defaultValue = default, string sourceWorldId = default)
         {
-            return TryGetFieldAs<double>(uid, entityId, fieldName, out outValue, defaultValue, sourceWorldId);
+
+            if (TryGetFieldValue(uid, entityId, fieldName, out var outValueText, sourceWorldId) == false)
+            {
+                outValue = defaultValue;
+
+                return false;
+            }
+            
+            try
+            {
+                outValue = Convert.ToDouble(outValueText, culture);
+
+                if (outValueText.Contains("."))
+                {
+                    var Val = $"{outValue}";
+                    var split = outValueText.Split('.');
+
+                    if (split.Length == 2)
+                    {
+                        var whole = split[0];
+
+                        if (Val.Length > whole.Length)
+                        {
+                            var decimals = split[1];
+                            var decimalCount = decimals.Length;
+
+                            outValue /= Mathf.Pow(10, decimalCount);
+                        }
+                    }
+                }
+
+                return true;
+            }
+            catch
+            {
+                outValue = defaultValue;
+
+                return false;
+            }
         }
         public static bool TryGetFieldAsTimeStamp(string uid, string entityId, string fieldName, out ulong outValue, ulong defaultValue = default, string sourceWorldId = default)
         {
-            return TryGetFieldAs<ulong>(uid, entityId, fieldName, out outValue, defaultValue, sourceWorldId);
+
+            if (TryGetFieldValue(uid, entityId, fieldName, out var outValueText, sourceWorldId) == false)
+            {
+                outValue = defaultValue;
+
+                return false;
+            }
+
+            try
+            {
+                outValue = Convert.ToUInt64(outValueText, culture);
+
+                if (outValueText.Contains("."))
+                {
+                    var split = outValueText.Split('.');
+
+                    if (split.Length == 2)
+                    {
+                        var whole = split[0];
+                        outValue = Convert.ToUInt64(whole, culture);
+                    }
+                }
+
+                return true;
+            }
+            catch
+            {
+                outValue = defaultValue;
+
+                return false;
+            }
         }
         public static bool TryGetFieldAsBool(string uid, string entityId, string fieldName, out bool outValue, bool defaultValue = default, string sourceWorldId = default)
         {
-            return TryGetFieldAs<bool>(uid, entityId, fieldName, out outValue, defaultValue, sourceWorldId);
+
+            if (TryGetFieldValue(uid, entityId, fieldName, out var outValueText, sourceWorldId) == false)
+            {
+                outValue = defaultValue;
+
+                return false;
+            }
+
+            try
+            {
+                outValue = Convert.ToBoolean(outValueText, culture);
+                return true;
+            }
+            catch
+            {
+                outValue = defaultValue;
+
+                return false;
+            }
         }
 
         //Single output (Datatypes.Entity extension functions)
-        private static bool TryGetFieldAs<T>(this DataTypes.Entity entity, string fieldName, out T outValue, T defaultValue = default)
+        private static bool TryGetFieldValue(this DataTypes.Entity entity, string fieldName, out string outValue)
         {
-            outValue = defaultValue;
-
-            if (!entity.fields.TryGetValue(fieldName, out var value)) return false;
-
-            if (value.TryParseValue<T>(out outValue))
-            {
-                return true;
-            }
-            
-            Debug.Log(fieldName);
-            Debug.Log(JsonConvert.SerializeObject(entity));
-            $"Error on \"value\" type, current type: {value.GetType()}, desired type is: {typeof(T)}".Error();
-            return false;
+            return entity.fields.TryGetValue(fieldName, out outValue);
         }
+
         public static bool TryGetFieldAsText(this DataTypes.Entity entity, string fieldName, out string outValue, string defaultValue = default)
         {
-            return TryGetFieldAs<string>(entity, fieldName, out outValue, defaultValue);
+            if (TryGetFieldValue(entity, fieldName, out outValue) == false)
+            {
+                outValue = defaultValue;
+
+                return false;
+            }
+
+            return true;
         }
         public static bool TryGetFieldAsDouble(this DataTypes.Entity entity, string fieldName, out double outValue, double defaultValue = default)
         {
-            return TryGetFieldAs<double>(entity, fieldName, out outValue, defaultValue);
+            if (TryGetFieldValue(entity, fieldName, out var outValueText) == false)
+            {
+                outValue = defaultValue;
+
+                return false;
+            }
+
+            try
+            {
+                outValue = Convert.ToDouble(outValueText, culture);
+
+                if (outValueText.Contains("."))
+                {
+                    var Val = $"{outValue}";
+                    var split = outValueText.Split('.');
+
+                    if (split.Length == 2)
+                    {
+                        var whole = split[0];
+
+                        if (Val.Length > whole.Length)
+                        {
+                            var decimals = split[1];
+                            var decimalCount = decimals.Length;
+
+                            outValue /= Mathf.Pow(10, decimalCount);
+                        }
+                    }
+                }
+
+                return true;
+            }
+            catch
+            {
+                outValue = defaultValue;
+
+                return false;
+            }
         }
         public static bool TryGetFieldAsTimeStamp(this DataTypes.Entity entity, string fieldName, out ulong outValue, ulong defaultValue = default)
         {
-            return TryGetFieldAs<ulong>(entity, fieldName, out outValue, defaultValue);
+            if (TryGetFieldValue(entity, fieldName, out var outValueText) == false)
+            {
+                outValue = defaultValue;
+
+                return false;
+            }
+
+            try
+            {
+                outValue = Convert.ToUInt64(outValueText, culture);
+
+                if (outValueText.Contains("."))
+                {
+                    var split = outValueText.Split('.');
+
+                    if (split.Length == 2)
+                    {
+                        var whole = split[0];
+                        outValue = Convert.ToUInt64(whole, culture);
+                    }
+                }
+
+                return true;
+            }
+            catch
+            {
+                outValue = defaultValue;
+
+                return false;
+            }
         }
         public static bool TryGetFieldAsBool(this DataTypes.Entity entity, string fieldName, out bool outValue, bool defaultValue = default)
         {
-            return TryGetFieldAs<bool>(entity, fieldName, out outValue, defaultValue);
+            if (TryGetFieldValue(entity, fieldName, out var outValueText) == false)
+            {
+                outValue = defaultValue;
+
+                return false;
+            }
+            try
+            {
+                outValue = Convert.ToBoolean(outValueText, culture);
+                return true;
+            }
+            catch
+            {
+                outValue = defaultValue;
+
+                return false;
+            }
         }
 
         //Single output (EntityOutcome extension functions)
@@ -610,7 +838,7 @@ namespace Boom
         internal static void ApplyEntityEdits(ProcessedActionResponse.Outcomes outcomes)
         {
             var uid = outcomes.uid;
-            Debug.Log($"Apply outcomes to {uid}, outcomes: {outcomes.entityOutcomes}");
+            //$"Apply outcomes to {uid}, outcomes: {JsonConvert.SerializeObject(outcomes.entityOutcomes)}".Log(typeof(EntityUtil).Name);
             var entityOutcomes = outcomes.entityOutcomes;
 
             Dictionary<string, DataTypes.Entity> editedEntities = new();
@@ -629,9 +857,9 @@ namespace Boom
                 if (currentEntityDataTypeResult.IsOk) currentEntityFields = currentEntityDataTypeResult.AsOk().fields;
                 else currentEntityFields = new();
 
-
-                if(fieldsEdits != null)
+                if (fieldsEdits != null)
                 {
+
                     foreach (var edit in fieldsEdits)
                     {
                         var fieldId = edit.Key;
@@ -646,19 +874,20 @@ namespace Boom
                                 if (currentEntityFields.ContainsKey(fieldId)) currentEntityFields.Remove(fieldId);
                                 break;
                             case EntityFieldEdit.AddToList e:
+
                                 if (currentEntityFields.TryAdd(fieldId, e.Value) == false)
                                 {
-                                    currentEntityFields[fieldId] += $",{e.Value}";
+                                    if (string.IsNullOrEmpty(currentEntityFields[fieldId])) currentEntityFields[fieldId] += $"{e.Value}";
+                                    else currentEntityFields[fieldId] += $",{e.Value}";
                                 }
                                 break;
                             case EntityFieldEdit.RemoveFromList e:
-                                if (currentEntityFields.ContainsKey(e.Value))
-                                {
-                                    var currentFieldValue = currentEntityFields[fieldId];
 
-                                    if (currentFieldValue.Contains(e.Value))
+                                if (currentEntityFields.TryGetValue(fieldId, out var fieldValue))
+                                {
+                                    if (fieldValue.Contains(e.Value))
                                     {
-                                        var split = currentFieldValue.Split(',').ToList();
+                                        var split = fieldValue.Split(',').ToList();
 
                                         split.Remove(e.Value);
 
@@ -679,20 +908,49 @@ namespace Boom
                                 else if (e.NumericType_ == EntityFieldEdit.Numeric.NumericType.Increment)
                                 {
                                     if (currentEntityFields.TryGetValue(fieldId, out var numberAsText) == false) numberAsText = "0";
-                                    numberAsText.TryParseValue(out double currentNumericValue);
+
+                                    double currentNumericValue = 0;
+
+                                    try
+                                    {
+                                        currentNumericValue = Convert.ToDouble(numberAsText, culture);
+                                    }
+                                    catch
+                                    {
+                                        Debug.LogError($"Issue parsing text as double: {currentEntityFields[fieldId]}");
+                                        return;
+                                    }
 
                                     currentEntityFields[fieldId] = (currentNumericValue + e.Value).ToString();
                                 }
                                 else if (e.NumericType_ == EntityFieldEdit.Numeric.NumericType.Decrement)
                                 {
                                     if (currentEntityFields.TryGetValue(fieldId, out var numberAsText) == false) numberAsText = "0";
-                                    numberAsText.TryParseValue(out double currentNumericValue);
+
+                                    double currentNumericValue = 0;
+
+                                    try
+                                    {
+                                        currentNumericValue = Convert.ToDouble(numberAsText, culture);
+                                    }
+                                    catch
+                                    {
+                                        Debug.LogError($"Issue parsing text as double: {currentEntityFields[fieldId]}");
+                                        return;
+                                    }
 
                                     currentEntityFields[fieldId] = (currentNumericValue - e.Value).ToString();
                                 }
                                 else
                                 {
-                                    if(double.TryParse(currentEntityFields[fieldId], out var tempValue) == false)
+
+                                    double tempValue = 0;
+
+                                    try
+                                    {
+                                        tempValue = Convert.ToDouble(currentEntityFields[fieldId], culture);
+                                    }
+                                    catch
                                     {
                                         Debug.LogError($"Issue parsing text as double: {currentEntityFields[fieldId]}");
                                         return;
@@ -709,6 +967,10 @@ namespace Boom
 
                                 }
 
+                                break;
+
+                            default:
+                                Debug.Log($"Apply outcome skip");
                                 break;
                         }
                     }
@@ -778,6 +1040,16 @@ namespace Boom
                 }
                 else
                 {
+                    try
+                    {
+                        operandStack.Push(Convert.ToUInt64(token, EntityUtil.culture));
+                    }
+                    catch
+                    {
+                        Debug.LogError($"Issue parsing text as double: {token}");
+                        return 0;
+                    }
+
                     operandStack.Push(double.Parse(token));
                 }
                 //

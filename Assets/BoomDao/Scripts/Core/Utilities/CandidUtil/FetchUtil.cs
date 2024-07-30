@@ -12,10 +12,12 @@
     using Cysharp.Threading.Tasks;
     using EdjCase.ICP.Agent.Agents;
     using EdjCase.ICP.Candid.Models;
+    using Newtonsoft.Json;
     using System;
     using System.Collections.Generic;
     using System.Linq;
     using UnityEngine;
+    using static Env;
 
     public static class FetchUtil
     {
@@ -108,7 +110,7 @@
             var response = await worldApiClient.GetAllUserActionStates(new WorldApiClient.GetAllUserActionStatesArg0(uid));
 
 
-            if (response.Tag == Candid.World.Models.Result6Tag.Ok)
+            if (response.Tag == Candid.World.Models.Result7Tag.Ok)
             {
                 List<Candid.World.Models.ActionState> userGameEntities = response.AsOk();
 
@@ -399,5 +401,91 @@
             }
         }
         #endregion
+
+
+        //
+
+        //ENTITY
+        public async static UniTask<UResult<Dictionary<string, LinkedList<DataTypes.StakedNftCollections>>, string>> GetAllStakedNFTs(string worldId, params string[] uids)
+        {
+            var agentResult = UserUtil.GetAgent();
+            if (agentResult.IsErr) throw new(agentResult.AsErr());
+            var agent = agentResult.AsOk();
+
+            WorldApiClient worldApiClient = new(agent, Principal.FromText(worldId));
+
+
+            Dictionary<string, LinkedList<DataTypes.StakedNftCollections>> responses = new(); //uid -> nftCanisterId -> Collection
+            Dictionary<string, string> userAddresses = new(); //uid -> address
+
+            List<UniTask> asyncFunctions = new();
+
+            foreach (var uid in uids)
+            {
+                asyncFunctions.Add(GetUserAddress(uid, userAddresses));
+
+            }
+
+            await UniTask.WhenAll(asyncFunctions);
+
+            asyncFunctions = new();
+
+
+
+            foreach (var uid in uids)
+            {
+                var collections = new LinkedList<DataTypes.StakedNftCollections>();
+                responses.Add(uid, collections);
+
+                asyncFunctions.Add(GetUserStakedNFTs(agent, worldApiClient, uid, collections));
+            }
+
+            await UniTask.WhenAll(asyncFunctions);
+
+            return new(responses);
+        }
+
+        private static async UniTask GetUserStakedNFTs(IAgent agent, WorldApiClient worldApiClient, string uid, LinkedList<DataTypes.StakedNftCollections> stakedCollections)
+        {
+            //responses.Add(uid, new List<DataTypes.Entity>());
+
+            var response = await worldApiClient.GetUserExtStakesInfo(uid);
+
+            Dictionary<string, DataTypes.StakedNftCollections> collections = new();
+
+            List<UniTask> asyncFunctions = new();
+
+            foreach (var stake in response)
+            {
+                var key = stake.Key;
+                var keySplit = key.Split('|');
+                var nftCollectionID = keySplit[0];
+                var nftIndexText = keySplit[1];
+
+                nftIndexText.TryParseValue<uint>(out var nftIndex);
+
+                if(collections.TryGetValue(nftCollectionID, out var collection) == false)
+                {
+                    collection = new(nftCollectionID);
+                    collections.Add(nftCollectionID, collection);
+                }
+
+                asyncFunctions.Add(GetStakedNFTIdentifier(agent, nftCollectionID, nftIndex, stake.Value, collection));
+            }
+
+            await UniTask.WhenAll(asyncFunctions);
+
+            collections.Iterate(e => stakedCollections.AddFirst(e.Value));
+        }
+        public static async UniTask GetStakedNFTIdentifier(IAgent agent, string collectionCanisterID, uint index, Candid.World.Models.EXTStake stake,DataTypes.StakedNftCollections collection)
+        {
+            var nftIdentifier = await BoomManager.Instance.WorldHub.GetTokenIdentifier(collectionCanisterID, index);
+            //var api = new Extv2StandardApiClient(agent, Principal.FromText(collectionCanisterID));
+      
+            var nft = new DataTypes.StakedNftCollections.Nft(collectionCanisterID, index, nftIdentifier, $"https://{collection.canisterId}.raw.icp0.io/?&tokenid={nftIdentifier}&type=thumbnail", "");
+
+            collection.tokens.Add(nft);
+
+        }
     }
 }

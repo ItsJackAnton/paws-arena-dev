@@ -1,6 +1,5 @@
 using EdjCase.ICP.Candid.Mapping;
 using Candid.World.Models;
-using System.Collections.Generic;
 using System;
 
 namespace Candid.World.Models
@@ -29,7 +28,7 @@ namespace Candid.World.Models
 			return new Result8(Result8Tag.Err, info);
 		}
 
-		public static Result8 Ok(List<ActionOutcomeHistory> info)
+		public static Result8 Ok(ActionStatusReturn info)
 		{
 			return new Result8(Result8Tag.Ok, info);
 		}
@@ -40,10 +39,10 @@ namespace Candid.World.Models
 			return (string)this.Value!;
 		}
 
-		public List<ActionOutcomeHistory> AsOk()
+		public ActionStatusReturn AsOk()
 		{
 			this.ValidateTag(Result8Tag.Ok);
-			return (List<ActionOutcomeHistory>)this.Value!;
+			return (ActionStatusReturn)this.Value!;
 		}
 
 		private void ValidateTag(Result8Tag tag)

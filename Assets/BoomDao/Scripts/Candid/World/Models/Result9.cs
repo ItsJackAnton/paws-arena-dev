@@ -1,5 +1,6 @@
 using EdjCase.ICP.Candid.Mapping;
 using Candid.World.Models;
+using System.Collections.Generic;
 using System;
 
 namespace Candid.World.Models
@@ -28,15 +29,21 @@ namespace Candid.World.Models
 			return new Result9(Result9Tag.Err, info);
 		}
 
-		public static Result9 Ok()
+		public static Result9 Ok(List<ActionOutcomeHistory> info)
 		{
-			return new Result9(Result9Tag.Ok, null);
+			return new Result9(Result9Tag.Ok, info);
 		}
 
 		public string AsErr()
 		{
 			this.ValidateTag(Result9Tag.Err);
 			return (string)this.Value!;
+		}
+
+		public List<ActionOutcomeHistory> AsOk()
+		{
+			this.ValidateTag(Result9Tag.Ok);
+			return (List<ActionOutcomeHistory>)this.Value!;
 		}
 
 		private void ValidateTag(Result9Tag tag)

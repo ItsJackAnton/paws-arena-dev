@@ -383,6 +383,17 @@ namespace Boom
                         BroadcastState.Invoke(new DataLoadingState<DataTypes.NftCollection>(true), false, $"{_uid}");
                     }
                     break;
+
+                case DataTypeRequestArgs.StakedNftCollections e:
+
+                    Broadcast.Invoke<FetchDataReq<DataTypeRequestArgs.StakedNftCollections>>(new FetchDataReq<DataTypeRequestArgs.StakedNftCollections>(e));
+
+                    foreach (var uid in arg.uids)
+                    {
+                        string _uid = uid != loginDataAsOk.principal ? uid : "self";
+                        BroadcastState.Invoke(new DataLoadingState<DataTypes.StakedNftCollections>(true), false, $"{_uid}");
+                    }
+                    break;
             }
         }
 

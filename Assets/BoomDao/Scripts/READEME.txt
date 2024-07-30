@@ -1,6 +1,41 @@
 ===================================================================================================================================================
 
-Current Version: 0.3.2
+Current Version: 0.3.4
+
+===================================================================================================================================================
+
+> Release Notes 0.3.4
+
+New Features: 
+
+- You can read the user's Boom Stacking Tier in the MainDataTypes.LoginData.
+- You can read the user's staked NFTs in the Boom Gaming Guilds website  in the DataTypes.StakedNftCollections.
+- You can read the user's badges in the DataTypes.Badge.
+- You can test the TutorialAddRemoveFromList list to test adding and removing fruits from an entity's field list in the player's data and/or in the world's data.
+
+Improvements: 
+
+- None
+
+Fixes: 
+
+- Fixed issue that prevented removing elements from entities' field lists in Unity.
+
+===================================================================================================================================================
+
+> Release Notes 0.3.3
+
+New Features: 
+
+- A new Tutorial "TutorialLeaderboard2" that shows two new ways of implementing leaderboards
+
+Improvements: 
+
+- New entity utilities functions to query easily specific entities
+
+Fixes: 
+
+- Possible fix to parsing values issue when the PC's region is set to Russian
 
 ===================================================================================================================================================
 
@@ -10,7 +45,7 @@ New Features: NONE
 
 Improvements: 
 
-- Boom WebGl template and Loging system upgrade to support hosting games in Web Iframe
+- Boom WebGl template and logging  system upgrade to support hosting games in Web Iframe
 
 Fixes: NONE
 

@@ -5,47 +5,41 @@ using System;
 namespace Candid.World.Models
 {
 	[Variant]
-	public class Result4
+	public class Result10
 	{
 		[VariantTagProperty]
-		public Result4Tag Tag { get; set; }
+		public Result10Tag Tag { get; set; }
 
 		[VariantValueProperty]
 		public object? Value { get; set; }
 
-		public Result4(Result4Tag tag, object? value)
+		public Result10(Result10Tag tag, object? value)
 		{
 			this.Tag = tag;
 			this.Value = value;
 		}
 
-		protected Result4()
+		protected Result10()
 		{
 		}
 
-		public static Result4 Err(string info)
+		public static Result10 Err(string info)
 		{
-			return new Result4(Result4Tag.Err, info);
+			return new Result10(Result10Tag.Err, info);
 		}
 
-		public static Result4 Ok(ActionReturn info)
+		public static Result10 Ok()
 		{
-			return new Result4(Result4Tag.Ok, info);
+			return new Result10(Result10Tag.Ok, null);
 		}
 
 		public string AsErr()
 		{
-			this.ValidateTag(Result4Tag.Err);
+			this.ValidateTag(Result10Tag.Err);
 			return (string)this.Value!;
 		}
 
-		public ActionReturn AsOk()
-		{
-			this.ValidateTag(Result4Tag.Ok);
-			return (ActionReturn)this.Value!;
-		}
-
-		private void ValidateTag(Result4Tag tag)
+		private void ValidateTag(Result10Tag tag)
 		{
 			if (!this.Tag.Equals(tag))
 			{
@@ -54,7 +48,7 @@ namespace Candid.World.Models
 		}
 	}
 
-	public enum Result4Tag
+	public enum Result10Tag
 	{
 		[CandidName("err")]
 		Err,

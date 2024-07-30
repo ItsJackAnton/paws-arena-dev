@@ -40,53 +40,46 @@ namespace Candid.World
 			await this.Agent.CallAndWaitAsync(this.CanisterId, "addTrustedOrigins", arg);
 		}
 
-		public async Task<Models.Result4> CreateAction(Models.Action arg0)
+		public async Task<Models.Result2> CreateAction(Models.Action arg0)
 		{
 			CandidArg arg = CandidArg.FromCandid(CandidTypedValue.FromObject(arg0, this.Converter));
 			CandidArg reply = await this.Agent.CallAndWaitAsync(this.CanisterId, "createAction", arg);
-			return reply.ToObjects<Models.Result4>(this.Converter);
+			return reply.ToObjects<Models.Result2>(this.Converter);
 		}
 
-		public async Task<Models.Result4> CreateConfig(Models.StableConfig arg0)
+		public async Task<Models.Result2> CreateConfig(Models.StableConfig arg0)
 		{
 			CandidArg arg = CandidArg.FromCandid(CandidTypedValue.FromObject(arg0, this.Converter));
 			CandidArg reply = await this.Agent.CallAndWaitAsync(this.CanisterId, "createConfig", arg);
-			return reply.ToObjects<Models.Result4>(this.Converter);
+			return reply.ToObjects<Models.Result2>(this.Converter);
 		}
 
-		public async Task<Models.Result4> CreateEntity(Models.EntitySchema arg0)
+		public async Task<Models.Result2> CreateEntity(Models.EntitySchema arg0)
 		{
 			CandidArg arg = CandidArg.FromCandid(CandidTypedValue.FromObject(arg0, this.Converter));
 			CandidArg reply = await this.Agent.CallAndWaitAsync(this.CanisterId, "createEntity", arg);
-			return reply.ToObjects<Models.Result4>(this.Converter);
+			return reply.ToObjects<Models.Result2>(this.Converter);
 		}
 
-		public async Task<Models.Result4> CreateEntityForAllUsers(WorldApiClient.CreateEntityForAllUsersArg0 arg0)
+		public async Task<Models.Result2> CreateEntityForAllUsers(WorldApiClient.CreateEntityForAllUsersArg0 arg0)
 		{
 			CandidArg arg = CandidArg.FromCandid(CandidTypedValue.FromObject(arg0, this.Converter));
 			CandidArg reply = await this.Agent.CallAndWaitAsync(this.CanisterId, "createEntityForAllUsers", arg);
-			return reply.ToObjects<Models.Result4>(this.Converter);
+			return reply.ToObjects<Models.Result2>(this.Converter);
 		}
 
-		public async Task<Models.Result4> CreateMinigameWinAction()
-		{
-			CandidArg arg = CandidArg.FromCandid();
-			CandidArg reply = await this.Agent.CallAndWaitAsync(this.CanisterId, "createMinigameWinAction", arg);
-			return reply.ToObjects<Models.Result4>(this.Converter);
-		}
-
-		public async Task<Models.Result4> CreateTestQuestActions(WorldApiClient.CreateTestQuestActionsArg0 arg0)
+		public async Task<Models.Result2> CreateTestQuestActions(WorldApiClient.CreateTestQuestActionsArg0 arg0)
 		{
 			CandidArg arg = CandidArg.FromCandid(CandidTypedValue.FromObject(arg0, this.Converter));
 			CandidArg reply = await this.Agent.CallAndWaitAsync(this.CanisterId, "createTestQuestActions", arg);
-			return reply.ToObjects<Models.Result4>(this.Converter);
+			return reply.ToObjects<Models.Result2>(this.Converter);
 		}
 
-		public async Task<Models.Result4> CreateTestQuestConfigs(List<WorldApiClient.CreateTestQuestConfigsArg0Item> arg0)
+		public async Task<Models.Result2> CreateTestQuestConfigs(List<WorldApiClient.CreateTestQuestConfigsArg0Item> arg0)
 		{
 			CandidArg arg = CandidArg.FromCandid(CandidTypedValue.FromObject(arg0, this.Converter));
 			CandidArg reply = await this.Agent.CallAndWaitAsync(this.CanisterId, "createTestQuestConfigs", arg);
-			return reply.ToObjects<Models.Result4>(this.Converter);
+			return reply.ToObjects<Models.Result2>(this.Converter);
 		}
 
 		public async Task<UnboundedUInt> CycleBalance()
@@ -97,11 +90,11 @@ namespace Candid.World
 			return reply.ToObjects<UnboundedUInt>(this.Converter);
 		}
 
-		public async Task<Models.Result4> DeleteAction(WorldApiClient.DeleteActionArg0 arg0)
+		public async Task<Models.Result2> DeleteAction(WorldApiClient.DeleteActionArg0 arg0)
 		{
 			CandidArg arg = CandidArg.FromCandid(CandidTypedValue.FromObject(arg0, this.Converter));
 			CandidArg reply = await this.Agent.CallAndWaitAsync(this.CanisterId, "deleteAction", arg);
-			return reply.ToObjects<Models.Result4>(this.Converter);
+			return reply.ToObjects<Models.Result2>(this.Converter);
 		}
 
 		public async Task DeleteActionHistoryForUser(WorldApiClient.DeleteActionHistoryForUserArg0 arg0)
@@ -116,18 +109,18 @@ namespace Candid.World
 			await this.Agent.CallAndWaitAsync(this.CanisterId, "deleteActionLockState", arg);
 		}
 
-		public async Task<Models.Result2> DeleteActionStateForAllUsers(WorldApiClient.DeleteActionStateForAllUsersArg0 arg0)
+		public async Task<Models.Result3> DeleteActionStateForAllUsers(WorldApiClient.DeleteActionStateForAllUsersArg0 arg0)
 		{
 			CandidArg arg = CandidArg.FromCandid(CandidTypedValue.FromObject(arg0, this.Converter));
 			CandidArg reply = await this.Agent.CallAndWaitAsync(this.CanisterId, "deleteActionStateForAllUsers", arg);
-			return reply.ToObjects<Models.Result2>(this.Converter);
+			return reply.ToObjects<Models.Result3>(this.Converter);
 		}
 
-		public async Task<Models.Result9> DeleteActionStateForUser(WorldApiClient.DeleteActionStateForUserArg0 arg0)
+		public async Task<Models.Result10> DeleteActionStateForUser(WorldApiClient.DeleteActionStateForUserArg0 arg0)
 		{
 			CandidArg arg = CandidArg.FromCandid(CandidTypedValue.FromObject(arg0, this.Converter));
 			CandidArg reply = await this.Agent.CallAndWaitAsync(this.CanisterId, "deleteActionStateForUser", arg);
-			return reply.ToObjects<Models.Result9>(this.Converter);
+			return reply.ToObjects<Models.Result10>(this.Converter);
 		}
 
 		public async Task DeleteAllActionLockStates()
@@ -136,18 +129,18 @@ namespace Candid.World
 			await this.Agent.CallAndWaitAsync(this.CanisterId, "deleteAllActionLockStates", arg);
 		}
 
-		public async Task<Models.Result2> DeleteAllActions()
+		public async Task<Models.Result3> DeleteAllActions()
 		{
 			CandidArg arg = CandidArg.FromCandid();
 			CandidArg reply = await this.Agent.CallAndWaitAsync(this.CanisterId, "deleteAllActions", arg);
-			return reply.ToObjects<Models.Result2>(this.Converter);
+			return reply.ToObjects<Models.Result3>(this.Converter);
 		}
 
-		public async Task<Models.Result2> DeleteAllConfigs()
+		public async Task<Models.Result3> DeleteAllConfigs()
 		{
 			CandidArg arg = CandidArg.FromCandid();
 			CandidArg reply = await this.Agent.CallAndWaitAsync(this.CanisterId, "deleteAllConfigs", arg);
-			return reply.ToObjects<Models.Result2>(this.Converter);
+			return reply.ToObjects<Models.Result3>(this.Converter);
 		}
 
 		public async Task DeleteCache()
@@ -156,31 +149,59 @@ namespace Candid.World
 			await this.Agent.CallAsync(this.CanisterId, "deleteCache", arg);
 		}
 
-		public async Task<Models.Result4> DeleteConfig(WorldApiClient.DeleteConfigArg0 arg0)
+		public async Task<Models.Result2> DeleteConfig(WorldApiClient.DeleteConfigArg0 arg0)
 		{
 			CandidArg arg = CandidArg.FromCandid(CandidTypedValue.FromObject(arg0, this.Converter));
 			CandidArg reply = await this.Agent.CallAndWaitAsync(this.CanisterId, "deleteConfig", arg);
-			return reply.ToObjects<Models.Result4>(this.Converter);
+			return reply.ToObjects<Models.Result2>(this.Converter);
 		}
 
-		public async Task<Models.Result4> DeleteEntity(WorldApiClient.DeleteEntityArg0 arg0)
+		public async Task<Models.Result2> DeleteEntity(WorldApiClient.DeleteEntityArg0 arg0)
 		{
 			CandidArg arg = CandidArg.FromCandid(CandidTypedValue.FromObject(arg0, this.Converter));
 			CandidArg reply = await this.Agent.CallAndWaitAsync(this.CanisterId, "deleteEntity", arg);
-			return reply.ToObjects<Models.Result4>(this.Converter);
+			return reply.ToObjects<Models.Result2>(this.Converter);
 		}
 
-		public async Task<Models.Result9> DeleteTestQuestActionStateForUser(WorldApiClient.DeleteTestQuestActionStateForUserArg0 arg0)
+		public async Task<Models.Result10> DeleteTestQuestActionStateForUser(WorldApiClient.DeleteTestQuestActionStateForUserArg0 arg0)
 		{
 			CandidArg arg = CandidArg.FromCandid(CandidTypedValue.FromObject(arg0, this.Converter));
 			CandidArg reply = await this.Agent.CallAndWaitAsync(this.CanisterId, "deleteTestQuestActionStateForUser", arg);
-			return reply.ToObjects<Models.Result9>(this.Converter);
+			return reply.ToObjects<Models.Result10>(this.Converter);
 		}
 
 		public async Task DeleteUser(WorldApiClient.DeleteUserArg0 arg0)
 		{
 			CandidArg arg = CandidArg.FromCandid(CandidTypedValue.FromObject(arg0, this.Converter));
 			await this.Agent.CallAndWaitAsync(this.CanisterId, "deleteUser", arg);
+		}
+
+		public async Task<Models.Result2> DisburseBOOMStake()
+		{
+			CandidArg arg = CandidArg.FromCandid();
+			CandidArg reply = await this.Agent.CallAndWaitAsync(this.CanisterId, "disburseBOOMStake", arg);
+			return reply.ToObjects<Models.Result2>(this.Converter);
+		}
+
+		public async Task<Models.Result2> DisburseExtNft(string arg0, uint arg1)
+		{
+			CandidArg arg = CandidArg.FromCandid(CandidTypedValue.FromObject(arg0, this.Converter), CandidTypedValue.FromObject(arg1, this.Converter));
+			CandidArg reply = await this.Agent.CallAndWaitAsync(this.CanisterId, "disburseExtNft", arg);
+			return reply.ToObjects<Models.Result2>(this.Converter);
+		}
+
+		public async Task<Models.Result2> DissolveBoomStake()
+		{
+			CandidArg arg = CandidArg.FromCandid();
+			CandidArg reply = await this.Agent.CallAndWaitAsync(this.CanisterId, "dissolveBoomStake", arg);
+			return reply.ToObjects<Models.Result2>(this.Converter);
+		}
+
+		public async Task<Models.Result2> DissolveExtNft(string arg0, uint arg1)
+		{
+			CandidArg arg = CandidArg.FromCandid(CandidTypedValue.FromObject(arg0, this.Converter), CandidTypedValue.FromObject(arg1, this.Converter));
+			CandidArg reply = await this.Agent.CallAndWaitAsync(this.CanisterId, "dissolveExtNft", arg);
+			return reply.ToObjects<Models.Result2>(this.Converter);
 		}
 
 		public async Task<Models.Action> EditAction(WorldApiClient.EditActionArg0 arg0)
@@ -218,19 +239,19 @@ namespace Candid.World
 			return reply.ToObjects<List<Models.StableConfig>>(this.Converter);
 		}
 
-		public async Task<Models.Result8> GetActionHistory(WorldApiClient.GetActionHistoryArg0 arg0)
+		public async Task<Models.Result9> GetActionHistory(WorldApiClient.GetActionHistoryArg0 arg0)
 		{
 			CandidArg arg = CandidArg.FromCandid(CandidTypedValue.FromObject(arg0, this.Converter));
 			CandidArg reply = await this.Agent.CallAndWaitAsync(this.CanisterId, "getActionHistory", arg);
-			return reply.ToObjects<Models.Result8>(this.Converter);
+			return reply.ToObjects<Models.Result9>(this.Converter);
 		}
 
-		public async Task<Models.Result8> GetActionHistoryComposite(WorldApiClient.GetActionHistoryCompositeArg0 arg0)
+		public async Task<Models.Result9> GetActionHistoryComposite(WorldApiClient.GetActionHistoryCompositeArg0 arg0)
 		{
 			CandidArg arg = CandidArg.FromCandid(CandidTypedValue.FromObject(arg0, this.Converter));
 			QueryResponse response = await this.Agent.QueryAsync(this.CanisterId, "getActionHistoryComposite", arg);
 			CandidArg reply = response.ThrowOrGetReply();
-			return reply.ToObjects<Models.Result8>(this.Converter);
+			return reply.ToObjects<Models.Result9>(this.Converter);
 		}
 
 		public async Task<bool> GetActionLockState(Models.ActionLockStateArgs arg0)
@@ -241,12 +262,12 @@ namespace Candid.World
 			return reply.ToObjects<bool>(this.Converter);
 		}
 
-		public async Task<Models.Result7> GetActionStatusComposite(WorldApiClient.GetActionStatusCompositeArg0 arg0)
+		public async Task<Models.Result8> GetActionStatusComposite(WorldApiClient.GetActionStatusCompositeArg0 arg0)
 		{
 			CandidArg arg = CandidArg.FromCandid(CandidTypedValue.FromObject(arg0, this.Converter));
 			QueryResponse response = await this.Agent.QueryAsync(this.CanisterId, "getActionStatusComposite", arg);
 			CandidArg reply = response.ThrowOrGetReply();
-			return reply.ToObjects<Models.Result7>(this.Converter);
+			return reply.ToObjects<Models.Result8>(this.Converter);
 		}
 
 		public async Task<List<Models.Action>> GetAllActions()
@@ -265,19 +286,19 @@ namespace Candid.World
 			return reply.ToObjects<List<Models.StableConfig>>(this.Converter);
 		}
 
-		public async Task<Models.Result6> GetAllUserActionStates(WorldApiClient.GetAllUserActionStatesArg0 arg0)
+		public async Task<Models.Result7> GetAllUserActionStates(WorldApiClient.GetAllUserActionStatesArg0 arg0)
 		{
 			CandidArg arg = CandidArg.FromCandid(CandidTypedValue.FromObject(arg0, this.Converter));
 			CandidArg reply = await this.Agent.CallAndWaitAsync(this.CanisterId, "getAllUserActionStates", arg);
-			return reply.ToObjects<Models.Result6>(this.Converter);
+			return reply.ToObjects<Models.Result7>(this.Converter);
 		}
 
-		public async Task<Models.Result6> GetAllUserActionStatesComposite(WorldApiClient.GetAllUserActionStatesCompositeArg0 arg0)
+		public async Task<Models.Result7> GetAllUserActionStatesComposite(WorldApiClient.GetAllUserActionStatesCompositeArg0 arg0)
 		{
 			CandidArg arg = CandidArg.FromCandid(CandidTypedValue.FromObject(arg0, this.Converter));
 			QueryResponse response = await this.Agent.QueryAsync(this.CanisterId, "getAllUserActionStatesComposite", arg);
 			CandidArg reply = response.ThrowOrGetReply();
-			return reply.ToObjects<Models.Result6>(this.Converter);
+			return reply.ToObjects<Models.Result7>(this.Converter);
 		}
 
 		public async Task<Models.Result5> GetAllUserEntities(WorldApiClient.GetAllUserEntitiesArg0 arg0)
@@ -293,6 +314,14 @@ namespace Candid.World
 			QueryResponse response = await this.Agent.QueryAsync(this.CanisterId, "getAllUserEntitiesComposite", arg);
 			CandidArg reply = response.ThrowOrGetReply();
 			return reply.ToObjects<Models.Result5>(this.Converter);
+		}
+
+		public async Task<UnboundedUInt> GetCurrentDauCount()
+		{
+			CandidArg arg = CandidArg.FromCandid();
+			QueryResponse response = await this.Agent.QueryAsync(this.CanisterId, "getCurrentDauCount", arg);
+			CandidArg reply = response.ThrowOrGetReply();
+			return reply.ToObjects<UnboundedUInt>(this.Converter);
 		}
 
 		public async Task<Dictionary<string, Dictionary<string, Models.EntityPermission>>> GetEntityPermissionsOfWorld()
@@ -325,6 +354,30 @@ namespace Candid.World
 			return reply.ToObjects<UnboundedUInt>(this.Converter);
 		}
 
+		public async Task<uint> GetTokenIndex(string arg0)
+		{
+			CandidArg arg = CandidArg.FromCandid(CandidTypedValue.FromObject(arg0, this.Converter));
+			QueryResponse response = await this.Agent.QueryAsync(this.CanisterId, "getTokenIndex", arg);
+			CandidArg reply = response.ThrowOrGetReply();
+			return reply.ToObjects<uint>(this.Converter);
+		}
+
+		public async Task<Models.Result6> GetUserBoomStakeInfo(string arg0)
+		{
+			CandidArg arg = CandidArg.FromCandid(CandidTypedValue.FromObject(arg0, this.Converter));
+			QueryResponse response = await this.Agent.QueryAsync(this.CanisterId, "getUserBoomStakeInfo", arg);
+			CandidArg reply = response.ThrowOrGetReply();
+			return reply.ToObjects<Models.Result6>(this.Converter);
+		}
+
+		public async Task<Models.Result2> GetUserBoomStakeTier(string arg0)
+		{
+			CandidArg arg = CandidArg.FromCandid(CandidTypedValue.FromObject(arg0, this.Converter));
+			QueryResponse response = await this.Agent.QueryAsync(this.CanisterId, "getUserBoomStakeTier", arg);
+			CandidArg reply = response.ThrowOrGetReply();
+			return reply.ToObjects<Models.Result2>(this.Converter);
+		}
+
 		public async Task<Models.Result5> GetUserEntitiesFromWorldNodeComposite(WorldApiClient.GetUserEntitiesFromWorldNodeCompositeArg0 arg0)
 		{
 			CandidArg arg = CandidArg.FromCandid(CandidTypedValue.FromObject(arg0, this.Converter));
@@ -339,6 +392,30 @@ namespace Candid.World
 			QueryResponse response = await this.Agent.QueryAsync(this.CanisterId, "getUserEntitiesFromWorldNodeFilteredSortingComposite", arg);
 			CandidArg reply = response.ThrowOrGetReply();
 			return reply.ToObjects<Models.Result5>(this.Converter);
+		}
+
+		public async Task<Dictionary<string, string>> GetUserExtStakes(string arg0)
+		{
+			CandidArg arg = CandidArg.FromCandid(CandidTypedValue.FromObject(arg0, this.Converter));
+			QueryResponse response = await this.Agent.QueryAsync(this.CanisterId, "getUserExtStakes", arg);
+			CandidArg reply = response.ThrowOrGetReply();
+			return reply.ToObjects<Dictionary<string, string>>(this.Converter);
+		}
+
+		public async Task<Dictionary<string, Models.EXTStake>> GetUserExtStakesInfo(string arg0)
+		{
+			CandidArg arg = CandidArg.FromCandid(CandidTypedValue.FromObject(arg0, this.Converter));
+			QueryResponse response = await this.Agent.QueryAsync(this.CanisterId, "getUserExtStakesInfo", arg);
+			CandidArg reply = response.ThrowOrGetReply();
+			return reply.ToObjects<Dictionary<string, Models.EXTStake>>(this.Converter);
+		}
+
+		public async Task<List<string>> GetUserSpecificExtStakes(WorldApiClient.GetUserSpecificExtStakesArg0 arg0)
+		{
+			CandidArg arg = CandidArg.FromCandid(CandidTypedValue.FromObject(arg0, this.Converter));
+			QueryResponse response = await this.Agent.QueryAsync(this.CanisterId, "getUserSpecificExtStakes", arg);
+			CandidArg reply = response.ThrowOrGetReply();
+			return reply.ToObjects<List<string>>(this.Converter);
 		}
 
 		public async Task<List<string>> GetTrustedOrigins()
@@ -360,32 +437,32 @@ namespace Candid.World
 			await this.Agent.CallAndWaitAsync(this.CanisterId, "grantGlobalPermission", arg);
 		}
 
-		public async Task<Models.Result4> ImportAllActionsOfWorld(WorldApiClient.ImportAllActionsOfWorldArg0 arg0)
+		public async Task<Models.Result2> ImportAllActionsOfWorld(WorldApiClient.ImportAllActionsOfWorldArg0 arg0)
 		{
 			CandidArg arg = CandidArg.FromCandid(CandidTypedValue.FromObject(arg0, this.Converter));
 			CandidArg reply = await this.Agent.CallAndWaitAsync(this.CanisterId, "importAllActionsOfWorld", arg);
-			return reply.ToObjects<Models.Result4>(this.Converter);
+			return reply.ToObjects<Models.Result2>(this.Converter);
 		}
 
-		public async Task<Models.Result4> ImportAllConfigsOfWorld(WorldApiClient.ImportAllConfigsOfWorldArg0 arg0)
+		public async Task<Models.Result2> ImportAllConfigsOfWorld(WorldApiClient.ImportAllConfigsOfWorldArg0 arg0)
 		{
 			CandidArg arg = CandidArg.FromCandid(CandidTypedValue.FromObject(arg0, this.Converter));
 			CandidArg reply = await this.Agent.CallAndWaitAsync(this.CanisterId, "importAllConfigsOfWorld", arg);
-			return reply.ToObjects<Models.Result4>(this.Converter);
+			return reply.ToObjects<Models.Result2>(this.Converter);
 		}
 
-		public async Task<Models.Result4> ImportAllPermissionsOfWorld(WorldApiClient.ImportAllPermissionsOfWorldArg0 arg0)
+		public async Task<Models.Result2> ImportAllPermissionsOfWorld(WorldApiClient.ImportAllPermissionsOfWorldArg0 arg0)
 		{
 			CandidArg arg = CandidArg.FromCandid(CandidTypedValue.FromObject(arg0, this.Converter));
 			CandidArg reply = await this.Agent.CallAndWaitAsync(this.CanisterId, "importAllPermissionsOfWorld", arg);
-			return reply.ToObjects<Models.Result4>(this.Converter);
+			return reply.ToObjects<Models.Result2>(this.Converter);
 		}
 
-		public async Task<Models.Result4> ImportAllUsersDataOfWorld(WorldApiClient.ImportAllUsersDataOfWorldArg0 arg0)
+		public async Task<Models.Result2> ImportAllUsersDataOfWorld(WorldApiClient.ImportAllUsersDataOfWorldArg0 arg0)
 		{
 			CandidArg arg = CandidArg.FromCandid(CandidTypedValue.FromObject(arg0, this.Converter));
 			CandidArg reply = await this.Agent.CallAndWaitAsync(this.CanisterId, "importAllUsersDataOfWorld", arg);
-			return reply.ToObjects<Models.Result4>(this.Converter);
+			return reply.ToObjects<Models.Result2>(this.Converter);
 		}
 
 		public async Task LogsClear()
@@ -410,18 +487,18 @@ namespace Candid.World
 			return reply.ToObjects<UnboundedUInt>(this.Converter);
 		}
 
-		public async Task<Models.Result3> ProcessAction(Models.ActionArg arg0)
+		public async Task<Models.Result4> ProcessAction(Models.ActionArg arg0)
 		{
 			CandidArg arg = CandidArg.FromCandid(CandidTypedValue.FromObject(arg0, this.Converter));
 			CandidArg reply = await this.Agent.CallAndWaitAsync(this.CanisterId, "processAction", arg);
-			return reply.ToObjects<Models.Result3>(this.Converter);
+			return reply.ToObjects<Models.Result4>(this.Converter);
 		}
 
-		public async Task<Models.Result3> ProcessActionAwait(Models.ActionArg arg0)
+		public async Task<Models.Result4> ProcessActionAwait(Models.ActionArg arg0)
 		{
 			CandidArg arg = CandidArg.FromCandid(CandidTypedValue.FromObject(arg0, this.Converter));
 			CandidArg reply = await this.Agent.CallAndWaitAsync(this.CanisterId, "processActionAwait", arg);
-			return reply.ToObjects<Models.Result3>(this.Converter);
+			return reply.ToObjects<Models.Result4>(this.Converter);
 		}
 
 		public async Task ProcessActionForAllUsers(Models.ActionArg arg0)
@@ -460,11 +537,38 @@ namespace Candid.World
 			await this.Agent.CallAndWaitAsync(this.CanisterId, "removeTrustedOrigins", arg);
 		}
 
-		public async Task<Models.Result2> ResetActionsAndConfigsToHardcodedTemplate()
+		public async Task<Models.Result3> ResetActionsAndConfigsToHardcodedTemplate()
 		{
 			CandidArg arg = CandidArg.FromCandid();
 			CandidArg reply = await this.Agent.CallAndWaitAsync(this.CanisterId, "resetActionsAndConfigsToHardcodedTemplate", arg);
+			return reply.ToObjects<Models.Result3>(this.Converter);
+		}
+
+		public async Task SetDevWorldCanisterId(string arg0)
+		{
+			CandidArg arg = CandidArg.FromCandid(CandidTypedValue.FromObject(arg0, this.Converter));
+			await this.Agent.CallAndWaitAsync(this.CanisterId, "setDevWorldCanisterId", arg);
+		}
+
+		public async Task<Models.Result2> StakeBoomTokens(UnboundedUInt arg0, string arg1, string arg2, UnboundedUInt arg3, Models.ICRCStakeKind arg4)
+		{
+			CandidArg arg = CandidArg.FromCandid(CandidTypedValue.FromObject(arg0, this.Converter), CandidTypedValue.FromObject(arg1, this.Converter), CandidTypedValue.FromObject(arg2, this.Converter), CandidTypedValue.FromObject(arg3, this.Converter), CandidTypedValue.FromObject(arg4, this.Converter));
+			CandidArg reply = await this.Agent.CallAndWaitAsync(this.CanisterId, "stakeBoomTokens", arg);
 			return reply.ToObjects<Models.Result2>(this.Converter);
+		}
+
+		public async Task<Models.Result2> StakeExtNft(uint arg0, string arg1, string arg2, string arg3)
+		{
+			CandidArg arg = CandidArg.FromCandid(CandidTypedValue.FromObject(arg0, this.Converter), CandidTypedValue.FromObject(arg1, this.Converter), CandidTypedValue.FromObject(arg2, this.Converter), CandidTypedValue.FromObject(arg3, this.Converter));
+			CandidArg reply = await this.Agent.CallAndWaitAsync(this.CanisterId, "stakeExtNft", arg);
+			return reply.ToObjects<Models.Result2>(this.Converter);
+		}
+
+		public async Task<UnboundedUInt> StoreDauCount()
+		{
+			CandidArg arg = CandidArg.FromCandid();
+			CandidArg reply = await this.Agent.CallAndWaitAsync(this.CanisterId, "storeDauCount", arg);
+			return reply.ToObjects<UnboundedUInt>(this.Converter);
 		}
 
 		public async Task<WorldApiClient.ValidateConstraintsReturnArg0> ValidateConstraints(string arg0, ActionId arg1, OptionalValue<Models.ActionConstraint> arg2)
@@ -949,6 +1053,25 @@ namespace Candid.World
 			{
 				Ascending,
 				Descending
+			}
+		}
+
+		public class GetUserSpecificExtStakesArg0
+		{
+			[CandidName("collectionCanisterId")]
+			public string CollectionCanisterId { get; set; }
+
+			[CandidName("uid")]
+			public string Uid { get; set; }
+
+			public GetUserSpecificExtStakesArg0(string collectionCanisterId, string uid)
+			{
+				this.CollectionCanisterId = collectionCanisterId;
+				this.Uid = uid;
+			}
+
+			public GetUserSpecificExtStakesArg0()
+			{
 			}
 		}
 

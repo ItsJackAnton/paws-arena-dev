@@ -643,7 +643,6 @@ namespace Boom
 
     }
 
-
     public static class PossibleOutcomeTypes
     {
         public abstract class Base
@@ -1089,6 +1088,15 @@ namespace Boom
                 this.canisterIds = canisterIds;
             }
         }
+
+        //
+        internal class StakedNftCollections : Base
+        {
+            public StakedNftCollections() : base("self") { }
+            public StakedNftCollections(params string[] usersUid) : base(usersUid)
+            {
+            }
+        }
     }
 
     public static class DataTypes
@@ -1139,6 +1147,38 @@ namespace Boom
             public override string GetKey()
             {
                 return $"{wid}{eid}";
+            }
+        }
+
+        [Preserve]
+        [Serializable]
+        public class Badge : Base
+        {
+            [Preserve] public string wid;
+            [Preserve] public string eid;
+            [Preserve] public Dictionary<string, string> fields;
+
+            public Badge(string wid, string eid, Dictionary<string, string> fields)
+            {
+                this.wid = string.IsNullOrEmpty(wid) ? BoomManager.Instance.WORLD_CANISTER_ID : wid;
+                this.eid = eid;
+                this.fields = fields;
+            }
+            public Badge(string wid, Candid.World.Models.StableEntity entity)
+            {
+                this.wid = wid;
+                this.eid = entity.Eid;
+                this.fields = new();
+
+                foreach (var field in entity.Fields)
+                {
+                    fields.Add(field.FieldName, field.FieldValue);
+                }
+            }
+
+            public override string GetKey()
+            {
+                return $"{eid}";
             }
         }
 
@@ -1217,6 +1257,48 @@ namespace Boom
             [Preserve] public List<Nft> tokens = new();
 
             public NftCollection(string canister)
+            {
+                this.canisterId = canister;
+            }
+
+            public override string GetKey()
+            {
+                return canisterId;
+            }
+        }
+
+        //
+
+        [Preserve]
+        [Serializable]
+        public class StakedNftCollections : Base
+        {
+            [Preserve]
+            [Serializable]
+            public class Nft
+            {
+                [Preserve] public string canister;
+                [Preserve] public uint index;
+                [Preserve] public string tokenIdentifier;
+                public string url;
+                [Preserve] public string metadata;
+
+                public Nft(string canister, uint index, string tokenIdentifier, string url, string metadata)
+                {
+                    this.canister = canister;
+                    this.index = index;
+                    this.tokenIdentifier = tokenIdentifier;
+                    this.url = url;
+                    this.metadata = metadata;
+                }
+            }
+
+            [Preserve] public string canisterId;
+
+
+            [Preserve] public List<Nft> tokens = new();
+
+            public StakedNftCollections(string canister)
             {
                 this.canisterId = canister;
             }
@@ -1410,6 +1492,8 @@ namespace Boom
             public State state;
             public long updateTs;
             public bool isEmbeddedAgent;
+            public string tier;
+
             public LoginData()
             {
                 this.state = State.None;
@@ -1433,8 +1517,9 @@ namespace Boom
                 updateTs = MainUtil.Now();
 
                 this.isEmbeddedAgent = isEmbeddedAgent;
+                this.tier = loginData.tier;
             }
-            public LoginData(IAgent agent, string principal, string accountIdentifier, State state, bool isEmbeddedAgent)
+            public LoginData(IAgent agent, string principal, string accountIdentifier, State state, bool isEmbeddedAgent, string tier)
             {
                 this.agent = agent;
                 this.principal = principal;
@@ -1442,6 +1527,7 @@ namespace Boom
                 this.state = state;
                 updateTs = MainUtil.Now();
                 this.isEmbeddedAgent = isEmbeddedAgent;
+                this.tier = tier;
             }
         }
 

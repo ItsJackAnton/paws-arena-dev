@@ -398,12 +398,12 @@ namespace Boom.Tutorials
 
             Log("User's quest states has been loaded");
 
-            if (isQuestCompleted_1.Tag == Result7Tag.Err)
+            if (isQuestCompleted_1.Tag == Result8Tag.Err)
             {
                 LogError(isQuestCompleted_1.AsErr());
                 return;
             }
-            if (isQuestCompleted_2.Tag == Result7Tag.Err)
+            if (isQuestCompleted_2.Tag == Result8Tag.Err)
             {
                 LogError(isQuestCompleted_2.AsErr());
                 return;
@@ -603,7 +603,7 @@ namespace Boom.Tutorials
 
                 var importActionsResult = await world.ImportAllActionsOfWorld(new WorldApiClient.ImportAllActionsOfWorldArg0(optionalReferenceWorldId));
 
-                if (importActionsResult.Tag == Result4Tag.Err)
+                if (importActionsResult.Tag == Result2Tag.Err)
                 {
                     LogError(importActionsResult.AsErr());
                 }
@@ -612,7 +612,7 @@ namespace Boom.Tutorials
 
                 var importConfigsResult = await world.ImportAllConfigsOfWorld(new WorldApiClient.ImportAllConfigsOfWorldArg0(optionalReferenceWorldId));
 
-                if (importConfigsResult.Tag == Result4Tag.Err)
+                if (importConfigsResult.Tag == Result2Tag.Err)
                 {
                    LogError(importConfigsResult.AsErr());
                 }
@@ -684,7 +684,7 @@ namespace Boom.Tutorials
 
             var createQuestsResult =  await gamingGuildWorld.CreateTestQuestActions(new(questId_1, questId_2, boomSettings.WorldId));
 
-            if(createQuestsResult.Tag == Result4Tag.Err)
+            if(createQuestsResult.Tag == Result2Tag.Err)
             {
                 LogError(createQuestsResult.AsErr());
                 createGuildQuestsButton.interactable = true;
@@ -728,9 +728,9 @@ namespace Boom.Tutorials
 
             Log("Executing \"match_won\" action");
             var actionResult = await deployedWorld.ProcessAction(new ActionArg("match_won", new()));
-            Log($"\"match_won\" action has been executed. Result: {(actionResult.Tag == Result3Tag.Ok ? "success" : "failure")}");
+            Log($"\"match_won\" action has been executed. Result: {(actionResult.Tag == Result4Tag.Ok ? "success" : "failure")}");
 
-            if (actionResult.Tag == Result3Tag.Err)
+            if (actionResult.Tag == Result4Tag.Err)
             {
                 winButton.interactable = true;
                 loseButton.interactable = true;
@@ -769,9 +769,9 @@ namespace Boom.Tutorials
 
             Log("Executing \"match_lost\" action");
             var actionResult = await deployedWorld.ProcessAction(new ActionArg("match_lost", new()));
-            Log($"\"match_lost\" action has been executed. Result: {(actionResult.Tag == Result3Tag.Ok ? "success" : "failure")}");
+            Log($"\"match_lost\" action has been executed. Result: {(actionResult.Tag == Result4Tag.Ok ? "success" : "failure")}");
 
-            if (actionResult.Tag == Result3Tag.Err)
+            if (actionResult.Tag == Result4Tag.Err)
             {
                 winButton.interactable = true;
                 loseButton.interactable = true;

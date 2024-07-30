@@ -11,6 +11,7 @@ namespace Boom
     using Newtonsoft.Json;
     using Boom.Patterns.Broadcasts;
     using Candid.Extv2Boom;
+    using static Boom.ProcessedActionResponse;
 
 
     //TRANSFER ERROR TYPES
@@ -277,7 +278,9 @@ namespace Boom
 
 
                                             if (allFieldsToEdit != null)
-                                            {                                                
+                                            {
+                                                fieldValue10 = EntityUtil.ReplaceVariables(fieldValue10, worldEntities, callerEntities, targetEntities, configs, args);
+
                                                 if (!allFieldsToEdit.TryAdd(fieldName, new EntityFieldEdit.AddToList((string)fieldValue10)))
                                                 {
                                                     allFieldsToEdit[fieldName] = new EntityFieldEdit.AddToList((string)fieldValue10);
@@ -299,19 +302,23 @@ namespace Boom
 
                                             if (!entityOutcomes.TryGetValue(entityKey, out var entityToEdit11))
                                             {
-                                                entityToEdit10 = new(wid, eid, new());
+                                                entityToEdit11 = new(wid, eid, new());
                                                 entityOutcomes.Add(entityKey, entityToEdit11);
                                             }
 
-                                            if(entityToEdit11 != null)
+                                            if (entityToEdit11 != null)
                                             {
                                                 allFieldsToEdit = entityToEdit11.fields;
 
 
                                                 if (allFieldsToEdit != null)
                                                 {
+                                                    fieldValue11 = EntityUtil.ReplaceVariables(fieldValue11, worldEntities, callerEntities, targetEntities, configs, args);
+
                                                     if (!allFieldsToEdit.TryAdd(fieldName, new EntityFieldEdit.RemoveFromList((string)fieldValue11)))
                                                     {
+                                                        UnityEngine.Debug.Log($"Remove E");
+
                                                         allFieldsToEdit[fieldName] = new EntityFieldEdit.RemoveFromList((string)fieldValue11);
                                                     }
                                                 }
@@ -612,7 +619,7 @@ namespace Boom
             var result = await BoomManager.Instance.GuildApiClient.GetActionStatusComposite(new Candid.World.WorldApiClient.GetActionStatusCompositeArg0(questActionId, loginData.principal));
 
 
-            if (result.Tag == Result7Tag.Err) return new(result.AsErr());
+            if (result.Tag == Result8Tag.Err) return new(result.AsErr());
 
             return new(result.AsOk().IsValid);
         }
@@ -983,10 +990,10 @@ namespace Boom
 
 
             //Execute Action
-            Result3 actionResponse = await BoomManager.Instance.WorldApiClient.ProcessAction(new ActionArg(actionId, args));
+            Result4 actionResponse = await BoomManager.Instance.WorldApiClient.ProcessAction(new ActionArg(actionId, args));
 
 
-            if (actionResponse.Tag == Result3Tag.Err)
+            if (actionResponse.Tag == Result4Tag.Err)
             {
                 //Reset action state to prev state
                 //TODO: MUST HANDLE REDO FOR WORLD AND TARGET AS WELL
@@ -1007,6 +1014,8 @@ namespace Boom
 
 
             var formulaDep = EntityUtil.GetFormulaDependencies(actionResponseAsOk);
+
+            $"Action Response: {JsonConvert.SerializeObject(actionResponseAsOk)}".Log(typeof(EntityUtil).Name);
 
             ProcessedActionResponse processedActionResponse = new(actionResponseAsOk, formulaDep.worldEntities, formulaDep.callerEntities, formulaDep.targetEntities, formulaDep.configs, args);
 
