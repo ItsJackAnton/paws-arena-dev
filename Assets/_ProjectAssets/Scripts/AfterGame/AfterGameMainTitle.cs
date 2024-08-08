@@ -130,7 +130,9 @@ namespace com.colorfulcoding.AfterGame
                 BoomDaoUtility.Instance.ExecuteActionWithParameter(SET_LEADERBOARD_POINTS, _parameters,null);
                 _parameters = new List<ActionParameter>()
                 {
-                    new() { Key = "IncreaseAmount", Value = GameState.pointsChange.points.ToString() }
+                    new() { Key = "IncreaseAmount", Value = GameState.pointsChange.points.ToString() },
+                    new() { Key = "GuildPoints", Value = DataManager.Instance.GameData.GuildBattles.IsActive ? GameState.pointsChange.points
+                    .ToString() : 0.ToString() }
                 };
                 BoomDaoUtility.Instance.ExecuteActionWithParameter(INCREASE_LEADERBOARD_POINTS,_parameters,null);
                 

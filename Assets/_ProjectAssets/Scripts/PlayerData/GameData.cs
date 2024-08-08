@@ -36,6 +36,7 @@ public class GameData
     public const string GUILD_HISTORY = "guildHistory";
     public const string GUILD_BATTLES_START = "guildBattlesStart";
     public const string GUILD_BATTLES_END = "guildBattlesEnd";
+    public const string GUILD_BATTLES_REVIEW = "guildBattlesReview";
     public const string GUILD_BATTLE_ID = "GuildBattleId";
     public const string GUILD_BATTLES_GUILD1 = "Guild1";
     public const string GUILD_BATTLES_GUILD2 = "Guild2";
@@ -522,9 +523,11 @@ public class GameData
             List<ConfigData> _config =BoomDaoUtility.Instance.GetConfigData(GUILD_BATTLES);
             string _startingDate = _config.Find(_configField => _configField.Name == GUILD_BATTLES_START).Value;
             string _endingDate = _config.Find(_configField => _configField.Name == GUILD_BATTLES_END).Value;
+            string _reviewDate = _config.Find(_configField => _configField.Name == GUILD_BATTLES_REVIEW).Value;
             
             _guildBattles.StartingDate = Utilities.NanosecondsToDateTime(BoomDaoUtility.Instance.ConvertToDouble(_startingDate));
             _guildBattles.EndingDate = Utilities.NanosecondsToDateTime(BoomDaoUtility.Instance.ConvertToDouble(_endingDate));
+            _guildBattles.ReviewDate = Utilities.NanosecondsToDateTime(BoomDaoUtility.Instance.ConvertToDouble(_reviewDate));
 
             return _guildBattles;
         }

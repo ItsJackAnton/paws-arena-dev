@@ -32,8 +32,11 @@ public class GuildBattlesPanel : MonoBehaviour
         peaceHolder.SetActive(false);
         if (!DataManager.Instance.GameData.GuildBattles.IsActive)
         {
-            peaceHolder.SetActive(true);
-            return;
+            if (!DataManager.Instance.GameData.GuildBattles.IsReviewDate)
+            {
+                peaceHolder.SetActive(true);
+                return;
+            }
         }
         
         battleHolder.SetActive(true);

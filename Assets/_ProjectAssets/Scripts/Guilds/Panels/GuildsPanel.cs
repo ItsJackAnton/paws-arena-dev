@@ -85,9 +85,12 @@ public class GuildsPanel : MonoBehaviour
 
       if (!DataManager.Instance.GameData.GuildBattles.IsActive)
       {
-         ShowMessage("There is a peace among kingdoms!");
-         ShowMyGuild();
-         return;
+         if (!DataManager.Instance.GameData.GuildBattles.IsReviewDate)
+         {
+            ShowMessage("There is a peace among kingdoms!");
+            ShowMyGuild();
+            return;
+         }
       }
       
       guildBattles.Setup();

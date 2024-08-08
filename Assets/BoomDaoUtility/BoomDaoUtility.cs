@@ -40,6 +40,7 @@ namespace BoomDaoWrapper
 
         private void Awake()
         {
+        Debug.Log("------ Latest version!!!");
             if (Instance == null)
             {
                 Instance = this;
