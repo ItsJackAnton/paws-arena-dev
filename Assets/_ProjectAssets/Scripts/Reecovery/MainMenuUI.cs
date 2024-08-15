@@ -21,6 +21,7 @@ public class MainMenuUI : MonoBehaviour
     [SerializeField] private Button tutorialButton;
     [SerializeField] private Button guildsButton;
     [SerializeField] private GameObject generatingChallenges;
+    [SerializeField] private ShowProfilePicture profilePicture;
 
     private void OnEnable()
     {
@@ -79,14 +80,6 @@ public class MainMenuUI : MonoBehaviour
     {
         levelProgressDisplay.fillAmount = DataManager.Instance.PlayerData.ExperienceOnCurrentLevel / (float)DataManager.Instance.PlayerData.ExperienceForNextLevel;
         levelDisplay.text = DataManager.Instance.PlayerData.Level.ToString();
-    }
-
-    private void Start()
-    {
-        if (GameState.selectedNFT == null)
-        {
-            SceneManager.Instance.LoadNftSelection();
-        }
     }
 
     private void JoinRoom()

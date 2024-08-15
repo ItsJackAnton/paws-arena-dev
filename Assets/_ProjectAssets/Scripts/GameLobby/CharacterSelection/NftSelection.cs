@@ -83,7 +83,7 @@ public class NftSelection : MonoBehaviour
             }
             return;
         }
-
+        
         SceneManager.Instance.LoadMainMenu();
     }
 
@@ -161,7 +161,7 @@ public class NftSelection : MonoBehaviour
             _tasks.Add(_nft.GrabImage());
             _idx++;
         }
-
+        
         for (int _i = currentNfts.Count; _i < 9; _i++)
         {
             GameObject _go = Instantiate(nftButtonPrefab, nftButtonsParent);

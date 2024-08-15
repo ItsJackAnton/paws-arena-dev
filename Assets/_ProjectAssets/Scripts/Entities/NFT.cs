@@ -12,6 +12,8 @@ public class NFT
     public Texture2D imageTex;
     private XmlDocument doc;
     private DateTime recoveryEndDate;
+    public Sprite Sprite;
+    public Sprite Avatar;
 
     public bool CanFight => RecoveryEndDate < DateTime.UtcNow;
     public bool IsDefaultKitty => imageUrl == ConnectingToServer.DEFAULT_KITTY;
@@ -34,7 +36,7 @@ public class NFT
         }
     }
 
-    public async UniTask GrabImage()
+    public async UniTask GrabImage(Action _callBack=null)
     {
         doc = await NFTImageLoader.LoadSVGXML(imageUrl);
         if (imageTex == null)
@@ -50,5 +52,12 @@ public class NFT
         {
             ids = NFTImageLoader.GetIds(doc);
         }
+
+        if (imageTex)
+        {
+            Sprite = Utilities.TextureToSprite(imageTex);
+            Avatar = Utilities.ConvertTextureToProfileSprite(imageTex,new Vector2Int(35, 30),50);
+        }
+        _callBack?.Invoke();
     }
 }

@@ -6,7 +6,6 @@ using Boom;
 using Boom.Patterns.Broadcasts;
 using Boom.Values;
 using Candid.World.Models;
-using NaughtyAttributes;
 using UnityEngine;
 using WebSocketSharp;
 using Action = System.Action;

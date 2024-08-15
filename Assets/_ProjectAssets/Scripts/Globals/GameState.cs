@@ -1,7 +1,5 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
 
 public class GameState
 {
@@ -10,7 +8,12 @@ public class GameState
     //NFT
     public static Action<NFT> onSelectedNFT;
     public static string walletId;
-    public static List<NFT> nfts { get; private set; }
+
+    public static List<NFT> nfts
+    {
+        get;
+        private set;
+    }
     public static NFT selectedNFT { get; private set; }
 
     //Settings
@@ -32,7 +35,8 @@ public class GameState
     public static GameResolveState gameResolveState = GameResolveState.DRAW;
     internal static LeaderboardPostResponseEntity pointsChange;
 
-    static GameState(){
+    static GameState()
+    {
         nfts = new List<NFT>();
         gameSettings = GameSettings.Default();
     }
@@ -43,5 +47,4 @@ public class GameState
         selectedNFT = nft;
         onSelectedNFT?.Invoke(nft);
     }
-
 }

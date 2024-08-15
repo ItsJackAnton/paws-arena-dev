@@ -33,6 +33,7 @@ public class GameData
 
     public const string GUILD_BATTLES = "guildBattles";
     public const string GUILD_BATTLE_POINTS = "guildBattlePoints";
+    public const string KITTY_AVATAR = "kittyAvatar";
     public const string GUILD_HISTORY = "guildHistory";
     public const string GUILD_BATTLES_START = "guildBattlesStart";
     public const string GUILD_BATTLES_END = "guildBattlesEnd";
@@ -291,6 +292,29 @@ public class GameData
         
         
         return _recoveryDate > DateTime.UtcNow;
+    }
+
+    public string GetAvatarUrl()
+    {
+        List<WorldDataEntry> _kittyAvatars = BoomDaoUtility.Instance.GetWorldData(KITTY_AVATAR);
+        if (_kittyAvatars == null)
+        {
+            return string.Empty;
+        }
+
+        string _avatarUrl = string.Empty;
+
+        foreach (var _kittyAvatar in _kittyAvatars)
+        {
+            if (_kittyAvatar.PrincipalId != BoomDaoUtility.Instance.UserPrincipal)
+            {
+                continue;
+            }
+
+            return _kittyAvatar.GetProperty(KITTY_AVATAR);
+        }
+
+        return _avatarUrl;
     }
 
     private string GetKittyRecoveryString(string _kittyId)

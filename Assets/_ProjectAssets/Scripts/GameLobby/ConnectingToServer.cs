@@ -85,7 +85,9 @@ public class ConnectingToServer : MonoBehaviour
             
             foreach (var _token in _collection.tokens)
             {
-                GameState.nfts.Add(new NFT { imageUrl = _token.url });
+                var _nft = new NFT { imageUrl = _token.url };
+                _nft.GrabImage();
+                GameState.nfts.Add(_nft);
             }
             break;
         }
