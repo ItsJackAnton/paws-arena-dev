@@ -1042,6 +1042,7 @@
                 {
                     try
                     {
+                        Debug.Log(token);
                         operandStack.Push(Convert.ToUInt64(token, EntityUtil.culture));
                     }
                     catch

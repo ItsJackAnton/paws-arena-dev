@@ -42,6 +42,12 @@ public class GuildBattlesPanel : MonoBehaviour
         battleHolder.SetActive(true);
         var _myGuild = DataManager.Instance.PlayerData.Guild;
         var _opponentGuild = DataManager.Instance.PlayerData.Guild.GuildBattle.Opponent;
+        if (_opponentGuild == null)
+        {
+            GuildsPanel.Instance.ShowMyGuild();
+            GuildsPanel.Instance.ShowMessage("Your opponents abandoned the battle field, you win!");
+            return;
+        }
         myGuild.Setup(_myGuild.Badge, _myGuild.Name, _myGuild.GuildBattle.Points(true).ToString(), AssetsManager.Instance.GetKingdomColor(_myGuild
         .Kingdom));
         opponentGuild.Setup(_opponentGuild.Badge, _opponentGuild.Name, _opponentGuild.GuildBattle.Points(false).ToString(), AssetsManager.Instance
@@ -61,6 +67,11 @@ public class GuildBattlesPanel : MonoBehaviour
                     .Principal)));
             }
             if (_playerData==null)
+            {
+                continue;
+            }
+
+            if (_entry.GuildId != _myGuild.Id)
             {
                 continue;
             }

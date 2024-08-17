@@ -150,12 +150,6 @@ public class NFTImageLoader
         }
 
         string rawText = www.downloadHandler.text;
-        if (ConfigurationManager.Instance.GameConfig.enableDevLogs)
-        {
-            Debug.Log("URL: " + URL);
-            Debug.Log("Success: " + rawText);
-        }
-
         return rawText;
     }
 

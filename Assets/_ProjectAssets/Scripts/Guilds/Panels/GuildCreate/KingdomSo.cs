@@ -8,6 +8,8 @@ public class KingdomSo : ScriptableObject
 {
     [field: SerializeField] public Sprite Normal { get; private set; }
     [field: SerializeField]public Sprite Selected{ get; private set; }
+    [field: SerializeField]public Sprite[] Badges { get; private set; }
+    
 
     private static List<KingdomSo> allKingdoms;
     

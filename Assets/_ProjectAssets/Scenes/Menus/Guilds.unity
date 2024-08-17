@@ -679,6 +679,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   kingdomHolder: {fileID: 929533276216763422}
   kingdomPrefab: {fileID: 2349347797030907418, guid: 2eda3fdfc0545254b84099217a6df061, type: 3}
+  badgeSelection: {fileID: 29719888}
 --- !u!1 &550636385
 GameObject:
   m_ObjectHideFlags: 0

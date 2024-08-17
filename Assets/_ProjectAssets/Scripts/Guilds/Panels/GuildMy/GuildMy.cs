@@ -140,13 +140,6 @@ public class GuildMy : MonoBehaviour
 
     private void DeleteGuild(List<ActionOutcome> _outcomes)
     {
-        if (_outcomes.Count==0)
-        {
-            GuildsPanel.Instance.ManageInputBlocker(false);
-            GuildsPanel.Instance.ShowMessage("Something went wrong, please try again later");
-            return;
-        }
-        
         List<ActionParameter> _parameters = new List<ActionParameter>();
         _parameters.Add(new () { Key = GameData.GUILD_ID, Value =  deleteGuildId});
         BoomDaoUtility.Instance.ExecuteActionWithParameter(DELETE_GUILD, _parameters, HandleDeleteGuildFinished);

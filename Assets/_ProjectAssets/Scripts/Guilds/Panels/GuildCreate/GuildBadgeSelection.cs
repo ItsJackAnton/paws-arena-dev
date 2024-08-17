@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -50,8 +51,14 @@ public class GuildBadgeSelection : MonoBehaviour
 
     private void Setup()
     {
-        badges = AssetsManager.Instance.GetChallengeBadgeSprites();
         badgeIndex = 0;
+    }
+
+    public void ShowBadges(KingdomSo _kingdom)
+    {
+        badges = _kingdom.Badges.ToList();
+        badgeIndex = 0;
+        ShowBadge();
     }
 
     private void ShowBadge()

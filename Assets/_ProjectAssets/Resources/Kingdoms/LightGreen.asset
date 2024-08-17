@@ -14,3 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   <Normal>k__BackingField: {fileID: 21300000, guid: 89e0d786f01bb11459042790b126a548, type: 3}
   <Selected>k__BackingField: {fileID: 21300000, guid: 4fb81c3226d2b0f4f9a3a8dd330b5f41, type: 3}
+  <Badges>k__BackingField:
+  - {fileID: 21300000, guid: c992a502f2fa338479c04d1ef1f0d7b1, type: 3}
+  - {fileID: 21300000, guid: 9daa840e88e7d52448c38dde2fb83bbe, type: 3}
+  - {fileID: 21300000, guid: a94bc6df4b363114988fbc8f4b1e4c30, type: 3}

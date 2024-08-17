@@ -535,7 +535,8 @@ public class GameData
                 continue;
             }
             
-            _battle.BattleEntries.Add( new GuildBattleEntry { Principal = _leaderboardEntry.PrincipalId, Points = _leaderboardEntry.GuildBattlePoints });
+            _battle.BattleEntries.Add( new GuildBattleEntry { Principal = _leaderboardEntry.PrincipalId, Points = _leaderboardEntry
+                .GuildBattlePoints, GuildId = _opponentId});
         }
     }
 

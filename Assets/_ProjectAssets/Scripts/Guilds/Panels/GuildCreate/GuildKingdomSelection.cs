@@ -5,6 +5,7 @@ public class GuildKingdomSelection : MonoBehaviour
 {
    [SerializeField] private Transform kingdomHolder;
    [SerializeField] private GuildKingdomDisplay kingdomPrefab;
+   [SerializeField] private GuildBadgeSelection badgeSelection;
 
    private List<GameObject> shownObjects = new();
    private KingdomSo selectedKingdom;
@@ -26,6 +27,7 @@ public class GuildKingdomSelection : MonoBehaviour
    private void SaveSelectedKingdom(KingdomSo _kingdom)
    {
       selectedKingdom = _kingdom;
+      badgeSelection.ShowBadges(selectedKingdom);
    }
 
    private void ShowKingdoms()
@@ -51,6 +53,7 @@ public class GuildKingdomSelection : MonoBehaviour
 
    public void SelectDefault()
    {
-      shownObjects[0].GetComponent<GuildKingdomDisplay>().Select();
+      GuildKingdomDisplay _guildKingdomDisplay= shownObjects[0].GetComponent<GuildKingdomDisplay>();
+      _guildKingdomDisplay.Select();
    }
 }
