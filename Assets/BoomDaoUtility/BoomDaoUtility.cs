@@ -6,6 +6,7 @@ using Boom;
 using Boom.Patterns.Broadcasts;
 using Boom.Values;
 using Candid.World.Models;
+using Newtonsoft.Json;
 using UnityEngine;
 using WebSocketSharp;
 using Action = System.Action;
@@ -39,7 +40,6 @@ namespace BoomDaoWrapper
 
         private void Awake()
         {
-        Debug.Log("------ Latest version!!!");
             if (Instance == null)
             {
                 Instance = this;
@@ -65,7 +65,6 @@ namespace BoomDaoWrapper
             UserUtil.RemoveListenerDataChangeSelf<DataTypes.Entity>(OnEntityDataChangeHandler);
             UserUtil.RemoveListenerDataChangeSelf<DataTypes.Token>(TokenDataChangeHandler);
             
-            Debug.Log("------------ Unsubscribed for login data changes");
             UserUtil.RemoveListenerMainDataChange<MainDataTypes.LoginData>(LoginDataChangeHandler);
         }
 
@@ -254,7 +253,6 @@ namespace BoomDaoWrapper
                 }
                 catch (Exception e)
                 {
-                    Debug.Log($"{_entityId} {_fieldName}, {_valueText}\n"+e);
                     throw;
                 }
             }

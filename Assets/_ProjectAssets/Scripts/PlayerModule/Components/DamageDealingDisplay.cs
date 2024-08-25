@@ -51,11 +51,6 @@ public class DamageDealingDisplay : MonoBehaviour
 
     private void SpawnExperience(int _damageTaken)
     {
-        if (!DataManager.Instance.GameData.IsSeasonActive)
-        {
-            return;
-        }
-
         if (photonView!=null)
         {
             if (photonView.IsMine)
@@ -70,10 +65,15 @@ public class DamageDealingDisplay : MonoBehaviour
                 return;
             }
         }
+        EventsManager.OnGotExperience?.Invoke(_damageTaken);
+        
+        if (!DataManager.Instance.GameData.IsSeasonActive)
+        {
+            return;
+        }
 
         XpEarned += _damageTaken;
         // DataManager.Instance.PlayerData.Experience += _damageTaken;
-        EventsManager.OnGotExperience?.Invoke(_damageTaken);
         EventsManager.OnDealtDamageToOpponent?.Invoke(_damageTaken);
         for (int i = 0; i < _damageTaken; i += 5)
         {

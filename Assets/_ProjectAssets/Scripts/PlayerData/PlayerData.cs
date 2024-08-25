@@ -358,7 +358,8 @@ public class PlayerData
         }
     }
 
-    public int LeaderboardPoints => BoomDaoUtility.Instance.GetInt(LEADERBOARD_POINTS, AMOUNT_KEY);
+    public int LeaderboardPoints => DataManager.Instance.GameData.GetLeaderboard.Entries.Find(_entry => _entry.PrincipalId == BoomDaoUtility
+        .Instance.UserPrincipal).Points;
 
     public string GuildId;
 

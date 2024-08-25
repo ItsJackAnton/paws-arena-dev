@@ -6,6 +6,7 @@ using System.Collections;
 using System.Collections.Generic;
 using BoomDaoWrapper;
 using com.colorfulcoding.AfterGame;
+using Newtonsoft.Json;
 using TMPro;
 using UnityEngine;
 using Random = UnityEngine.Random;
@@ -98,27 +99,7 @@ namespace com.colorfulcoding.GameScene
                 (resp) =>
                 {
                     LeaderboardPostResponseEntity response = JsonUtility.FromJson<LeaderboardPostResponseEntity>(resp);
-                    if (DataManager.Instance.PlayerData.LeaderboardPoints==0)
-                    {
-                        List<ActionParameter> _parameters = new List<ActionParameter>()
-                        {
-                            new() { Key = "IncreaseAmount", Value = response.oldPoints.ToString() }
-                        };
-                        
-                        BoomDaoUtility.Instance.ExecuteActionWithParameter(AfterGameMainTitle.INCREASE_LEADERBOARD_POINTS,_parameters,null);
-                    }
-                    else
-                    {
-                        response.oldPoints = DataManager.Instance.PlayerData.LeaderboardPoints;
-                    }
-
-                    int _oldPoints = response.oldPoints;
-                    int _points = response.points;
-                    response = new LeaderboardPostResponseEntity
-                    {
-                        points = _points, oldPoints = _oldPoints, gameResultType = (int)state, reason = string.Empty
-                    };
-                    
+                    response.oldPoints = DataManager.Instance.PlayerData.LeaderboardPoints;
                     GameState.pointsChange = response;
                 },
                 (err, code) =>

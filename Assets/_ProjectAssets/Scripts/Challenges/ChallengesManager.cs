@@ -294,6 +294,7 @@ public class ChallengesManager : MonoBehaviour
                     EventsManager.OnLostGame += _challengeProgress.IncreaseAmount;
                     break;
                 case ChallengeCategory.DealDamage:
+                    Debug.Log("-------- Subscribed");
                     EventsManager.OnDealtDamageToOpponent += _challengeProgress.IncreaseAmount;
                     break;
                 case ChallengeCategory.UseMilkBottle:

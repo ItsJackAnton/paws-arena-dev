@@ -33,8 +33,6 @@ namespace Candid
             Instance = this;
 
             IsEmbeddedAgent = BrowserUtils.IsIframe();
-            Debug.Log("Is game embedded? " + IsEmbeddedAgent);
-
             UserUtil.AddListenerMainDataChange<MainDataTypes.LoginData>(LoginDataChangeHandler, new() { invokeOnRegistration = true });
         }
 
