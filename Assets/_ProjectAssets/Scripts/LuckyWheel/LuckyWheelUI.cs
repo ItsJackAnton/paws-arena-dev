@@ -5,7 +5,6 @@ using UnityEngine.UI;
 using TMPro;
 using System.Collections.Generic;
 using BoomDaoWrapper;
-using Newtonsoft.Json;
 
 public class LuckyWheelUI : MonoBehaviour
 {

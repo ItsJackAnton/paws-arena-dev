@@ -65,7 +65,9 @@ public class DamageDealingDisplay : MonoBehaviour
                 return;
             }
         }
+        
         EventsManager.OnGotExperience?.Invoke(_damageTaken);
+        EventsManager.OnDealtDamageToOpponent?.Invoke(_damageTaken);
         
         if (!DataManager.Instance.GameData.IsSeasonActive)
         {
@@ -74,7 +76,6 @@ public class DamageDealingDisplay : MonoBehaviour
 
         XpEarned += _damageTaken;
         // DataManager.Instance.PlayerData.Experience += _damageTaken;
-        EventsManager.OnDealtDamageToOpponent?.Invoke(_damageTaken);
         for (int i = 0; i < _damageTaken; i += 5)
         {
             GameObject _experience = Instantiate(experiencePrefab);

@@ -270,6 +270,7 @@ public class ChallengesManager : MonoBehaviour
             }
 
             ChallengeData _challengeData = DataManager.Instance.GameData.GetChallengeByIdentifier(_challengeProgress.Identifier);
+            Debug.Log(_challengeData.Category);
             switch (_challengeData.Category)
             {
                 case ChallengeCategory.WinGame:
@@ -294,7 +295,6 @@ public class ChallengesManager : MonoBehaviour
                     EventsManager.OnLostGame += _challengeProgress.IncreaseAmount;
                     break;
                 case ChallengeCategory.DealDamage:
-                    Debug.Log("-------- Subscribed");
                     EventsManager.OnDealtDamageToOpponent += _challengeProgress.IncreaseAmount;
                     break;
                 case ChallengeCategory.UseMilkBottle:

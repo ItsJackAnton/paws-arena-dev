@@ -1,4 +1,5 @@
 using System;
+using BoomDaoWrapper;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
@@ -8,6 +9,8 @@ public class LuckyWheelClaimDisplay : MonoBehaviour
     [SerializeField] private Button closeButton;
     [SerializeField] private Image iconDisplay;
     [SerializeField] private TextMeshProUGUI nameDisplay;
+    [SerializeField] private GameObject elementumReward; 
+
     private Action callBack;
 
     public void Setup(LuckyWheelRewardSO _reward, Action _callBack)
@@ -37,6 +40,13 @@ public class LuckyWheelClaimDisplay : MonoBehaviour
     private void Close()
     {
         closeButton.interactable = false;
+        if (elementumReward && DataManager.Instance.PlayerData.CanSeeElementumPromotion)
+        {
+            BoomDaoUtility.Instance.ExecuteAction("increaseElementumCounter",null);
+            elementumReward.SetActive(true);
+            return;
+        }
+        
         PUNRoomUtils _roomUtilities= FindObjectOfType<PUNRoomUtils>();
         if (_roomUtilities!=null)
         {
