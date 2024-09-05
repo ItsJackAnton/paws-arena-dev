@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en-us">
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+    <title>ICKitties</title>
+    <link rel="shortcut icon" href="./TemplateData/favicon.ico" />
+    <link rel="stylesheet" href="./TemplateData/style.css" />
+    <script src="https://www.gstatic.com/firebasejs/10.3.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.3.0/firebase-analytics-compat.js"></script>
+    <script src="../JS/firebaseAnalytics.js"></script>
+    <script src="../TemplateData/noble-curves.js"></script>
+</head>
+<body class="dark">
+    <div id="unity-container" class="unity-desktop">
+        <canvas id="unity-canvas" width=1920 height=1080></canvas>
+        <iframe id="loginIframe" src="https://ifxbl-nyaaa-aaaap-abroa-cai.icp0.io/"></iframe>
+    </div>
+    <div id="loading-cover">
+        <div id="unity-loading-bar">
+            <div class="loader-wrapper">
+                <div id="loading-container">
+                    <div id="unity-loader-circle-base"></div>
+                </div>
+                <div id="loader-over-images">
+                    <img src="./TemplateData/powered_by_image.svg"
+                         style="padding-top: 50px" />
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="unity-fullscreen-button" style="display: none"></div>
+    <script>
+        //////custom stuff
+        function ShareImageToTwitter(base64Image, text) {
+            //// save the image to local device
+            var link = document.createElement('a');
+            link.setAttribute('href', 'data:image/png;base64,' + base64Image);
+            link.setAttribute('download', 'PawsArena.png');
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            /////
+
+            ////create tweet
+            let url = `https://twitter.com/intent/tweet?text=${text}`;
+            window.open(url, '_blank');
+            ////
+        }
+        //////end of custom stuff
+        var gameInstance = null;
+
+        const hideFullScreenButton = "true";
+        const buildUrl = "Build";
+        const loaderUrl = buildUrl + "/wasm.loader.js";
+        const config = {
+            dataUrl: buildUrl + "/wasm.data",
+            frameworkUrl: buildUrl + "/wasm.framework.js",
+            codeUrl: buildUrl + "/wasm.wasm",
+            streamingAssetsUrl: "StreamingAssets",
+            companyName: "com.colorfulcoding",
+            productName: "ICKitties",
+            productVersion: "1.0",
+        };
+
+        const container = document.querySelector("#unity-container");
+        const canvas = document.querySelector("#unity-canvas");
+        const loadingCover = document.querySelector("#loading-cover");
+        const fullscreenButton = document.querySelector("#unity-fullscreen-button");
+        const loader = document.getElementById('unity-loader-circle-base');
+
+        const unityLogo = document.getElementById('unity-title-img');
+        const unityImage = document.getElementById('unity-logo-img');
+
+
+        const canFullscreen = (function () {
+            for (const key of [
+                "exitFullscreen",
+                "webkitExitFullscreen",
+                "webkitCancelFullScreen",
+                "mozCancelFullScreen",
+                "msExitFullscreen",
+            ]) {
+                if (key in document) {
+                    return true;
+                }
+            }
+            return false;
+        })();
+
+        if (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
+            // Mobile device style: fill the whole browser client area with the game canvas:
+
+            var meta = document.createElement('meta');
+            meta.name = 'viewport';
+            meta.content = 'width=device-width, height=device-height, initial-scale=1.0, user-scalable=no, shrink-to-fit=yes';
+            document.getElementsByTagName('head')[0].appendChild(meta);
+            container.className = "unity-mobile";
+
+            // To lower canvas resolution on mobile devices to gain some
+            // performance, uncomment the following line:
+            // config.devicePixelRatio = 1;
+
+            canvas.style.width = window.innerWidth + 'px';
+            canvas.style.height = window.innerHeight + 'px';
+
+            unityShowBanner('WebGL builds are not supported on mobile devices.');
+        } else {
+            container.style.aspectRatio = "1.77";
+        }
+        loadingCover.style.display = "block";
+
+        const script = document.createElement("script");
+        script.src = loaderUrl;
+
+        script.onload = () => {
+            createUnityInstance(canvas, config, (progress) => {
+                let x = Math.max(10, Math.ceil(progress * 100));
+                console.log("progress : " + x);
+                let rotation = "0";
+                if (x < 100) {
+                    rotation = "rotate(-" + (100 - x) + "deg)";
+                } else {
+                    rotation = "rotate(" + 50 + "deg)";
+                }
+                loader.style.transform = rotation;
+            })
+                .then((unityInstance) => {
+                    gameInstance = unityInstance;
+                    loadingCover.style.display = "none";
+                    document.body.style.backgroundImage = 'none';  // Remove the background image
+                    document.body.style.backgroundColor = "black";  // Set background color to black
+                    if (canFullscreen) {
+                        if (!hideFullScreenButton) {
+                            fullscreenButton.style.display = "block";
+                        }
+                        fullscreenButton.onclick = () => {
+                            unityInstance.SetFullscreen(1);
+                        };
+                    }
+                })
+                .catch((message) => {
+                    alert(message);
+                });
+        };
+
+        document.body.appendChild(script);
+
+        window.addEventListener(
+            "message",
+            function (e) {
+                // Make sure to check the origin property for security reasons
+                var loginWebpageUrl = "https://ifxbl-nyaaa-aaaap-abroa-cai.icp0.io/";
+                var sanitizedUrl = loginWebpageUrl.replace(/\/+$/, "");
+                if ((
+                    e.origin === sanitizedUrl || //Login Url
+
+                    //If embedded
+                    (window !== window.parent && (
+                        e.origin === "https://awcae-maaaa-aaaam-abmyq-cai.icp0.io" || //Production Boom Launchpad
+                        e.origin === "https://n7z64-2yaaa-aaaam-abnsa-cai.icp0.io" || //Staging Boom Launchpad
+                        e.origin === "https://t2qzd-6qaaa-aaaak-qdbdq-cai.icp0.io" || //Development Boom Launchpad
+                        e.origin === "https://4s6wt-wiaaa-aaaap-qhjdq-cai.icp0.io" //Test Website (TODO: Remove)
+                    ))
+                ) == false) { // Check origin for security
+                    console.error(
+                        "Source: Gaming HTML, Message: You are using a origin that is not valid, current origin: ",
+                        e.origin,
+                        "data: ",
+                        JSON.stringify(e.data)
+                    );
+                    return;
+                }
+
+                console.log(
+                    "Source: Gaming HTML, Message: message received from origin: ",
+                    event.origin,
+                    "data: ",
+                    event.data
+                );
+
+                gameInstance.SendMessage(
+                    "BoomManager",
+                    "CreateIdentityWithJson",
+                    e.data
+                );
+            },
+            false
+        );
+    </script>
+</body>
+</html>
