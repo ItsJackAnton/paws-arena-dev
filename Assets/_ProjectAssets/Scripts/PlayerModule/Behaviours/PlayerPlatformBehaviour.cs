@@ -4,6 +4,7 @@ public class PlayerPlatformBehaviour : MonoBehaviour
 {
     public PlayerCustomization playerCustomization;
     public bool isMyCat = true;
+    public GameObject Platform;
 
     protected virtual void OnEnable()
     {

@@ -28,6 +28,10 @@ public class JavaScriptManager : MonoBehaviour
 
     public void ShareImageToTwitter(string _image, string _text)
     {
+        if (Application.isEditor)
+        {
+            return;
+        }
         DoShareImageToTwitter(_image, _text);
     }
 

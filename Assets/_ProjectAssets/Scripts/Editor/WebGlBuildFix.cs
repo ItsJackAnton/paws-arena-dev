@@ -5,108 +5,106 @@ using UnityEngine;
 
 public static class WebGlBuildPostProcess
 {
-    private const string ProjectName = "wasm";
-
     [PostProcessBuild(1)]
-    public static void OnPostprocessBuild(BuildTarget target, string destinationPath)
+    public static void OnPostprocessBuild(BuildTarget _target, string _destinationPath)
     {
-        if (target != BuildTarget.WebGL)
+        if (_target != BuildTarget.WebGL)
         {
             return;
         }
 
         // Clean destination folder, excluding the Build folder
-        CleanDestinationFolder(destinationPath);
+        CleanDestinationFolder(_destinationPath);
 
         // Copy all files and folders from the template directory to the destination, excluding the Build folder
-        CopyTemplateFiles(destinationPath);
+        CopyTemplateFiles(_destinationPath);
     }
 
-    private static void CleanDestinationFolder(string destinationPath)
+    private static void CleanDestinationFolder(string _destinationPath)
     {
-        DirectoryInfo dirInfo = new DirectoryInfo(destinationPath);
+        DirectoryInfo _dirInfo = new DirectoryInfo(_destinationPath);
 
-        foreach (var file in dirInfo.GetFiles())
+        foreach (var _file in _dirInfo.GetFiles())
         {
-            if (file.Name.Equals("Build"))
+            if (_file.Name.Equals("Build"))
             {
                 continue;
             }
-            file.Delete();
+            _file.Delete();
         }
 
-        foreach (var dir in dirInfo.GetDirectories())
+        foreach (var _dir in _dirInfo.GetDirectories())
         {
-            if (dir.Name.Equals("Build"))
+            if (_dir.Name.Equals("Build"))
             {
                 continue;
             }
-            dir.Delete(true);
+            _dir.Delete(true);
         }
 
-        Debug.Log($"Cleaned up destination folder: {destinationPath}, excluding the Build folder");
+        Debug.Log($"Cleaned up destination folder: {_destinationPath}, excluding the Build folder");
     }
 
-    private static void CopyTemplateFiles(string destinationPath)
+    private static void CopyTemplateFiles(string _destinationPath)
     {
-        string indexPath = AssetDatabase.GetAssetPath(Resources.Load<TextAsset>("WebTemplate/index"));
-        string baseTemplatePath = Path.GetDirectoryName(indexPath);
+        string _indexPath = AssetDatabase.GetAssetPath(Resources.Load<TextAsset>("WebTemplate/index"));
+        string _baseTemplatePath = Path.GetDirectoryName(_indexPath);
 
         // Copy all files and directories from the template folder to the destination, except the Build folder
-        foreach (var filePath in Directory.GetFiles(baseTemplatePath))
+        foreach (var _filePath in Directory.GetFiles(_baseTemplatePath))
         {
-            if (Path.GetExtension(filePath).Equals(".meta"))
+            if (Path.GetExtension(_filePath).Equals(".meta"))
             {
                 continue;
             }
 
-            string destinationFilePath = Path.Combine(destinationPath, Path.GetFileName(filePath));
-            File.Copy(filePath, destinationFilePath, true);
+            string _destinationFilePath = Path.Combine(_destinationPath, Path.GetFileName(_filePath));
+            File.Copy(_filePath, _destinationFilePath, true);
         }
 
-        foreach (var directoryPath in Directory.GetDirectories(baseTemplatePath))
+        foreach (var _directoryPath in Directory.GetDirectories(_baseTemplatePath))
         {
-            string directoryName = Path.GetFileName(directoryPath);
-            if (directoryName.Equals("Build"))
+            string _directoryName = Path.GetFileName(_directoryPath);
+            if (_directoryName.Equals("Build"))
             {
                 continue;
             }
 
-            string destinationDirectoryPath = Path.Combine(destinationPath, directoryName);
-            CopyFolderContents(directoryPath, destinationDirectoryPath);
+            string _destinationDirectoryPath = Path.Combine(_destinationPath, _directoryName);
+            CopyFolderContents(_directoryPath, _destinationDirectoryPath);
         }
 
-        Debug.Log($"Copied template files from {baseTemplatePath} to {destinationPath}");
+        Debug.Log($"Copied template files from {_baseTemplatePath} to {_destinationPath}");
     }
 
-    private static void CopyFolderContents(string sourcePath, string destinationPath)
+    private static void CopyFolderContents(string _sourcePath, string _destinationPath)
     {
-        if (Directory.Exists(destinationPath))
+        if (Directory.Exists(_destinationPath))
         {
-            Directory.Delete(destinationPath, true);
+            Directory.Delete(_destinationPath, true);
         }
-        Directory.CreateDirectory(destinationPath);
+        Directory.CreateDirectory(_destinationPath);
 
-        DirectoryInfo sourceDir = new DirectoryInfo(sourcePath);
-        if (!sourceDir.Exists)
+        DirectoryInfo _sourceDir = new DirectoryInfo(_sourcePath);
+        if (!_sourceDir.Exists)
         {
-            throw new DirectoryNotFoundException($"Source directory does not exist or could not be found: {sourcePath}");
+            throw new DirectoryNotFoundException($"Source directory does not exist or could not be found: {_sourcePath}");
         }
 
-        foreach (FileInfo file in sourceDir.GetFiles())
+        foreach (FileInfo _file in _sourceDir.GetFiles())
         {
-            if (file.Extension.Equals(".meta"))
+            if (_file.Extension.Equals(".meta"))
             {
                 continue;
             }
-            string destinationFilePath = Path.Combine(destinationPath, file.Name);
-            file.CopyTo(destinationFilePath, true);
+            string _destinationFilePath = Path.Combine(_destinationPath, _file.Name);
+            _file.CopyTo(_destinationFilePath, true);
         }
 
-        foreach (DirectoryInfo subdir in sourceDir.GetDirectories())
+        foreach (DirectoryInfo _subdir in _sourceDir.GetDirectories())
         {
-            string destinationSubdirPath = Path.Combine(destinationPath, subdir.Name);
-            CopyFolderContents(subdir.FullName, destinationSubdirPath);
+            string _destinationSubdirPath = Path.Combine(_destinationPath, _subdir.Name);
+            CopyFolderContents(_subdir.FullName, _destinationSubdirPath);
         }
     }
 }

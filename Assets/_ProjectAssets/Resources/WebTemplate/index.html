@@ -10,6 +10,7 @@
     <script src="https://www.gstatic.com/firebasejs/10.3.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.3.0/firebase-analytics-compat.js"></script>
     <script src="../JS/firebaseAnalytics.js"></script>
+    <script src="../JS/screenshot.js"></script>
     <script src="../TemplateData/noble-curves.js"></script>
 </head>
 <body class="dark">
@@ -32,37 +33,21 @@
     </div>
     <div id="unity-fullscreen-button" style="display: none"></div>
     <script>
-        //////custom stuff
-        function ShareImageToTwitter(base64Image, text) {
-            //// save the image to local device
-            var link = document.createElement('a');
-            link.setAttribute('href', 'data:image/png;base64,' + base64Image);
-            link.setAttribute('download', 'PawsArena.png');
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-            /////
-
-            ////create tweet
-            let url = `https://twitter.com/intent/tweet?text=${text}`;
-            window.open(url, '_blank');
-            ////
-        }
-        //////end of custom stuff
         var gameInstance = null;
 
         const hideFullScreenButton = "true";
         const buildUrl = "Build";
         const loaderUrl = buildUrl + "/wasm.loader.js";
         const config = {
-            dataUrl: buildUrl + "/wasm.data",
-            frameworkUrl: buildUrl + "/wasm.framework.js",
-            codeUrl: buildUrl + "/wasm.wasm",
+            dataUrl: buildUrl + "/wasm.data.br",
+            frameworkUrl: buildUrl + "/wasm.framework.js.br",
+            codeUrl: buildUrl + "/wasm.wasm.br",
             streamingAssetsUrl: "StreamingAssets",
             companyName: "com.colorfulcoding",
             productName: "ICKitties",
             productVersion: "1.0",
         };
+
 
         const container = document.querySelector("#unity-container");
         const canvas = document.querySelector("#unity-canvas");
