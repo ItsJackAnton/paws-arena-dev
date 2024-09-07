@@ -40,8 +40,7 @@ public class LuckyWheelClaimDisplay : MonoBehaviour
     private void Close()
     {
         closeButton.interactable = false;
-        // if (elementumReward && DataManager.Instance.PlayerData.CanSeeElementumPromotion)
-        if (false)
+        if (elementumReward && DataManager.Instance.PlayerData.CanSeeElementumPromotion)
         {
             BoomDaoUtility.Instance.ExecuteAction("increaseElementumCounter",null);
             elementumReward.SetActive(true);
