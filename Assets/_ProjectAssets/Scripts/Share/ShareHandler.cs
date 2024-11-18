@@ -7,8 +7,8 @@ using UnityEngine.UI;
 public class ShareHandler : MonoBehaviour
 {
     [SerializeField] private Button capture;
-    [SerializeField] private GameObject template;
-    [SerializeField] private GameObject mainMenu;
+    [SerializeField] private GameObject templateHolder;
+    [SerializeField] private GameObject objectTOHide;
     [SerializeField] private GameObject kittyStand;
     [SerializeField] private TextMeshProUGUI nameDisplay;
     [SerializeField] private TextMeshProUGUI scoreDisplay;
@@ -32,8 +32,8 @@ public class ShareHandler : MonoBehaviour
 
     private IEnumerator CaptureScreenshot()
     {
-        mainMenu.SetActive(false);
-        template.SetActive(true);
+        objectTOHide.SetActive(false);
+        templateHolder.SetActive(true);
         PlayerPlatformBehaviour _platform = kittyStand.GetComponentInChildren<PlayerPlatformBehaviour>();
         Vector3 _standPosition = _platform.transform.localPosition;
         Vector3 _startingSize = _platform.transform.localScale;
@@ -55,10 +55,10 @@ public class ShareHandler : MonoBehaviour
         $"{DataManager.Instance.PlayerData.LeaderboardPoints}?\n I {DataManager.Instance.PlayerData.Username} am challenging you!");
         
         yield return new WaitForEndOfFrame();
-        template.SetActive(false);
+        templateHolder.SetActive(false);
         _platform.transform.localScale = _startingSize;
         _platform.transform.localPosition = _standPosition;
-        mainMenu.SetActive(true);
+        objectTOHide.SetActive(true);
         _platform.Platform.gameObject.SetActive(true);
     }
 }

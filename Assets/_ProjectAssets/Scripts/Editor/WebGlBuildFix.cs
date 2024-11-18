@@ -13,10 +13,7 @@ public static class WebGlBuildPostProcess
             return;
         }
 
-        // Clean destination folder, excluding the Build folder
         CleanDestinationFolder(_destinationPath);
-
-        // Copy all files and folders from the template directory to the destination, excluding the Build folder
         CopyTemplateFiles(_destinationPath);
     }
 

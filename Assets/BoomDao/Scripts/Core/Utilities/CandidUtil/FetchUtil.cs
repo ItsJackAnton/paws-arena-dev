@@ -67,7 +67,7 @@
         {
             //responses.Add(uid, new List<DataTypes.Entity>());
 
-            var response = await worldApiClient.GetAllUserEntities(new WorldApiClient.GetAllUserEntitiesArg0(new(), uid));
+            var response = await worldApiClient.GetAllUserEntitiesComposite(new WorldApiClient.GetAllUserEntitiesCompositeArg0(new(), uid));
 
             if (response.Tag == Candid.World.Models.Result5Tag.Ok)
             {

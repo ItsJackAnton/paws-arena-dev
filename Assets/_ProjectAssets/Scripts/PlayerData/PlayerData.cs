@@ -1,8 +1,6 @@
 using System;
 using System.Collections.Generic;
-using System.Runtime.CompilerServices;
 using BoomDaoWrapper;
-using Newtonsoft.Json;
 using UnityEngine;
 
 [Serializable]
@@ -110,7 +108,6 @@ public class PlayerData
 
     public const string AMOUNT_OF_GAMES_PLAYED_TODAY = "amountOfGamesPlayedToday";
     public const string RESET_AMOUNT_OF_GAMES_PLAYED_TODAY = "resetAmountOfGamesPlayedToday";
-    public const string ELEMENTUM_PROMOTION = "elementumPromotion";
     
     public static Action OnUpdatedSnacks;
     public static Action OnUpdatedShards;
@@ -133,7 +130,6 @@ public class PlayerData
     public double Snacks => BoomDaoUtility.Instance.GetDouble(SNACKS, AMOUNT_KEY);
     public double CommonShard => BoomDaoUtility.Instance.GetDouble(COMMON_SHARD, AMOUNT_KEY);
     public double UncommonShard => BoomDaoUtility.Instance.GetDouble(UNCOMMON_SHARD, AMOUNT_KEY);
-    public bool CanSeeElementumPromotion => BoomDaoUtility.Instance.GetDouble(ELEMENTUM_PROMOTION, AMOUNT_KEY) < 3;
     public double RareShard => BoomDaoUtility.Instance.GetDouble(RARE_SHARD, AMOUNT_KEY);
     public double EpicShard => BoomDaoUtility.Instance.GetDouble(EPIC_SHARD, AMOUNT_KEY);
     public double LegendaryShard => BoomDaoUtility.Instance.GetDouble(LEGENDARY_SHARD, AMOUNT_KEY);

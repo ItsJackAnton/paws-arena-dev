@@ -38,7 +38,7 @@ public class ChallengesManager : MonoBehaviour
     private const string UPDATE_CHALLENGE_PROGRESS = "increaseChallengeProgress";
 
     public static ChallengesManager Instance;
-    public bool IsGeneratingNewChallenges;
+    [HideInInspector] public bool IsGeneratingNewChallenges;
     private bool isSubscribed;
     
     private List<ChallengeUpdateProgress> progressToUpdate = new();
@@ -270,6 +270,10 @@ public class ChallengesManager : MonoBehaviour
             }
 
             ChallengeData _challengeData = DataManager.Instance.GameData.GetChallengeByIdentifier(_challengeProgress.Identifier);
+            if (_challengeData==null)
+            {
+                continue;
+            }
             Debug.Log(_challengeData.Category);
             switch (_challengeData.Category)
             {

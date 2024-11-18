@@ -98,9 +98,13 @@ namespace com.colorfulcoding.GameScene
                 reqJson,
                 (resp) =>
                 {
+                    Debug.Log(resp);
                     LeaderboardPostResponseEntity response = JsonUtility.FromJson<LeaderboardPostResponseEntity>(resp);
+                    Debug.Log(1);
                     response.oldPoints = DataManager.Instance.PlayerData.LeaderboardPoints;
+                    Debug.Log(2);
                     GameState.pointsChange = response;
+                    Debug.Log(3);
                 },
                 (err, code) =>
                 {
