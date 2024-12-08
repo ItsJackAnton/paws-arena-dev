@@ -69,14 +69,20 @@ public class PhotonManager : MonoBehaviourPunCallbacks
 
     public override void OnConnectedToMaster()
     {
+        SetCustomProperties();
+        OnConnectedServer?.Invoke();
+    }
+
+    private void SetCustomProperties()
+    {
+        Debug.Log("----- setting custom room properties");
         PhotonNetwork.LocalPlayer.SetCustomProperties(
             new Hashtable
             {
                 { "principalId", GameState.principalId },
-                {NAME, GameState.nickname}
+                {NAME, GameState.nickname},
+                {SEAT, 0}
             });
-
-        OnConnectedServer?.Invoke();
     }
 
     public override void OnDisconnected(DisconnectCause cause)

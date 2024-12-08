@@ -313,17 +313,29 @@ public class RoomStateManager : MonoSingleton<RoomStateManager>
     [PunRPC]
     protected void SetWinnerKitty()
     {
+        Debug.Log("--------- Trying to set winning kitty");
         int _seat = PUNGameRoomManager.Instance.GetMySeat();
         if (_seat<=2)
         {
+            Debug.Log("--------- My seat is lower than two");
             return;
         }
 
-        if (GameResolveStateUtils.CheckIfIWon(PlayerManager.Instance.GetWinnerByDeath())!=1)
+        if (GameState.gameResolveState == GameResolveState.PLAYER_2_WIN && _seat == 3)
         {
+            Debug.Log("--------- I didn't win");
+            return;
+        }
+
+        if (GameState.gameResolveState == GameResolveState.PLAYER_1_WIN && _seat == 4)
+        {
+            Debug.Log("--------- I didn't win 2");
             return;
         }
         
+        Debug.Log("--------- I am setting the winner information");
+        Debug.Log($"--------- {PhotonManager.ROOM_WINNER}: {GameState.selectedNFT.imageUrl}");
+        Debug.Log($"--------- {PhotonManager.ROOM_WINNER_IDS}: {JsonConvert.SerializeObject(GameState.selectedNFT.ids)}");
         PhotonManager.SetRoomProperties(PhotonManager.ROOM_WINNER, GameState.selectedNFT.imageUrl);
         PhotonManager.SetRoomProperties(PhotonManager.ROOM_WINNER_IDS, JsonConvert.SerializeObject(GameState.selectedNFT.ids));
     }

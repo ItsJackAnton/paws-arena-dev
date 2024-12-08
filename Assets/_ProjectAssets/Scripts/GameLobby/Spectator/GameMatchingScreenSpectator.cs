@@ -17,6 +17,38 @@ public class GameMatchingScreenSpectator : GameMatchingScreen
         {
             CreateFriendlyMatch.AllowSpectators = Convert.ToInt32(PhotonNetwork.CurrentRoom.CustomProperties[PhotonManager.ALLOW_SPECTATORS]) == 1;
         }
+
+        StartCoroutine(ShowPlayerNamesRoutine());
+    }
+    
+    private IEnumerator ShowPlayerNamesRoutine()
+    {
+        while (gameObject)
+        {
+            foreach (SeatGameobject _seat in seats)
+            {
+                _seat.occupierNickname.text = "-";
+            }
+            foreach (var _photonPlayer in PhotonNetwork.CurrentRoom.Players)
+            {
+                int _seat = Convert.ToInt32(_photonPlayer.Value.CustomProperties[PhotonManager.SEAT]);
+                _seat--;
+                if (_seat<0)
+                {
+                    continue;
+                }
+
+                if (_seat>= seats.Count)
+                {
+                    continue;
+                }
+                string _name = _photonPlayer.Value.CustomProperties[PhotonManager.NAME].ToString();
+                Debug.Log($"----- {_seat}: {_name}");
+                seats[_seat].occupierNickname.text = _name;
+            }
+
+            yield return new WaitForSeconds(1);
+        }
     }
 
     protected override void Init()
@@ -50,10 +82,6 @@ public class GameMatchingScreenSpectator : GameMatchingScreen
                     {PhotonManager.SEAT, _number}
                 });
             }
-            
-            int _seat = Convert.ToInt32(_photonPlayer.CustomProperties[PhotonManager.SEAT]);
-            string _name = _photonPlayer.CustomProperties[PhotonManager.NAME].ToString();
-            OccupySeat(seats[_seat], _name);
         }
         
         startButton.gameObject.SetActive(Convert.ToInt32(PhotonNetwork.LocalPlayer.CustomProperties[PhotonManager.SEAT])<=2 && PhotonNetwork
@@ -62,29 +90,7 @@ public class GameMatchingScreenSpectator : GameMatchingScreen
 
     protected override void OnPlayerJoined(string _opponentNickname, string _userId)
     {
-        StartCoroutine(OnPlayerJoinedRoutine());
         
-        IEnumerator OnPlayerJoinedRoutine()
-        {
-            yield return new WaitForSeconds(2);
-            int _playerIndex = -1;
-            Player _player = null;
-
-            foreach (var (_index,_playerInRoom) in PhotonNetwork.CurrentRoom.Players)
-            {
-                if (_playerInRoom.UserId!=_userId)
-                {
-                    continue;
-                }
-
-                _playerIndex = _index;
-                _player = _playerInRoom;
-            }
-            
-            Debug.Log($"{_opponentNickname}: {_userId} = {_playerIndex}");
-        
-            OccupySeat(seats[_playerIndex-1], _player.CustomProperties[PhotonManager.NAME].ToString());
-        }
     }
 
     protected override void HandleStartButton()
