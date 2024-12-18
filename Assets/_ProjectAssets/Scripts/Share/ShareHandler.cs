@@ -13,6 +13,7 @@ public class ShareHandler : MonoBehaviour
     [SerializeField] private TextMeshProUGUI nameDisplay;
     [SerializeField] private TextMeshProUGUI scoreDisplay;
     [SerializeField] private Vector3 standPosition;
+    private float timeScale;
     
 
     private void OnEnable()
@@ -27,6 +28,8 @@ public class ShareHandler : MonoBehaviour
 
     private void TakeScreenShot()
     {
+        timeScale = Time.timeScale;
+        Time.timeScale = 0;
         StartCoroutine(CaptureScreenshot());
     }
 
@@ -52,7 +55,7 @@ public class ShareHandler : MonoBehaviour
         string _base64Image = Convert.ToBase64String(_imageBytes);
 
         JavaScriptManager.Instance.ShareImageToTwitter(_base64Image,"Can you beat my current leaderboard score of " + 
-        $"{DataManager.Instance.PlayerData.LeaderboardPoints}?\n I {DataManager.Instance.PlayerData.Username} am challenging you!");
+        $"{DataManager.Instance.PlayerData.LeaderboardPoints}?\n I am challenging you! #PawsArena #ICP $ICP");
         
         yield return new WaitForEndOfFrame();
         templateHolder.SetActive(false);
@@ -60,5 +63,6 @@ public class ShareHandler : MonoBehaviour
         _platform.transform.localPosition = _standPosition;
         objectTOHide.SetActive(true);
         _platform.Platform.gameObject.SetActive(true);
+        Time.timeScale = timeScale;
     }
 }

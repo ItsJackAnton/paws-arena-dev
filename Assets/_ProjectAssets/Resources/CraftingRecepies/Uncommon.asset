@@ -19,7 +19,7 @@ MonoBehaviour:
   <IngridiantSprite>k__BackingField: {fileID: 21300000, guid: dfc9ddef2a3a70446a2403f0e594c951, type: 3}
   <EndProduct>k__BackingField: 2
   <EndProductColor>k__BackingField: '#2e6de1'
-  <FusionTime>k__BackingField: 5
+  <FusionTime>k__BackingField: 3
   <EndProductSprite>k__BackingField: {fileID: 21300000, guid: 43dad446296fbdf41aef93f669bf7721, type: 3}
   <TopOfferBackground>k__BackingField: {fileID: 21300000, guid: bb7b31c78a8a1c64c8562a8fb0a36e6c, type: 3}
   <BottomOfferBackground>k__BackingField: {fileID: 21300000, guid: 8a177741a0bb90946bfe04c356283b2f, type: 3}

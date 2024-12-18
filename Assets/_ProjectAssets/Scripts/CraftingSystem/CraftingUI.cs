@@ -43,11 +43,10 @@ public class CraftingUI : MonoBehaviour
     [SerializeField] private CraftFinishedDisplay craftingFinished;
     private CraftingRecepieSO showingRecepie;
     private bool isProcessingAction;
-    
-    public void Setup()
+
+    private void OnEnable()
     {
         CraftingProcess.OnFinishedCrafting += FinishedCrafting;
-
         commonButton.onClick.AddListener(() => ShowRecipe(ItemType.CommonShard));
         uncommonButton.onClick.AddListener(() => ShowRecipe(ItemType.UncommonShard));
         rareButton.onClick.AddListener(() => ShowRecipe(ItemType.RareShard));
@@ -55,9 +54,14 @@ public class CraftingUI : MonoBehaviour
         legendaryButton.onClick.AddListener(() => ShowRecipe(ItemType.LegendaryShard));
         craftCrystalButton.onClick.AddListener(CraftCrystal);
         botCraftItemButton.onClick.AddListener(CraftItem);
+    }
 
+    public void Setup()
+    {
         ShowRecipe(ItemType.CommonShard);
         gameObject.SetActive(true);
+        craftCrystalButton.interactable = false;
+        botCraftItemButton.interactable = false;
     }
 
     private void OnDisable()
@@ -137,6 +141,7 @@ public class CraftingUI : MonoBehaviour
 
     private void CraftCrystal()
     {
+        Debug.Log("Crafting crystal");
         string _actionKey = CRAFT_ACTION + Utilities.GetItemKey(showingRecepie.Inggrdiant).UpperFirstLetter();
         BoomDaoUtility.Instance.ExecuteActionWithParameter(_actionKey,
             new List<ActionParameter>
@@ -147,7 +152,6 @@ public class CraftingUI : MonoBehaviour
 
     private void HandleActionExecuted(List<ActionOutcome> _outcomes)
     {
-        Debug.Log("Started crafting process");
         ShowRecipe(showingRecepie.Inggrdiant);
     }
 
