@@ -12,7 +12,9 @@ public class GameData
     public const string CLAIM_NORMAL_REWARD = "battlePassNormal";
     public const string LEADERBOARD_POINTS = "leaderboardPoints";
     public const string LEADERBOARD_KITTY_URL = "kittyUrl";
+    public const string LEADERBOARD_SEASON = "leaderboardSeason";
     public const string LEADERBOARD_NICK_NAME = "nickName";
+    public const string CURENT_SEASON = "currentSeason";
     
     private const string SEASON_KEY = "season";
     private const string SEASON_NUMBER = "number";
@@ -112,10 +114,21 @@ public class GameData
         {
             LeaderboardData _leaderboardData = new LeaderboardData();
             List<WorldDataEntry> _entries = BoomDaoUtility.Instance.GetWorldData(LEADERBOARD_POINTS,LEADERBOARD_NICK_NAME, LEADERBOARD_KITTY_URL, 
-            PlayerData.SEASON_LEVEL, GUILD_BATTLE_POINTS);
+            PlayerData.SEASON_LEVEL, GUILD_BATTLE_POINTS, LEADERBOARD_SEASON);
             foreach (var _worldEntry in _entries)
             {
                 if (_worldEntry.GetProperty(LEADERBOARD_NICK_NAME)== null)
+                {
+                    continue;
+                }
+                
+                string _leaderboardSeason = _worldEntry.GetProperty(LEADERBOARD_SEASON);
+                if (string.IsNullOrEmpty(_leaderboardSeason))
+                {
+                    continue;
+                }
+                int _season = BoomDaoUtility.Instance.ConvertToInt(_leaderboardSeason);
+                if (_season<LeaderboardSeason)
                 {
                     continue;
                 }
@@ -148,7 +161,8 @@ public class GameData
                     Points = _points,
                     KittyUrl = _worldEntry.GetProperty(LEADERBOARD_KITTY_URL),
                     Level = _level,
-                    GuildBattlePoints = _guildPoints
+                    GuildBattlePoints = _guildPoints,
+                    LeaderboardSeason = _season
                 });
             }
 
@@ -559,6 +573,7 @@ public class GameData
     }
 
     public double GuildPrice => BoomDaoUtility.Instance.GetConfigDataAsDouble("guildsConfig", "price");
+    public int LeaderboardSeason => BoomDaoUtility.Instance.GetConfigDataAsInt(LEADERBOARD_SEASON, "currentSeason");
     public string GuildPriceAsString => BoomDaoUtility.Instance.GetConfigDataAsString("guildsConfig", "price");
     public double MaxGuildPlayers => BoomDaoUtility.Instance.GetConfigDataAsDouble("guildsConfig", "maxPlayers");
     public double GuildGoldBar => BoomDaoUtility.Instance.GetConfigDataAsDouble("guildsConfig", "goldBar");

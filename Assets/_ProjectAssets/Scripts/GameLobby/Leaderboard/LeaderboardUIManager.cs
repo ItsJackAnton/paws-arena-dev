@@ -69,6 +69,7 @@ public class LeaderboardUIManager : MonoBehaviour
         }
     }
 
+  
     private void PopulateLeaderboardData(LeaderboardData _data)
     {
         int _idx = 0;

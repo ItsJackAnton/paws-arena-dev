@@ -9,4 +9,5 @@ public class LeaderboardEntries
     public int Points;
     public int Level;
     public int GuildBattlePoints;
+    public int LeaderboardSeason;
 }

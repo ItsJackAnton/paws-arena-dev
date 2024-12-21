@@ -55,7 +55,7 @@ public class ShareHandler : MonoBehaviour
         string _base64Image = Convert.ToBase64String(_imageBytes);
 
         JavaScriptManager.Instance.ShareImageToTwitter(_base64Image,"Can you beat my current leaderboard score of " + 
-        $"{DataManager.Instance.PlayerData.LeaderboardPoints}?\n I am challenging you! #PawsArena #ICP $ICP");
+        $"{DataManager.Instance.PlayerData.LeaderboardPoints}? %0A I am challenging you!%0A %23PawsArena+%23ICP+%24ICP");
         
         yield return new WaitForEndOfFrame();
         templateHolder.SetActive(false);

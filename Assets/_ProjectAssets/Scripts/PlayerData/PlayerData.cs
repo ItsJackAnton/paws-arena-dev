@@ -127,6 +127,7 @@ public class PlayerData
     public string UseMilkGlass => GameState.selectedNFT.IsDefaultKitty ? "useMilkGlass" : "useMilkGlass2";
 
     public string Username => BoomDaoUtility.Instance.GetString(USER_PROFILE, NAME_KEY);
+    public int CurrentLeaderboardSeason => BoomDaoUtility.Instance.GetInt(GameData.LEADERBOARD_SEASON, GameData.CURENT_SEASON);
     public double Snacks => BoomDaoUtility.Instance.GetDouble(SNACKS, AMOUNT_KEY);
     public double CommonShard => BoomDaoUtility.Instance.GetDouble(COMMON_SHARD, AMOUNT_KEY);
     public double UncommonShard => BoomDaoUtility.Instance.GetDouble(UNCOMMON_SHARD, AMOUNT_KEY);
