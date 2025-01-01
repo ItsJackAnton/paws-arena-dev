@@ -10,6 +10,7 @@ public class LeaderboardData
 
     public void FinishSetup(int _amountOfTopPlayers)
     {
+        TopPlayers.Clear();
         Entries = Entries.OrderByDescending(_entry => _entry.Points).ToList();
         for (int _i = 0; _i < _amountOfTopPlayers; _i++)
         {

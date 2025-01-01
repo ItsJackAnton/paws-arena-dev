@@ -1,9 +1,7 @@
-using System;
 using System.Collections.Generic;
-using System.IO;
+using System.Linq;
 using BoomDaoWrapper;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Serialization;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -24,20 +22,39 @@ public class LeaderboardUIManager : MonoBehaviour
     public PlayerPlatformBehaviour secondPlayer;
     public PlayerPlatformBehaviour thirdPlayer;
 
-    [SerializeField] private LeaderboardFromApi leaderboardFromApi;
-
+    [SerializeField] private Button showContest;
+    [SerializeField] private Button showLeaderboard;
+    [SerializeField] private TextMeshProUGUI title;
+    private LeaderboardData data;
     public List<Sprite> stars;
+    private static bool shouldShowContest = true;
 
     private void OnEnable()
     {
         reload.onClick.AddListener(RequestReload);
         BoomDaoUtility.OnUpdatedWorldData += ReloadScene;
+        showContest.onClick.AddListener(PrepareContest);
+        showLeaderboard.onClick.AddListener(PrepareLeaderboard);
     }
 
     private void OnDisable()
     {
         reload.onClick.RemoveListener(RequestReload);
         BoomDaoUtility.OnUpdatedWorldData -= ReloadScene;
+        showContest.onClick.RemoveListener(PrepareContest);
+        showLeaderboard.onClick.RemoveListener(PrepareLeaderboard);
+    }
+
+    private void PrepareContest()
+    {
+        shouldShowContest = true;
+        SceneManager.Instance.Reload();
+    }
+
+    private void PrepareLeaderboard()
+    {
+        shouldShowContest = false;
+        SceneManager.Instance.Reload();
     }
 
     private void RequestReload()
@@ -52,26 +69,37 @@ public class LeaderboardUIManager : MonoBehaviour
 
     private void Start()
     {
-        PopulateLeaderboard();
-    }
-
-    private void PopulateLeaderboard()
-    {
-        try
+        LeaderboardData _data = DataManager.Instance.GameData.GetLeaderboard;
+        data = _data;
+        if (shouldShowContest)
         {
-            LeaderboardData _data = DataManager.Instance.GameData.GetLeaderboard;
-            PopulateLeaderboardData(_data);
+            ShowContest();
         }
-        catch (Exception _exception)
+        else
         {
-            Debug.Log($"Exception occured during loading leadeboard data{_exception.Message} {_exception.StackTrace}");
-            leaderboardFromApi.GetLeaderboard(PopulateLeaderboardData);
-        }
+            ShowLeaderboard();
+        }   
     }
 
   
-    private void PopulateLeaderboardData(LeaderboardData _data)
+    private void ShowContest()
     {
+        showContest.interactable = false;
+        showLeaderboard.interactable = true;
+        LeaderboardData _data = JsonConvert.DeserializeObject<LeaderboardData>(JsonConvert.SerializeObject(data));
+
+        foreach (var _playerEntry in _data.Entries.ToList())
+        {
+            if (_playerEntry.KittyUrl != "https://webapiwithssl20230210160824.azurewebsites.net/download/files/blackKitty.svg")
+            {
+                continue;
+            }
+
+            _data.Entries.Remove(_playerEntry);
+        }
+        
+        _data.FinishSetup(3);
+        
         int _idx = 0;
         foreach(LeaderboardEntries _playerStats in _data.Entries)
         {
@@ -110,6 +138,52 @@ public class LeaderboardUIManager : MonoBehaviour
         {
             thirdPlacePoints.text = "" + _data.Entries[2]?.Points;
             thirdPlayer.SetCat(_data.TopPlayers[2]);
+        }
+    }
+
+    private void ShowLeaderboard()
+    {
+        showContest.interactable = true;
+        showLeaderboard.interactable = false;
+        
+        int _idx = 0;
+        foreach(LeaderboardEntries _playerStats in data.Entries)
+        {
+            GameObject _go = Instantiate(leaderboardLinePrefab, leaderboardContent);
+            _go.GetComponent<LeaderboardLineBehaviour>().SetPrincipalId(_playerStats.PrincipalId, _idx);
+            _go.transform.Find("HorizontalLayout/Points").GetComponent<TextMeshProUGUI>().text = "" + _playerStats.Points;
+            _go.transform.Find("HorizontalLayout/Nickname").GetComponent<TextMeshProUGUI>().text = _playerStats.Nickname;
+
+            if (_idx < stars.Count)
+            {
+                _go.transform.Find("HorizontalLayout/Icon_Text").gameObject.SetActive(false);
+                _go.transform.Find("HorizontalLayout/Icon").GetComponent<Image>().sprite = stars[_idx];
+            }
+            else
+            {
+                _go.transform.Find("HorizontalLayout/Icon").gameObject.SetActive(false);
+                _go.transform.Find("HorizontalLayout/Icon_Text").GetComponent<TextMeshProUGUI>().text ="" + (_idx + 1);
+            }
+
+            _idx++;
+        }
+
+        if (data.Entries.Count >= 1)
+        {
+            firstPlacePoints.text = "" + data.Entries[0]?.Points;
+            firstPlayer.SetCat(data.TopPlayers[0]);
+        }
+
+        if(data.Entries.Count >= 2)
+        {
+            secondPlacePoints.text = "" + data.Entries[1]?.Points;
+            secondPlayer.SetCat(data.TopPlayers[1]);
+        }
+
+        if (data.Entries.Count >= 3)
+        {
+            thirdPlacePoints.text = "" + data.Entries[2]?.Points;
+            thirdPlayer.SetCat(data.TopPlayers[2]);
         }
     }
 

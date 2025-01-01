@@ -33,5 +33,4 @@ public class PlayerPlatformBehaviour : MonoBehaviour
         playerCustomization.wrapper.SetActive(true);
         playerCustomization.SetCat(nft.imageUrl, nft.ids);
     }
-
 }

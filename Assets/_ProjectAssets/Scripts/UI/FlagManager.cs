@@ -51,16 +51,28 @@ public class FlagManager : MonoBehaviour
             flagImageDisplay.sprite = flagSprite;
             flagShineDisplay.sprite = flagSprite;
 
-            Texture2D _texture = new Texture2D((int)flagSprite.rect.width, (int)flagSprite.rect.height);
-            _texture.SetPixels(flagSprite.texture.GetPixels((int)flagSprite.textureRect.x,
-                (int)flagSprite.textureRect.y,
-                (int)flagSprite.textureRect.width,
-                (int)flagSprite.textureRect.height));
-            _texture.Apply();
+            Rect texRect = flagSprite.textureRect;
+            Texture2D sourceTexture = flagSprite.texture;
 
-            shiningMaterial.SetTexture("_Mask", _texture);
+            int width = (int)texRect.width;
+            int height = (int)texRect.height;
+
+            Texture2D newTexture = new Texture2D(width, height, TextureFormat.RGBA32, false);
+
+            Color[] pixels = sourceTexture.GetPixels(
+                (int)texRect.x,
+                (int)texRect.y,
+                width,
+                height
+            );
+
+            newTexture.SetPixels(pixels);
+            newTexture.Apply();
+
+            shiningMaterial.SetTexture("_Mask", newTexture);
         }
-        
+
         messageDisplay.text = DataManager.Instance.GameData.FlagData.Description;
     }
+
 }
