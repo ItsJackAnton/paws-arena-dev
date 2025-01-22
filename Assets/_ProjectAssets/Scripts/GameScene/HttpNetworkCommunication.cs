@@ -101,6 +101,9 @@ namespace com.colorfulcoding.GameScene
                     Debug.Log(resp);
                     LeaderboardPostResponseEntity response = JsonUtility.FromJson<LeaderboardPostResponseEntity>(resp);
                     Debug.Log(1);
+                    Debug.Log(DataManager.Instance);
+                    Debug.Log(DataManager.Instance.PlayerData);
+                    Debug.Log(DataManager.Instance.PlayerData.LeaderboardPoints);
                     response.oldPoints = DataManager.Instance.PlayerData.LeaderboardPoints;
                     Debug.Log(2);
                     GameState.pointsChange = response;

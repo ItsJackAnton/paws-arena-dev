@@ -579,4 +579,6 @@ public class GameData
     public double GuildGoldBar => BoomDaoUtility.Instance.GetConfigDataAsDouble("guildsConfig", "goldBar");
     public double GuildSilverBar => BoomDaoUtility.Instance.GetConfigDataAsDouble("guildsConfig", "silverBar");
     public double GuildBronzeBar => BoomDaoUtility.Instance.GetConfigDataAsDouble("guildsConfig", "bronzeBar");
+    public DateTime ContestStart => BoomDaoUtility.Instance.GetConfigDataAsDate("contest", "start");
+    public DateTime ContestEnd => BoomDaoUtility.Instance.GetConfigDataAsDate("contest", "end");
 }

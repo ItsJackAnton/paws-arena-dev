@@ -1,3 +1,5 @@
+using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using BoomDaoWrapper;
@@ -25,6 +27,8 @@ public class LeaderboardUIManager : MonoBehaviour
     [SerializeField] private Button showContest;
     [SerializeField] private Button showLeaderboard;
     [SerializeField] private TextMeshProUGUI title;
+    [SerializeField] private GameObject contestNotStartedHolder;
+    [SerializeField] private TextMeshProUGUI contestNotStartedText;
     private LeaderboardData data;
     public List<Sprite> stars;
     private static bool shouldShowContest = true;
@@ -43,6 +47,7 @@ public class LeaderboardUIManager : MonoBehaviour
         BoomDaoUtility.OnUpdatedWorldData -= ReloadScene;
         showContest.onClick.RemoveListener(PrepareContest);
         showLeaderboard.onClick.RemoveListener(PrepareLeaderboard);
+        StopAllCoroutines();
     }
 
     private void PrepareContest()
@@ -86,6 +91,26 @@ public class LeaderboardUIManager : MonoBehaviour
     {
         showContest.interactable = false;
         showLeaderboard.interactable = true;
+        DateTime _currentDate = DateTime.UtcNow;
+        Debug.Log("Current date: "+_currentDate);
+        Debug.Log("Contest end: "+DataManager.Instance.GameData.ContestEnd);
+        Debug.Log("Contest start: "+DataManager.Instance.GameData.ContestStart);
+        Debug.Log(_currentDate>DataManager.Instance.GameData.ContestEnd);
+        Debug.Log(_currentDate<DataManager.Instance.GameData.ContestStart);
+        if (DidContestEnd())
+        {
+            contestNotStartedHolder.SetActive(true);
+            Debug.Log((_currentDate-DataManager.Instance.GameData.ContestStart).TotalDays < 10);
+            Debug.Log(_currentDate < DataManager.Instance.GameData.ContestEnd);
+            if ((_currentDate-DataManager.Instance.GameData.ContestStart).TotalDays < 10 && _currentDate < DataManager.Instance.GameData.ContestEnd)
+            {
+                StartCoroutine(ShowTimer());
+                return;
+            }
+
+            contestNotStartedText.text = "Contest finished\nCome back later!";
+            return;
+        }
         LeaderboardData _data = JsonConvert.DeserializeObject<LeaderboardData>(JsonConvert.SerializeObject(data));
 
         foreach (var _playerEntry in _data.Entries.ToList())
@@ -140,6 +165,35 @@ public class LeaderboardUIManager : MonoBehaviour
             thirdPlayer.SetCat(_data.TopPlayers[2]);
         }
     }
+
+    private bool DidContestEnd()
+    {
+        DateTime _currentDate = DateTime.UtcNow;
+        return _currentDate > DataManager.Instance.GameData.ContestEnd || _currentDate < DataManager.Instance.GameData.ContestStart;
+    }
+
+    private IEnumerator ShowTimer()
+    {
+        while (gameObject.activeSelf)
+        {
+            TimeSpan _timeRemaining = DataManager.Instance.GameData.ContestStart - DateTime.UtcNow;
+            if (_timeRemaining.TotalSeconds<0)
+            {
+                SceneManager.Instance.Reload();
+                yield break;
+            }
+        
+            string _days = _timeRemaining.Days.ToString("D2");
+            string _hours = _timeRemaining.Hours.ToString("D2");
+            string _minutes = _timeRemaining.Minutes.ToString("D2");
+            string _seconds = _timeRemaining.Seconds.ToString("D2");
+
+            contestNotStartedText.text = $"Contest starts in: {_days}:{_hours}:{_minutes}:{_seconds}";
+
+            yield return new WaitForSeconds(1);
+        }
+    }
+
 
     private void ShowLeaderboard()
     {

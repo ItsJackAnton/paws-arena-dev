@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using UnityEngine;
 using TMPro;
@@ -9,6 +10,11 @@ public class RecoveryShowTimer : MonoBehaviour
     private void OnEnable()
     {
         StartCoroutine(Show());
+    }
+
+    private void OnDestroy()
+    {
+        StopAllCoroutines();
     }
 
     private IEnumerator Show()

@@ -307,9 +307,13 @@ namespace BoomDaoWrapper
             {
                 return default;
             }
+            if (_date.Contains("T"))
+            {
+                return DateTime.Parse(_date);
+            }
+
             int[] _time = _date.Split('.').Select(int.Parse).ToArray();
-            DateTime _output = new DateTime(year: _time[2], month: _time[1], day: _time[0]);
-            return _output;
+            return new DateTime(year: _time[0], month: _time[1], day: _time[2]);
         }
 
         public string GetConfigDataAsString(string _configId, string _fieldName)
