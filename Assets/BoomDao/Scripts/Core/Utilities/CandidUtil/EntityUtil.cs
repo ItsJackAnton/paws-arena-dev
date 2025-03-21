@@ -1007,6 +1007,7 @@
             Stack<double> operandStack = new Stack<double>();
             Stack<string> operatorStack = new Stack<string>();
             int tokenIndex = 0;
+
             while (tokenIndex < tokens.Count)
             {
                 //

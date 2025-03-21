@@ -1,5 +1,3 @@
-using UnityEngine;
-
 namespace Boom
 {
     using Cysharp.Threading.Tasks;

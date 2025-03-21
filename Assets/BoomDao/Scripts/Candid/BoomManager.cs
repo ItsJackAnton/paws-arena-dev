@@ -76,18 +76,13 @@ namespace Boom
                 IAgent randomAgent = null;
 
                 var httpClient = new UnityHttpClient();
-#if UNITY_WEBGL && !UNITY_EDITOR
-                var bls = new BypassedBlsCryptography ();
-#else
-                var bls = new WasmBlsCryptography();
-#endif
 
                 try
                 {
                     if (useLocalHost)
-                        randomAgent = new HttpAgent(Ed25519Identity.Generate(), new Uri("http://localhost:4943"), bls);
+                        randomAgent = new HttpAgent(Ed25519Identity.Generate(), new Uri("http://localhost:4943"));
                     else
-                        randomAgent = new HttpAgent(httpClient, Ed25519Identity.Generate(), bls);
+                        randomAgent = new HttpAgent(httpClient, Ed25519Identity.Generate());
                 }
                 catch (Exception e)
                 {
@@ -239,13 +234,13 @@ namespace Boom
 
             if (isLoggedIn == false)
             {
-                CreateAgentUsingIdentityJson(json.data, false).Forget();
+                CreateAgentUsingIdentityJson(json.data).Forget();
                 return;
             }
 
             "You already have an Agent created".Log();
         }
-        public async UniTaskVoid CreateAgentUsingIdentityJson(string json, bool useLocalHost = false)
+        public async UniTaskVoid CreateAgentUsingIdentityJson(string json)
         {
             await UniTask.SwitchToMainThread();
 
@@ -255,13 +250,7 @@ namespace Boom
 
                 var httpClient = new UnityHttpClient();
 
-#if UNITY_WEBGL && !UNITY_EDITOR
-                var bls = new BypassedBlsCryptography ();
-#else
-                var bls = new WasmBlsCryptography();
-#endif
-                if (useLocalHost) await InitializeCandidApis(new HttpAgent(identity, new Uri("http://localhost:4943"), bls));
-                else await InitializeCandidApis(new HttpAgent(httpClient, identity, bls));
+                await InitializeCandidApis(new HttpAgent(httpClient, identity));
 
                 "You have logged in".Log();
             }
