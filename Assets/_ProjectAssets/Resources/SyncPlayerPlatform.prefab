@@ -333,6 +333,7 @@ PrefabInstance:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Modification:
+    serializedVersion: 2
     m_TransformParent: {fileID: 9122209185718362652}
     m_Modifications:
     - target: {fileID: 975193665343492859, guid: 2ecb7b0c40e8c3640ac43d02a629fec1, type: 3}
@@ -724,6 +725,7 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 3575244011638329052}
     m_RemovedComponents: []
+    m_AddedGameObjects: []
   m_SourcePrefab: {fileID: 100100000, guid: 2ecb7b0c40e8c3640ac43d02a629fec1, type: 3}
 --- !u!114 &1652268005445013935 stripped
 MonoBehaviour:
@@ -746,6 +748,7 @@ PrefabInstance:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Modification:
+    serializedVersion: 2
     m_TransformParent: {fileID: 9122209185718362652}
     m_Modifications:
     - target: {fileID: 1212432978861229125, guid: f9d7f9876e2b79b47bbbdc4b0b56b4be, type: 3}
@@ -797,6 +800,7 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
+    m_AddedGameObjects: []
   m_SourcePrefab: {fileID: 100100000, guid: f9d7f9876e2b79b47bbbdc4b0b56b4be, type: 3}
 --- !u!212 &567385698572510970 stripped
 SpriteRenderer:
