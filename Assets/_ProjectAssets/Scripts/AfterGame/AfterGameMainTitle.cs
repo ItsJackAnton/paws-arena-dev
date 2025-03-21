@@ -1,7 +1,4 @@
 using System;
-using System.Collections.Generic;
-using BoomDaoWrapper;
-using Newtonsoft.Json;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -10,14 +7,6 @@ namespace com.colorfulcoding.AfterGame
 {
     public class AfterGameMainTitle : MonoBehaviour
     {
-        private const string BATTLE_LOST_ACTION_KEY = "battle_outcome_lost";
-        private const string BATTLE_DRAW_ACTION_KEY = "battle_outcome_draw";
-        public const string HURT_KITTY = "hurtKitty";
-        
-        private const string SET_LEADERBOARD_POINTS = "setLeaderboardPoints";
-        public const string INCREASE_LEADERBOARD_POINTS = "updateLeaderboardPoints";
-        
-        
         public GameObject winTitle;
         public GameObject loseTitle;
         public GameObject drawTitle;
@@ -33,9 +22,6 @@ namespace com.colorfulcoding.AfterGame
 
         [Header("Cat Stand")]
         public SpriteRenderer standGlow;
-
-        [SerializeField] private LuckyWheelUI luckyWheelUI;
-        [SerializeField] private GameObject leaveButton;
 
         private void Start()
         {
@@ -56,7 +42,7 @@ namespace com.colorfulcoding.AfterGame
             
             if (checkIfIWon > 0)
             {
-                if (GameState.selectedNFT.CanFight)
+                if (DataManager.Instance.PlayerData.CanFight)
                 {
                     EventsManager.OnWonGameWithFullHp?.Invoke();
                 }
@@ -75,29 +61,12 @@ namespace com.colorfulcoding.AfterGame
                 }
                 
                 EventsManager.OnWonGame?.Invoke();
-                leaveButton.gameObject.SetActive(false);
-                if (CreateFriendlyMatch.IsFriendly)
-                {
-                    leaveButton.gameObject.SetActive(true);
-                }
-                else
-                {
-                    luckyWheelUI.RequestReward();
-                }
                 winTitle.SetActive(true);
                 bg.GetComponent<Image>().color = winColor;
                 standGlow.color = winColor;
             }
             else if (checkIfIWon < 0)
             {
-                if (!CreateFriendlyMatch.IsFriendly)
-                {
-                    List<ActionParameter> _parameters = new()
-                    {
-                        new ActionParameter { Key = PlayerData.EARNED_XP_KEY, Value = DamageDealingDisplay.XpEarned.ToString()}
-                    };
-                    BoomDaoUtility.Instance.ExecuteActionWithParameter(BATTLE_LOST_ACTION_KEY,_parameters,null);
-                }
                 EventsManager.OnLostGame?.Invoke();
                 loseTitle.SetActive(true);
                 bg.GetComponent<Image>().color = loseColor;
@@ -108,7 +77,6 @@ namespace com.colorfulcoding.AfterGame
                 drawTitle.SetActive(true);
                 bg.GetComponent<Image>().color = drawColor;
                 standGlow.color = drawColor;
-                BoomDaoUtility.Instance.ExecuteAction(BATTLE_DRAW_ACTION_KEY, null);
             }
 
             totalCoinsValue.text = "" + GameState.pointsChange.oldPoints;
@@ -121,33 +89,12 @@ namespace com.colorfulcoding.AfterGame
 
             if (GameState.pointsChange.points != 0)
             {
-                List<ActionParameter> _parameters = new()
-                {
-                    new ActionParameter { Key = GameData.LEADERBOARD_NICK_NAME, Value = DataManager.Instance.PlayerData.Username},
-                    new ActionParameter { Key = GameData.LEADERBOARD_KITTY_URL, Value = GameState.selectedNFT.imageUrl},
-                    new ActionParameter { Key = PlayerData.SEASON_LEVEL, Value = DataManager.Instance.PlayerData.Level.ToString()},
-                    new ActionParameter { Key = GameData.LEADERBOARD_SEASON, Value = DataManager.Instance.GameData.LeaderboardSeason.ToString()}
-                };
-                BoomDaoUtility.Instance.ExecuteActionWithParameter(SET_LEADERBOARD_POINTS, _parameters,null);
-                
-                _parameters = new List<ActionParameter>()
-                {
-                    new() { Key = "IncreaseAmount", Value = GameState.pointsChange.points.ToString() },
-                    new() { Key = GameData.GUILD_BATTLE_POINTS, Value = DataManager.Instance.GameData.GuildBattles.IsActive ? GameState.pointsChange.points
-                    .ToString() : 0.ToString() }
-                };
-                BoomDaoUtility.Instance.ExecuteActionWithParameter(INCREASE_LEADERBOARD_POINTS,_parameters,null);
-                
                 LeanTween.value(gameObject, 0, GameState.pointsChange.points, 2f).setOnUpdate(val =>
                 {
                     totalCoinsValue.text = "" + Math.Floor(GameState.pointsChange.oldPoints + val);
                     deltaPoints.text = "+" + Math.Floor(val);
                 }).setEaseInOutCirc().setDelay(1f).setOnComplete(() =>
                 {
-                    if (checkIfIWon > 0)
-                    {
-                        luckyWheelUI.ShowReward();
-                    }
                 }
                 );
             }
@@ -174,17 +121,7 @@ namespace com.colorfulcoding.AfterGame
             }
 
             DateTime _recoveryEnds = DateTime.UtcNow.AddMinutes(_minutesItWillTakeToRecover);
-            GameState.selectedNFT.RecoveryEndDate = _recoveryEnds;
-
-            Debug.Log("Recovery ends: "+_recoveryEnds);
-            string _hurtAction = GameState.selectedNFT.IsDefaultKitty ? HURT_KITTY : HURT_KITTY + 2;
-            BoomDaoUtility.Instance.ExecuteActionWithParameter(_hurtAction,
-                new List<ActionParameter>
-                {
-                    new() { Key = GameData.KITTY_RECOVERY_KEY, Value = Utilities.DateTimeToNanoseconds(_recoveryEnds).ToString() },
-                    new() { Key = DataManager.Instance.GameData.KittyKey, Value = GameState.selectedNFT.imageUrl }
-                }, null);
-
+            DataManager.Instance.PlayerData.RecoveryEndDate = _recoveryEnds;
         }
     }
 }

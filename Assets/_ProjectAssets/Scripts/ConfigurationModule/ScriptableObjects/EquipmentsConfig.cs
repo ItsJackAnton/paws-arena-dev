@@ -35,53 +35,6 @@ public class EquipmentsConfig : ScriptableObject
     public List<EquipmentData> TailsFloating;
     public List<EquipmentData> TailsAnimated;
 
-    public EquipmentData CraftItem(CraftingRecepieSO _craftingRecepie)
-    {
-        EquipmentRarity _rarity;
-        switch (_craftingRecepie.Inggrdiant)
-        {
-            case ItemType.CommonShard:
-                _rarity = EquipmentRarity.Common;
-                break;
-            case ItemType.UncommonShard:
-                _rarity = EquipmentRarity.Uncommon;
-                break;
-            case ItemType.RareShard:
-                _rarity = EquipmentRarity.Rare;
-                break;
-            case ItemType.EpicShard:
-                _rarity = EquipmentRarity.Epic;
-                break;
-            case ItemType.LegendaryShard:
-                _rarity = EquipmentRarity.Legendary;
-                break;
-            default:
-                throw new Exception("Don't know how to create item for receipt with ingredient: " + _craftingRecepie.Inggrdiant);
-        }
-        
-        return CraftItem(_rarity);
-    }
-
-    public EquipmentData CraftItem(EquipmentRarity _equipmentRarity)
-    {
-        EquipmentData _equipmentData;
-        while (true)
-        {
-            _equipmentData = GenerateRandomItem();
-            if (_equipmentData.Rarity==_equipmentRarity)
-            {
-                break;
-            }
-        }
-
-        return _equipmentData;
-    }
-
-    public EquipmentData CraftItem()
-    {
-        return GenerateRandomItem();
-    }
-
     private EquipmentData GenerateRandomItem()
     {
         List<EquipmentData> _equipments;

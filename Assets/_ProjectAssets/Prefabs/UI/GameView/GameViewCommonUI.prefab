@@ -4779,14 +4779,13 @@ GameObject:
   - component: {fileID: 6430003057174731525}
   - component: {fileID: 2153139709679317656}
   - component: {fileID: 161059919}
-  - component: {fileID: 633220175}
   m_Layer: 5
   m_Name: Player2Level
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &4529364923824542318
 RectTransform:
   m_ObjectHideFlags: 0
@@ -4869,21 +4868,6 @@ MonoBehaviour:
   sceneViewId: 0
   InstantiationId: 0
   isRuntimeInstantiated: 0
---- !u!114 &633220175
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1222981535529419567}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: bc52bfdd76cf2434195ab1d5ef774bc9, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  levelDisplay: {fileID: 4959308334080864501}
-  levelBar: {fileID: 83316342888801083}
-  isForMasterClient: 0
 --- !u!1 &2585230351012302866
 GameObject:
   m_ObjectHideFlags: 0
@@ -4971,7 +4955,6 @@ GameObject:
   - component: {fileID: 2660213459225802569}
   - component: {fileID: 230373804407898446}
   - component: {fileID: 6485285504362188664}
-  - component: {fileID: 161059925}
   - component: {fileID: 161059926}
   m_Layer: 5
   m_Name: Player1Level
@@ -4979,7 +4962,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &2660213459225802569
 RectTransform:
   m_ObjectHideFlags: 0
@@ -5040,21 +5023,6 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
---- !u!114 &161059925
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6094515928560153354}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: bc52bfdd76cf2434195ab1d5ef774bc9, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  levelDisplay: {fileID: 2066623316941183875}
-  levelBar: {fileID: 5809245474925973552}
-  isForMasterClient: 1
 --- !u!114 &161059926
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5111,7 +5079,7 @@ RectTransform:
   - {fileID: 710578837208319526}
   - {fileID: 710578837470393183}
   m_Father: {fileID: 0}
-  m_RootOrder: 0
+  m_RootOrder: -1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}

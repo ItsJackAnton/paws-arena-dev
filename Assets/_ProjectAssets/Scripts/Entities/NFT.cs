@@ -11,30 +11,8 @@ public class NFT
     public List<string> ids;
     public Texture2D imageTex;
     private XmlDocument doc;
-    private DateTime recoveryEndDate;
     public Sprite Sprite;
     public Sprite Avatar;
-
-    public bool CanFight => RecoveryEndDate < DateTime.UtcNow;
-    public bool IsDefaultKitty => imageUrl == ConnectingToServer.DEFAULT_KITTY;
-    public int MinutesUntilHealed => (int)(RecoveryEndDate - DateTime.UtcNow).TotalMinutes;
-
-    public TimeSpan TimeUntilHealed => RecoveryEndDate - DateTime.UtcNow;
-
-    public Action UpdatedRecoveryTime;
-
-    public DateTime RecoveryEndDate
-    {
-        get
-        {
-            return recoveryEndDate;
-        }
-        set
-        {
-            recoveryEndDate = value;
-            UpdatedRecoveryTime?.Invoke();
-        }
-    }
 
     public async UniTask GrabImage(Action _callBack=null)
     {

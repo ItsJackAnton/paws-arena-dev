@@ -1,6 +1,4 @@
 using System;
-using System.Collections.Generic;
-using BoomDaoWrapper;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
@@ -22,7 +20,6 @@ public class RecoveryDropDown : MonoBehaviour
 
     [SerializeField] private Button jugOfMilkButton;
     [SerializeField] private Button glassOfMilkButton;
-    [SerializeField] private UserInfoDropDown userInfoDropDown;
     [SerializeField] private RecoveryHandler recoveryHandler;
     
     private RecoveryOption recoveryOption;
@@ -91,7 +88,6 @@ public class RecoveryDropDown : MonoBehaviour
         }
         else
         {
-            userInfoDropDown.Close();
             Show();
         }
     }
@@ -120,57 +116,61 @@ public class RecoveryDropDown : MonoBehaviour
 
     public void Heal()
     {
-        if (GameState.selectedNFT.CanFight)
+        if (DataManager.Instance.PlayerData.CanFight)
         {
             kittyIsFull.gameObject.SetActive(true);
             return;
         }
 
         healButton.interactable = false;
-        Debug.Log(GameState.selectedNFT.imageUrl);
         if (recoveryOption == RecoveryOption.JugOfMilk)
         {
-            if (DataManager.Instance.PlayerData.JugOfMilk > 0)
+            if (Application.isEditor)
             {
-                BoomDaoUtility.Instance.ExecuteActionWithParameter(DataManager.Instance.PlayerData.UseMilkBottle,
-                    new List<ActionParameter>()
+                if (DataManager.Instance.PlayerData.JugOfMilk > 0)
+                {
+                    bool _outcome = UnityEngine.Random.Range(0, 2) == 1;
+                    if (_outcome)
                     {
-                        new ()
-                        {
-                            Key = DataManager.Instance.GameData.KittyKey,
-                            Value = GameState.selectedNFT.imageUrl
-                        }
-                    },
-                    HandleBottleHealOutcome);
+                        DataManager.Instance.PlayerData.JugOfMilk--;
+                    }
+                    HandleBottleHealOutcome(_outcome);
+                }
+                else
+                {
+                    healMessageHolder.SetActive(true);
+                    healButton.interactable = true;
+                    return;
+                }
             }
             else
             {
-                healMessageHolder.SetActive(true);
-                healButton.interactable = true;
-                return;
+                //todo fix me Abstract
             }
         }
         else
         {
-            if (DataManager.Instance.PlayerData.GlassOfMilk > 0)
+            if (Application.isEditor)
             {
-                BoomDaoUtility.Instance.ExecuteActionWithParameter(DataManager.Instance.PlayerData.UseMilkGlass,
-                    new List<ActionParameter>()
+                if (DataManager.Instance.PlayerData.GlassOfMilk > 0)
+                {
+                    bool _outcome = UnityEngine.Random.Range(0, 2) == 1;
+                    if (_outcome)
                     {
-                        new ()
-                        {
-                            Key = DataManager.Instance.GameData.KittyKey,
-                            Value = GameState.selectedNFT.imageUrl
-                        }
-                    },
-                    HandleGlassHealOutcome);
+                        DataManager.Instance.PlayerData.GlassOfMilk--;
+                    }
+                    HandleGlassHealOutcome(_outcome);
+                }
+                else
+                {
+                    healMessageHolder.SetActive(true);
+                    healButton.interactable = true;
+                    return;
+                }
             }
             else
             {
-                Debug.Log(DataManager.Instance.PlayerData.GlassOfMilk);
-                healMessageHolder.SetActive(true);
-                healButton.interactable = true;
-                return;
+                //todo fix me Abstract
             }
         }
 
@@ -178,31 +178,31 @@ public class RecoveryDropDown : MonoBehaviour
         Close();
     }
 
-    private void HandleBottleHealOutcome(List<ActionOutcome> _outcomes)
+    private void HandleBottleHealOutcome(bool _didSucceed)
     {
         healButton.interactable = true;
-        if (_outcomes==default||_outcomes.Count==0)
+        if (!_didSucceed)
         {
             healMessageHolder.SetActive(true);
             return;
         }
         EventsManager.OnHealedKitty?.Invoke();
         EventsManager.OnUsedMilkBottle?.Invoke();
-        GameState.selectedNFT.RecoveryEndDate = DateTime.UtcNow;
+        DataManager.Instance.PlayerData.RecoveryEndDate = DateTime.UtcNow;
     }
 
-    private void HandleGlassHealOutcome(List<ActionOutcome> _outcomes)
+    private void HandleGlassHealOutcome(bool _didSucceed)
     {
         healButton.interactable = true;
-        if (_outcomes==default||_outcomes.Count==0)
+        if (!_didSucceed)
         {
             healMessageHolder.SetActive(true);
             return;
         }
         
         EventsManager.OnHealedKitty?.Invoke();
-        GameState.selectedNFT.RecoveryEndDate = GameState.selectedNFT.RecoveryEndDate.AddMinutes(-15);
-        recoveryHandler.RestartRoutine(GameState.selectedNFT.RecoveryEndDate);
+        DataManager.Instance.PlayerData.RecoveryEndDate = DataManager.Instance.PlayerData.RecoveryEndDate.AddMinutes(-15);
+        recoveryHandler.RestartRoutine(DataManager.Instance.PlayerData.RecoveryEndDate);
     }
 
     public void BuyMilk()

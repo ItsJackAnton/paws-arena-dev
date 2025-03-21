@@ -17,7 +17,6 @@ public class LuckyWheelWhoPlaysFirst : MonoBehaviour
     [SerializeField] private RectTransform pointerHolder;
     [SerializeField] private Button leaveButton;
     
-    private LuckyWheelRewardSO choosenPlayer;
     private float speed;
     private PhotonView photonView;
 

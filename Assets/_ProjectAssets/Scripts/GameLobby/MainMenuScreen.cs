@@ -38,17 +38,9 @@ public class MainMenuScreen : MonoBehaviour
         }
         
         DidInit=true;
-        int _imagesToLoad = GameState.nfts.Count;
-        foreach (var _nft in GameState.nfts)
+        _ = DataManager.Instance.PlayerData.Nft.GrabImage(() =>
         {
-            _nft.GrabImage(() =>
-            {
-                _imagesToLoad--;
-                if (_imagesToLoad==0)
-                {
-                    OnLoadedImages?.Invoke();
-                }
-            });
-        }
+            OnLoadedImages?.Invoke();
+        });
     }
 }

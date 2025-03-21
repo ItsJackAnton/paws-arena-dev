@@ -1,4 +1,3 @@
-using System;
 using System.Collections;
 using UnityEngine;
 using TMPro;
@@ -21,20 +20,20 @@ public class RecoveryShowTimer : MonoBehaviour
     {
         while (gameObject.activeSelf)
         {
-            if (GameState.selectedNFT.CanFight)
+            if (DataManager.Instance.PlayerData.CanFight)
             {
                 recoveryDisplay.text = string.Empty;
             }
             else
             {
-                int _minutes = GameState.selectedNFT.MinutesUntilHealed;
+                int _minutes = DataManager.Instance.PlayerData.MinutesUntilHealed;
                 if (_minutes!=0)
                 {
                     recoveryDisplay.text = _minutes + "m";
                 }
                 else
                 {
-                    recoveryDisplay.text = (int)GameState.selectedNFT.TimeUntilHealed.TotalSeconds + "s";
+                    recoveryDisplay.text = (int)DataManager.Instance.PlayerData.TimeUntilHealed.TotalSeconds + "s";
                 }
             }
             yield return new WaitForSeconds(1);

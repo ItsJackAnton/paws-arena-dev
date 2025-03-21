@@ -11,7 +11,6 @@ public class ShareHandler : MonoBehaviour
     [SerializeField] private GameObject objectTOHide;
     [SerializeField] private GameObject kittyStand;
     [SerializeField] private TextMeshProUGUI nameDisplay;
-    [SerializeField] private TextMeshProUGUI scoreDisplay;
     [SerializeField] private Vector3 standPosition;
     private float timeScale;
     
@@ -41,7 +40,6 @@ public class ShareHandler : MonoBehaviour
         Vector3 _standPosition = _platform.transform.localPosition;
         Vector3 _startingSize = _platform.transform.localScale;
         nameDisplay.text = DataManager.Instance.PlayerData.Username;
-        scoreDisplay.text = DataManager.Instance.PlayerData.LeaderboardPoints.ToString();
         float _newSize = 0.8f;
         _platform.transform.localScale = new Vector3(_newSize, _newSize);
         _platform.transform.localPosition = standPosition;
@@ -54,8 +52,7 @@ public class ShareHandler : MonoBehaviour
         byte[] _imageBytes = _screenImage.EncodeToPNG();
         string _base64Image = Convert.ToBase64String(_imageBytes);
 
-        JavaScriptManager.Instance.ShareImageToTwitter(_base64Image,"Can you beat my current leaderboard score of " + 
-        $"{DataManager.Instance.PlayerData.LeaderboardPoints}? %0A I am challenging you!%0A %23PawsArena+%23ICP+%24ICP");
+        JavaScriptManager.Instance.ShareImageToTwitter(_base64Image,"Can you beat me? %0A I am challenging you!%0A %23PawsArena+%23ICP+%24ICP");
         
         yield return new WaitForEndOfFrame();
         templateHolder.SetActive(false);

@@ -1,4 +1,3 @@
-using BoomDaoWrapper;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -21,83 +20,27 @@ public class ConnectingToServer : MonoBehaviour
 
     private void Connect()
     {
-        BoomDaoUtility.Instance.Login(FinishConnecting);
         logText.text = "Waiting the connection with ICP Wallet to be approved...";
+        if (Application.isEditor)
+        {
+            GameState.principalId = "UnityEditor123asdK";
+            FinishConnecting();
+        }
+        else
+        {
+            //todo fix me Abstract
+            // var _loginDataResult = BoomDaoUtility.Instance.GetLoginData;
+            // var _loginDataAsOk = _loginDataResult.AsOk();
+            //
+            // GameState.principalId = _loginDataAsOk.principal;
+        }
     }
 
     private void FinishConnecting()
     {
         logText.text = "Connection made!";
-        SetupNftData();
-
-        var _loginDataResult = BoomDaoUtility.Instance.GetLoginData;
-        var _loginDataAsOk = _loginDataResult.AsOk();
-
-        GameState.principalId = _loginDataAsOk.principal;
         DataManager.Instance.Setup();
-        ChallengesManager.Instance.Setup();
-        //MockNfts();
-        
+        DataManager.Instance.PlayerData.Nft = (new NFT { imageUrl = DEFAULT_KITTY });
         SceneManager.Instance.LoadNftSelection();
-    }
-    
-    private void SetupNftData()
-    {
-        UpdateNfts();
-    }
-
-    private void MockNfts()
-    {
-        if (Application.isEditor)
-        {
-            GameState.nfts.Add(new NFT()
-            {
-                imageUrl = "https://rw7qm-eiaaa-aaaak-aaiqq-cai.raw.icp0.io/?type=thumbnail&tokenid=i56dg-jykor-uwiaa-aaaaa-cqace-eaqca-aaavb-a"
-            });  
-        }
-    }
-
-    public static void ReloadNfts()
-    {
-        GameState.nfts.Clear();
-        UpdateNfts();
-    }
-
-    private static void UpdateNfts()
-    {
-        var _nftCollectionsResult = BoomDaoUtility.Instance.GetNftData;
-        if (_nftCollectionsResult.IsErr)
-        {
-            Debug.Log($"{_nftCollectionsResult.AsErr()} "+ nameof(ConnectingToServer));
-            return;
-        }
-
-        var _nftCollectionsAsOk = _nftCollectionsResult.AsOk();
-
-        foreach (var _keyValue in _nftCollectionsAsOk.elements)
-        {
-            var _collection = _keyValue.Value;
-
-            if (_collection.canisterId != BoomDaoUtility.ICK_KITTIES)
-            {
-                continue;
-            }
-            
-            foreach (var _token in _collection.tokens)
-            {
-                var _nft = new NFT { imageUrl = _token.url };
-                _nft.GrabImage();
-                GameState.nfts.Add(_nft);
-            }
-            break;
-        }
-        
-        if (GameState.nfts.Count==0)
-        {
-            GameState.nfts.Add(new NFT()
-            {
-                imageUrl = DEFAULT_KITTY
-            });
-        }
     }
 }

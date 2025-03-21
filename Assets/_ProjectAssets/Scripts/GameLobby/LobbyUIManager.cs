@@ -34,10 +34,6 @@ public class LobbyUIManager : MonoBehaviour
 
     [Header("Others")]
     public GameObject loadingScreen;
-    [SerializeField] private CraftingSystemUI craftingSystem;
-    [SerializeField] private Image fightImage;
-    [SerializeField] private Sprite normalFightSprite;
-    [SerializeField] private Sprite injuredFightSprite;
 
 
     private void OnEnable()
@@ -125,7 +121,7 @@ public class LobbyUIManager : MonoBehaviour
 
     public void TryConnectToRoom()
     {
-        if (!GameState.selectedNFT.CanFight)
+        if (!DataManager.Instance.PlayerData.CanFight)
         {
             RecoveryMessageDisplay.Instance.ShowMessage();
             OpenNFTSelectionScreen();
@@ -164,27 +160,5 @@ public class LobbyUIManager : MonoBehaviour
     {
         OpenGameMenu();
         settings.SetActive(false);
-    }
-
-    public void ShowCraftingSystem()
-    {
-        craftingSystem.Setup();
-    }
-
-    private void Start()
-    {
-        StartCoroutine(FightButtonGraphics());
-    }
-
-    private IEnumerator FightButtonGraphics()
-    {
-        while (gameObject.activeSelf)
-        {
-            if (GameState.selectedNFT!=null)
-            {
-                fightImage.sprite = GameState.selectedNFT.CanFight ? normalFightSprite : injuredFightSprite;
-            }
-            yield return new WaitForSeconds(2);
-        }
     }
 }

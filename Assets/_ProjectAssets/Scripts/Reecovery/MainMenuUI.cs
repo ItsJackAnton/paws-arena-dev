@@ -6,45 +6,30 @@ using UnityEngine.UI;
 
 public class MainMenuUI : MonoBehaviour
 {
-    [SerializeField] private Image levelProgressDisplay;
-    [SerializeField] private TextMeshProUGUI levelDisplay;
-    [Space]
     [SerializeField] private RecoveryHandler mainRecoveryHandler;
     [SerializeField] private GameObject connectingToRoom;
     [SerializeField] private TextMeshProUGUI connectingToRoomText;
     [SerializeField] private PhotonManager photonManager;
     [SerializeField] private LobbyPhotonConnection lobbyPhotonConnection;
-    [SerializeField] private Button lobby;
     [SerializeField] private GameObject settingsHolder;
     [SerializeField] private Button settings;
     [SerializeField] private Button fightButton;
     [SerializeField] private Button tutorialButton;
-    [SerializeField] private Button guildsButton;
-    [SerializeField] private GameObject generatingChallenges;
-    [SerializeField] private ShowProfilePicture profilePicture;
 
     private void OnEnable()
     {
         tutorialButton.onClick.AddListener(ShowTutorial);
         settings.onClick.AddListener(ShowSettings);
-        lobby.onClick.AddListener(ShowLobby);
-        guildsButton.onClick.AddListener(ShowGuilds);
-        GameState.selectedNFT.UpdatedRecoveryTime += CheckIfShouldStopRecovering;
-        PlayerData.OnUpdatedExp += ShowLevelProgress;
+        PlayerData.OnUpdatedRecoverEndDate += CheckIfShouldStopRecovering;
         fightButton.onClick.AddListener(JoinRoom);
-
-        ShowLevelProgress();
-        mainRecoveryHandler.ShowRecovery(GameState.selectedNFT.RecoveryEndDate);
+        mainRecoveryHandler.ShowRecovery(DataManager.Instance.PlayerData.RecoveryEndDate);
     }
 
     private void OnDisable()
     {
         tutorialButton.onClick.RemoveListener(ShowTutorial);
         settings.onClick.RemoveListener(ShowSettings);
-        lobby.onClick.RemoveListener(ShowLobby);
-        guildsButton.onClick.RemoveListener(ShowGuilds);
-        GameState.selectedNFT.UpdatedRecoveryTime -= CheckIfShouldStopRecovering;
-        PlayerData.OnUpdatedExp -= ShowLevelProgress;
+        PlayerData.OnUpdatedRecoverEndDate -= CheckIfShouldStopRecovering;
         fightButton.onClick.RemoveListener(JoinRoom);
     }
 
@@ -58,45 +43,22 @@ public class MainMenuUI : MonoBehaviour
         settingsHolder.SetActive(true);
     }
 
-    private void ShowLobby()
-    {
-        SceneManager.Instance.LoadLeaderboard();
-    }
-
-    private void ShowGuilds()
-    {
-        SceneManager.Instance.LoadGuilds();
-    }
-    
     private void CheckIfShouldStopRecovering()
     {
-        if (GameState.selectedNFT.RecoveryEndDate <= DateTime.UtcNow)
+        if (DataManager.Instance.PlayerData.RecoveryEndDate <= DateTime.UtcNow)
         {
             mainRecoveryHandler.StopRecovery();
         }
     }
     
-    private void ShowLevelProgress()
-    {
-        levelProgressDisplay.fillAmount = DataManager.Instance.PlayerData.ExperienceOnCurrentLevel / (float)DataManager.Instance.PlayerData.ExperienceForNextLevel;
-        levelDisplay.text = DataManager.Instance.PlayerData.Level.ToString();
-    }
-
     private void JoinRoom()
     {
-        if (!GameState.selectedNFT.CanFight)
+        if (!DataManager.Instance.PlayerData.CanFight)
         {
             RecoveryMessageDisplay.Instance.ShowMessage();
-            SceneManager.Instance.LoadNftSelection();
             return;
         }
 
-        if (ChallengesManager.Instance.IsGeneratingNewChallenges)
-        {
-            generatingChallenges.SetActive(true);
-            return;
-        }
-        
         connectingToRoom.SetActive(true);
 
         connectingToRoomText.text = "Connecting to Multiplayer Server(" + PhotonNetwork.CloudRegion + ")...";
@@ -118,7 +80,7 @@ public class MainMenuUI : MonoBehaviour
     
     public void TryConnectToFriendlyRoom(string _name)
     {
-        if (!GameState.selectedNFT.CanFight)
+        if (!DataManager.Instance.PlayerData.CanFight)
         {
             RecoveryMessageDisplay.Instance.ShowMessage();
             SceneManager.Instance.LoadNftSelection();

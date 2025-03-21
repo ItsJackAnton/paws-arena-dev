@@ -1,12 +1,8 @@
-using System.Collections.Generic;
 using Photon.Pun;
-using BoomDaoWrapper;
 using UnityEngine;
 
 public class PlayerNicknameButton : MonoBehaviour
 {
-    private const string SET_NAME_ACTION_ID = "setPlayerName";
-    
     [SerializeField] private TMPro.TextMeshProUGUI nicknameText;
     [SerializeField] private InputModal inputModal;
 
@@ -32,15 +28,17 @@ public class PlayerNicknameButton : MonoBehaviour
     private void SaveNewName(string _nickname)
     {
         inputModal.ManageButton(false);
-        BoomDaoUtility.Instance.ExecuteActionWithParameter(
-            SET_NAME_ACTION_ID,
-            new List<ActionParameter>(){ new() {Key = PlayerData.NAME_KEY, Value = _nickname}}, _outcomes =>
-            {
-                HandleSetNameFinished(_outcomes, _nickname);
-            });
+        if (Application.isEditor)
+        {
+            HandleSetNameFinished(_nickname);
+        }
+        else
+        {
+            // todo fix me Abstract
+        }
     }
 
-    private void HandleSetNameFinished(List<ActionOutcome> _, string _newName)
+    private void HandleSetNameFinished(string _newName)
     {
         inputModal.ManageButton(true);
         SetPlayerName(_newName);
@@ -49,10 +47,11 @@ public class PlayerNicknameButton : MonoBehaviour
     private void SetPlayerName(string _newName)
     {
         GameState.nickname = PhotonNetwork.NickName = nicknameText.text = _newName;
+        DataManager.Instance.PlayerData.Username = _newName;
         SendNewNicknameToServer(_newName);
         inputModal.Hide();
     }
-    
+
     private async void SendNewNicknameToServer(string _nickname)
     {
         try

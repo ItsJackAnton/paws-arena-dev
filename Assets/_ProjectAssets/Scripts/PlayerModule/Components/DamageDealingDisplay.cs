@@ -19,7 +19,7 @@ public class DamageDealingDisplay : MonoBehaviour
     {
         XpEarned = 0;
         isBotPlayer = GetComponentInParent<BotPlayerComponent>();
-        if (PhotonNetwork.CurrentRoom.PlayerCount==2)
+        if (PhotonNetwork.CurrentRoom != null && PhotonNetwork.CurrentRoom.PlayerCount==2)
         {
             photonView = GetComponent<PhotonView>();
         }
@@ -69,11 +69,7 @@ public class DamageDealingDisplay : MonoBehaviour
         EventsManager.OnGotExperience?.Invoke(_damageTaken);
         EventsManager.OnDealtDamageToOpponent?.Invoke(_damageTaken);
         
-        if (!DataManager.Instance.GameData.IsSeasonActive)
-        {
-            return;
-        }
-
+        return;
         XpEarned += _damageTaken;
         // DataManager.Instance.PlayerData.Experience += _damageTaken;
         for (int i = 0; i < _damageTaken; i += 5)

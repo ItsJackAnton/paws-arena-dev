@@ -28,10 +28,6 @@ public class PasswordScreen : MonoBehaviour
         var text = logText.GetComponent<TMPro.TextMeshProUGUI>();
         text.text = "Pretending we connect to ICP Wallet...";
 
-        //Mock data. To be removed
-        GameState.nfts.Add(
-            new NFT() { imageUrl = "https://images.entrepot.app/tnc/rw7qm-eiaaa-aaaak-aaiqq-cai/jjzf6-5ikor-uwiaa-aaaaa-cqace-eaqca-aadai-q" }
-            );
         GameState.walletId = "asd";
 
         yield return new WaitForSeconds(1f);

@@ -2,8 +2,6 @@ using Anura.ConfigurationModule.Managers;
 using Cysharp.Threading.Tasks;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using BoomDaoWrapper;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -16,12 +14,7 @@ public class NftSelection : MonoBehaviour
     public GameObject nftButtonPrefab;
     public Transform nftButtonsParent;
 
-    [SerializeField] private GameObject message;
-    [SerializeField] private Button reload;
-    [SerializeField] private Button reloadNoKitty;
-    [SerializeField] private GameObject noNftsMessage;
     [SerializeField] private Button enterArena;
-    [SerializeField] private Button signOut;
     
     private List<GameObject> nftButtons = new();
     private GameObject playerPlatform;
@@ -34,11 +27,7 @@ public class NftSelection : MonoBehaviour
     private void OnEnable()
     {
         enterArena.onClick.AddListener(EnterArena);
-        reload.onClick.AddListener(RequestReload);
-        reloadNoKitty.onClick.AddListener(RequestReload);
         pages.OnClick += OnPageSelected;
-        signOut.onClick.AddListener(SignOut);
-        BoomDaoUtility.OnUpdatedNftsData += ReloadNfts;
         GameState.SetSelectedNFT(null);
         
         InitNftScreen();
@@ -47,9 +36,6 @@ public class NftSelection : MonoBehaviour
     private void OnDisable()
     {
         enterArena.onClick.RemoveListener(EnterArena);
-        reload.onClick.RemoveListener(RequestReload);
-        reloadNoKitty.onClick.RemoveListener(RequestReload);
-        signOut.onClick.RemoveListener(SignOut);
         ClearShownNfts();
         if (playerPlatform != null)
         {
@@ -59,40 +45,18 @@ public class NftSelection : MonoBehaviour
 
 
         pages.OnClick -= OnPageSelected;
-        BoomDaoUtility.OnUpdatedNftsData -= ReloadNfts;
-    }
-
-    private void SignOut()
-    {
-        BoomDaoUtility.Instance.Logout(ShowLoginScene);
-    }
-
-    private void ShowLoginScene()
-    {
-        GameState.nfts.Clear();
-        SceneManager.Instance.LoadLoginScene();
     }
 
     private void EnterArena()
     {
         if (GameState.selectedNFT==null)
         {
-            if (GameState.nfts.Count==0)
-            {
-                noNftsMessage.SetActive(true);
-            }
             return;
         }
         
         SceneManager.Instance.LoadMainMenu();
     }
 
-    private void RequestReload()
-    {
-        ConnectingToServer.ReloadNfts();
-        BoomDaoUtility.Instance.ReloadNfts();
-    }
-    
     private async void OnPageSelected(int _idx)
     {
         currentPage = _idx;
@@ -115,22 +79,19 @@ public class NftSelection : MonoBehaviour
         currentNfts.Clear();
     }
 
-    public async void InitNftScreen()
+    private async void InitNftScreen()
     {
         currentPage = 0;
-        int _maxPages = (int)Math.Floor((GameState.nfts.Count - 1) * 1.0 / pageSize);
+        int _maxPages = (int)Math.Floor((1 - 1) * 1.0 / pageSize);
         pages.SetNumberOfPages(_maxPages + 1);
         await PopulateGridAsync();
-        if (GameState.nfts.Count>0)
-        {
-            SelectNft(0);
-        }
-        message.SetActive(GameState.nfts.Count==0);
+        SelectNft(0);
+        OnPageSelected(currentPage);
     }
 
     private List<NFT> GetNfts(int _pageNr, int _pageSize)
     {
-        return GameState.nfts.Skip(_pageNr * _pageSize).Take(_pageSize).ToList();
+        return new List<NFT> {DataManager.Instance.PlayerData.Nft};
     }
     
     private async UniTask PopulateGridAsync()
@@ -173,14 +134,8 @@ public class NftSelection : MonoBehaviour
         _idx = 0;
         foreach (NFT _nft in currentNfts)
         {
-            _nft.RecoveryEndDate = DateTime.MinValue;
-            if (DataManager.Instance.GameData.IsKittyHurt(_nft.imageUrl))
-            {
-                _nft.RecoveryEndDate = DataManager.Instance.GameData.GetKittyRecoveryDate(_nft.imageUrl);
-            }
-            
             nftButtons[_idx].GetComponent<NFTImageButton>().SetTexture(_nft.imageTex);
-            nftButtons[_idx].GetComponent<RecoveryHandler>().ShowRecovery(_nft.RecoveryEndDate);
+            nftButtons[_idx].GetComponent<RecoveryHandler>().ShowRecovery(DataManager.Instance.PlayerData.RecoveryEndDate);
             nftButtons[_idx].GetComponent<Button>().onClick.RemoveAllListeners();
 
             int _crtIdx = _idx;

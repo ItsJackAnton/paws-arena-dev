@@ -75,7 +75,6 @@ public class PhotonManager : MonoBehaviourPunCallbacks
 
     private void SetCustomProperties()
     {
-        Debug.Log("----- setting custom room properties");
         PhotonNetwork.LocalPlayer.SetCustomProperties(
             new Hashtable
             {

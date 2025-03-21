@@ -112,27 +112,7 @@ public class EquipScreen : MonoBehaviour
     
     private void Populate(Equipment equippedItem, List<EquipmentData> elements)
     {
-        foreach (EquipmentData el in elements)
-        {
-            if (!DataManager.Instance.PlayerData.OwnedEquiptables.Contains((Convert.ToInt32(el.Id))))
-            {
-                continue;
-            }
-            var go = GameObject.Instantiate(nftPrefab, content);
-            var nftImageSprite = go.GetComponent<NFTImageSprite>();
-            nftImageSprite.mainImage.sprite = el.Thumbnail;
-            equipments.Add(nftImageSprite);
-
-            if (equippedItem != null && equippedItem is SpriteEquipment spriteItem && el.Thumbnail == spriteItem.sprite)
-            {
-                Debug.Log("Found match for " + spriteItem.sprite.name);
-                nftImageSprite.Select();
-                selectedEquipment = nftImageSprite;
-            }
-
-            int idx = equipments.Count - 1;
-            equipments[idx].onClick += () => OnEquipmentSelected(idx);
-        }
+        
     }
 
     private void OnEquipmentSelected(int idx, EquipmentData idPair = null)

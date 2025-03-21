@@ -36,21 +36,6 @@ public class SceneManager : MonoBehaviour
         LoadScene(NFT_SELECTION);
     }
 
-    public void LoadGuilds()
-    {
-        LoadScene(GUILDS);
-    }
-
-    public void LoadLoginScene()
-    {
-        LoadScene(LOGIN_SCENE);
-    }
-
-    public void LoadLeaderboard()
-    {
-        LoadScene(LEADERBOARD);
-    }
-
     public void LoadMainMenu()
     {
         LoadScene(MAIN_MENU);

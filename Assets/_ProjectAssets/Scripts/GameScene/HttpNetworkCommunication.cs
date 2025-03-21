@@ -2,14 +2,7 @@ using Anura.ConfigurationModule.Managers;
 using Cysharp.Threading.Tasks;
 using Photon.Pun;
 using System;
-using System.Collections;
-using System.Collections.Generic;
-using BoomDaoWrapper;
-using com.colorfulcoding.AfterGame;
-using Newtonsoft.Json;
-using TMPro;
 using UnityEngine;
-using Random = UnityEngine.Random;
 
 namespace com.colorfulcoding.GameScene
 {
@@ -100,14 +93,7 @@ namespace com.colorfulcoding.GameScene
                 {
                     Debug.Log(resp);
                     LeaderboardPostResponseEntity response = JsonUtility.FromJson<LeaderboardPostResponseEntity>(resp);
-                    Debug.Log(1);
-                    Debug.Log(DataManager.Instance);
-                    Debug.Log(DataManager.Instance.PlayerData);
-                    Debug.Log(DataManager.Instance.PlayerData.LeaderboardPoints);
-                    response.oldPoints = DataManager.Instance.PlayerData.LeaderboardPoints;
-                    Debug.Log(2);
                     GameState.pointsChange = response;
-                    Debug.Log(3);
                 },
                 (err, code) =>
                 {

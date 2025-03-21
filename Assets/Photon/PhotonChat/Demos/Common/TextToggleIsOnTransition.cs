@@ -26,7 +26,7 @@ namespace Photon.Chat.UtilityScripts
         /// </summary>
 		public Toggle toggle;
 
-        private Text _text;
+		Text _text;
 
         /// <summary>
         /// The color of the normal on transition state.
@@ -48,7 +48,7 @@ namespace Photon.Chat.UtilityScripts
         /// </summary>
 		public Color HoverOffColor = Color.black;
 
-        private bool isHover;
+		bool isHover;
 
 		public void OnEnable()
 		{

@@ -207,20 +207,6 @@ public class GameMatchingScreen : MonoBehaviour
         };
 
         int _index = Random.Range(0, _bots.Count);
-        if (DataManager.Instance.PlayerData.ShouldBotBeEasy)
-        {
-            int _minLevel = int.MaxValue;
-            foreach (var _bot in _bots)
-            {
-                if (_bot.l<_minLevel)
-                {
-                    _minLevel = _bot.l;
-                }
-            }
-
-            var _botsWithMinLevel = _bots.FindAll(_bot => _bot.l == _minLevel).ToList();
-            return _botsWithMinLevel[Random.Range(0,_botsWithMinLevel.Count)];
-        }
         return _bots[_index];
     }
 

@@ -35,7 +35,7 @@ public class RoomNameDisplay : MonoBehaviour
 
     private void CopyName()
     {
-        Utilities.DoCopyToClipboard(PhotonNetwork.CurrentRoom.Name);
+        JavaScriptManager.DoCopyToClipboard(PhotonNetwork.CurrentRoom.Name);
     }
 
     private void Awake()

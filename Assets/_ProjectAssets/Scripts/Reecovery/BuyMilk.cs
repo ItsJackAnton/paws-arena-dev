@@ -1,14 +1,9 @@
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
-using BoomDaoWrapper;
 
 public class BuyMilk : MonoBehaviour
 {
-    private const string BUY_MILK_BOTTLE = "buyMilkBottleIcp";
-    private const string BUY_MILK_GLASS = "buyMilkGlassIcp";
-    
     [SerializeField] private Button doneButton;
     [SerializeField] private Button buyJugOfMilkButton;
     [SerializeField] private Button buyGlassOfMilkButton;
@@ -36,8 +31,8 @@ public class BuyMilk : MonoBehaviour
         PlayerData.OnUpdatedJugOfMilk += ShowJugOfMilk;
         PlayerData.OnUpdatedGlassOfMilk += ShowGlassOfMilk;
 
-        glassOfMilkPriceDisplay.text = DataManager.Instance.GameData.GlassOfMilkPrice.ToString();
-        jugOfMilkPriceDisplay.text = DataManager.Instance.GameData.JugOfMilkPrice.ToString();
+        glassOfMilkPriceDisplay.text = GameData.GLASS_OF_MILK_PRICE.ToString();
+        jugOfMilkPriceDisplay.text = GameData.JUG_OF_MILK_PRICE.ToString();
 
         gameObject.SetActive(true);
     }
@@ -67,19 +62,47 @@ public class BuyMilk : MonoBehaviour
     private void BuyJugOfMilk()
     {
         ManageInteractables(false);
-        BoomDaoUtility.Instance.ExecuteAction(BUY_MILK_BOTTLE, HandleBuyOutcome,ShowInsufficientFunds);
+        if (Application.isEditor)
+        {
+            bool _outcome = Random.Range(0, 2) == 1;
+            if (_outcome)
+            {
+                DataManager.Instance.PlayerData.JugOfMilk++;
+            }
+            else
+            {
+                ShowInsufficientFunds();
+            }
+            
+            ManageInteractables(true);
+        }
+        else
+        {
+            //Todo fix me Abstract
+        }
     }
 
     private void BuyGlassOfMIlk()
     {
         ManageInteractables(false);
-
-        BoomDaoUtility.Instance.ExecuteAction(BUY_MILK_GLASS, HandleBuyOutcome,ShowInsufficientFunds);
-    }
-
-    private void HandleBuyOutcome(List<ActionOutcome> _outcomes)
-    {
-        ManageInteractables(true);
+        if (Application.isEditor)
+        {
+            bool _outcome = Random.Range(0, 2) == 1;
+            if (_outcome)
+            {
+                DataManager.Instance.PlayerData.GlassOfMilk++;
+            }
+            else
+            {
+                ShowInsufficientFunds();
+            }
+            
+            ManageInteractables(true);
+        }
+        else
+        {
+            //Todo fix me Abstract
+        }
     }
 
     private void ShowInsufficientFunds()
