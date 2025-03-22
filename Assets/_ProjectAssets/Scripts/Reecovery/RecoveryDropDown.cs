@@ -125,7 +125,7 @@ public class RecoveryDropDown : MonoBehaviour
         healButton.interactable = false;
         if (recoveryOption == RecoveryOption.JugOfMilk)
         {
-            if (Application.isEditor)
+            if (JavaScriptManager.UseMockUpData)
             {
                 if (DataManager.Instance.PlayerData.JugOfMilk > 0)
                 {
@@ -150,7 +150,7 @@ public class RecoveryDropDown : MonoBehaviour
         }
         else
         {
-            if (Application.isEditor)
+            if (JavaScriptManager.UseMockUpData)
             {
                 if (DataManager.Instance.PlayerData.GlassOfMilk > 0)
                 {

@@ -21,7 +21,7 @@ public class ConnectingToServer : MonoBehaviour
     private void Connect()
     {
         logText.text = "Waiting the connection with ICP Wallet to be approved...";
-        if (Application.isEditor)
+        if (JavaScriptManager.UseMockUpData)
         {
             GameState.principalId = "UnityEditor123asdK";
             FinishConnecting();

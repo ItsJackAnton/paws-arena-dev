@@ -7,7 +7,6 @@ public class DataManager : MonoBehaviour
     public static DataManager Instance;
 
     public PlayerData PlayerData { get; private set; }
-    public GameData GameData { get; private set; } = new ();
 
     private void Awake()
     {
@@ -24,7 +23,7 @@ public class DataManager : MonoBehaviour
 
     public void Setup()
     {
-        if (Application.isEditor)
+        if (JavaScriptManager.UseMockUpData)
         {
             if (PlayerPrefs.HasKey(PLAYER_JSON_KEY))
             {
@@ -45,7 +44,7 @@ public class DataManager : MonoBehaviour
 
     private void SubscribeEvents()
     {
-        if (Application.isEditor)
+        if (JavaScriptManager.UseMockUpData)
         {
             PlayerData.OnUpdatedGlassOfMilk += SaveJsonInPlayerPrefs;
             PlayerData.OnUpdatedJugOfMilk += SaveJsonInPlayerPrefs;

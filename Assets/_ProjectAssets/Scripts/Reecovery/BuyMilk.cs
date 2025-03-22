@@ -14,9 +14,6 @@ public class BuyMilk : MonoBehaviour
     [SerializeField] private Color normalAmountColor;
     [SerializeField] private Color zeroAmountColor;
 
-    [SerializeField] private TextMeshProUGUI glassOfMilkPriceDisplay;
-    [SerializeField] private TextMeshProUGUI jugOfMilkPriceDisplay;
-
     [SerializeField] private GameObject insufficientFounds;
 
     public void Setup()
@@ -31,8 +28,6 @@ public class BuyMilk : MonoBehaviour
         PlayerData.OnUpdatedJugOfMilk += ShowJugOfMilk;
         PlayerData.OnUpdatedGlassOfMilk += ShowGlassOfMilk;
 
-        glassOfMilkPriceDisplay.text = GameData.GLASS_OF_MILK_PRICE.ToString();
-        jugOfMilkPriceDisplay.text = GameData.JUG_OF_MILK_PRICE.ToString();
 
         gameObject.SetActive(true);
     }
@@ -62,7 +57,7 @@ public class BuyMilk : MonoBehaviour
     private void BuyJugOfMilk()
     {
         ManageInteractables(false);
-        if (Application.isEditor)
+        if (JavaScriptManager.UseMockUpData)
         {
             bool _outcome = Random.Range(0, 2) == 1;
             if (_outcome)
@@ -85,7 +80,7 @@ public class BuyMilk : MonoBehaviour
     private void BuyGlassOfMIlk()
     {
         ManageInteractables(false);
-        if (Application.isEditor)
+        if (JavaScriptManager.UseMockUpData)
         {
             bool _outcome = Random.Range(0, 2) == 1;
             if (_outcome)

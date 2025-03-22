@@ -13,5 +13,10 @@ mergeInto(LibraryManager.library,
        }, function(err) {
             console.error('Could not copy text to clipboard: ', err);
        });
+    },
+    
+    ReceiveMessage: function(text)
+    {
+        receiveMessage(UTF8ToString(text));
     }
 });

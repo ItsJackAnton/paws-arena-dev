@@ -4,12 +4,17 @@ using UnityEngine;
 public class JavaScriptManager : MonoBehaviour
 {
     public static JavaScriptManager Instance;
+
+    public static bool UseMockUpData = true;
     
     [DllImport("__Internal")]
     public static extern void DoShareImageToTwitter(string _image, string _text);
     
     [DllImport("__Internal")]
-    public static extern void CopyToClipboard(string _text);
+    public static extern void CopyToClipboard(string _text);    
+    
+    [DllImport("__Internal")]
+    public static extern void ReceiveMessage(string _text);
 
     private void Awake()
     {
@@ -32,6 +37,11 @@ public class JavaScriptManager : MonoBehaviour
         }
         DoShareImageToTwitter(_image, _text);
     }
+
+    public void SendMessage()
+    {
+        ReceiveMessage("This is a test message from Unity");
+    }
     
     public static void DoCopyToClipboard(string _string)
     {
@@ -43,5 +53,10 @@ public class JavaScriptManager : MonoBehaviour
         {
             GUIUtility.systemCopyBuffer = _string;
         }
+    }
+
+    public void ReceiveMessageOutside(string _message)
+    {
+        Debug.Log("Received message outside Unity: "+_message);
     }
 }
