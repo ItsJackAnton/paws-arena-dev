@@ -56,48 +56,28 @@ public class BuyMilk : MonoBehaviour
 
     private void BuyJugOfMilk()
     {
-        ManageInteractables(false);
-        if (JavaScriptManager.UseMockUpData)
+        int _price = 2;
+        if (DataManager.Instance.PlayerData.Cookies<_price)
         {
-            bool _outcome = Random.Range(0, 2) == 1;
-            if (_outcome)
-            {
-                DataManager.Instance.PlayerData.JugOfMilk++;
-            }
-            else
-            {
-                ShowInsufficientFunds();
-            }
-            
-            ManageInteractables(true);
+            ShowInsufficientFunds();
+            return;
         }
-        else
-        {
-            //Todo fix me Abstract
-        }
+
+        DataManager.Instance.PlayerData.Cookies -= _price;
+        DataManager.Instance.PlayerData.JugOfMilk++;
     }
 
     private void BuyGlassOfMIlk()
     {
-        ManageInteractables(false);
-        if (JavaScriptManager.UseMockUpData)
+        int _price = 1;
+        if (DataManager.Instance.PlayerData.Cookies<_price)
         {
-            bool _outcome = Random.Range(0, 2) == 1;
-            if (_outcome)
-            {
-                DataManager.Instance.PlayerData.GlassOfMilk++;
-            }
-            else
-            {
-                ShowInsufficientFunds();
-            }
-            
-            ManageInteractables(true);
+            ShowInsufficientFunds();
+            return;
         }
-        else
-        {
-            //Todo fix me Abstract
-        }
+
+        DataManager.Instance.PlayerData.Cookies -= _price;
+        DataManager.Instance.PlayerData.GlassOfMilk++;
     }
 
     private void ShowInsufficientFunds()
@@ -108,11 +88,5 @@ public class BuyMilk : MonoBehaviour
     private void Done()
     {
         gameObject.SetActive(false);
-    }
-
-    private void ManageInteractables(bool _status)
-    {
-        buyJugOfMilkButton.interactable = _status;
-        buyGlassOfMilkButton.interactable = _status;
     }
 }

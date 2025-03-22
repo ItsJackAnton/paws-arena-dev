@@ -8,17 +8,18 @@ public class PlayerData
     public static Action OnUpdatedRecoverEndDate;
     public static Action OnUpdatedJugOfMilk;
     public static Action OnUpdatedGlassOfMilk;
+    public static Action OnUpdatedCookies;
     
     private string username = string.Empty;
     private DateTime recoveryEndDate;
     private int glassOfMilk;
     private int jugOfMilk;
-    private double cookies;
+    private int cookies;
     
-    public bool CanFight => RecoveryEndDate < DateTime.UtcNow;
+    [JsonIgnore]public bool CanFight => RecoveryEndDate < DateTime.UtcNow;
     
-    public int MinutesUntilHealed => (int)(RecoveryEndDate - DateTime.UtcNow).TotalMinutes;
-    public TimeSpan TimeUntilHealed => RecoveryEndDate - DateTime.UtcNow;
+    [JsonIgnore]public int MinutesUntilHealed => (int)(RecoveryEndDate - DateTime.UtcNow).TotalMinutes;
+    [JsonIgnore]public TimeSpan TimeUntilHealed => RecoveryEndDate - DateTime.UtcNow;
 
     public string Username
     {
@@ -74,4 +75,17 @@ public class PlayerData
     }
 
     [JsonIgnore] public NFT Nft;
+
+    public int Cookies
+    {
+        get
+        {
+            return cookies;
+        }
+        set
+        {
+            cookies = value;
+            OnUpdatedCookies?.Invoke();
+        }
+    }
 }

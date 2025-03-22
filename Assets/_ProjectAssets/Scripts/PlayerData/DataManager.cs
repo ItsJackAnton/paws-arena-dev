@@ -1,12 +1,17 @@
+using System;
+using System.Collections;
 using Newtonsoft.Json;
 using UnityEngine;
 
 public class DataManager : MonoBehaviour
 {
-    private const string PLAYER_JSON_KEY = "playerDataJson";
     public static DataManager Instance;
 
     public PlayerData PlayerData { get; private set; }
+
+    private Action callBack;
+
+    private bool isPushingUpdate;
 
     private void Awake()
     {
@@ -21,44 +26,51 @@ public class DataManager : MonoBehaviour
         }
     }
 
-    public void Setup()
+    public void Setup(Action _callBack)
     {
-        if (JavaScriptManager.UseMockUpData)
-        {
-            if (PlayerPrefs.HasKey(PLAYER_JSON_KEY))
-            {
-                PlayerData = JsonConvert.DeserializeObject<PlayerData>(PlayerPrefs.GetString(PLAYER_JSON_KEY));
-            }
-            else
-            {
-                PlayerData = new PlayerData { Username = "Unity Editor", RecoveryEndDate = default, JugOfMilk = 100, GlassOfMilk = 100};
-            }
+        callBack = _callBack;
+        FirebaseManager.Instance.GetPlayerData(FinishSetup);
+    }
 
-            SubscribeEvents();
+    private void FinishSetup(string _data)
+    {
+        if (string.IsNullOrEmpty(_data) || _data.ToLower() == "null")
+        {
+            PlayerData = new PlayerData();
         }
         else
         {
-            //todo handle Abstract
+            PlayerData = JsonConvert.DeserializeObject<PlayerData>(_data);
         }
+        
+        SubscribeEvents();
+        callBack?.Invoke();
     }
 
     private void SubscribeEvents()
     {
-        if (JavaScriptManager.UseMockUpData)
-        {
-            PlayerData.OnUpdatedGlassOfMilk += SaveJsonInPlayerPrefs;
-            PlayerData.OnUpdatedJugOfMilk += SaveJsonInPlayerPrefs;
-            PlayerData.OnUpdatedRecoverEndDate += SaveJsonInPlayerPrefs;
-            PlayerData.OnUpdatedUsername += SaveJsonInPlayerPrefs;
-        }
-        else
-        {
-            //todo fix me for Abstract
-        }
+        PlayerData.OnUpdatedGlassOfMilk += SaveData;
+        PlayerData.OnUpdatedJugOfMilk += SaveData;
+        PlayerData.OnUpdatedRecoverEndDate += SaveData;
+        PlayerData.OnUpdatedUsername += SaveData;
+        PlayerData.OnUpdatedCookies += SaveData;
     }
 
-    private void SaveJsonInPlayerPrefs()
+    private void SaveData()
     {
-        PlayerPrefs.SetString(PLAYER_JSON_KEY, JsonConvert.SerializeObject(PlayerData));
+        if (isPushingUpdate)
+        {
+            return;
+        }
+
+        isPushingUpdate = true;
+        StartCoroutine(PushDataRoutine());
+    }
+
+    private IEnumerator PushDataRoutine()
+    {
+        yield return new WaitForSeconds(1);
+        isPushingUpdate = false;
+        FirebaseManager.Instance.SavePlayerData(JsonConvert.SerializeObject(PlayerData));
     }
 }

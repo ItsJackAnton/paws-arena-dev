@@ -18,5 +18,15 @@ mergeInto(LibraryManager.library,
     ReceiveMessage: function(text)
     {
         receiveMessage(UTF8ToString(text));
+    },
+    
+    DoAuthenticate: function()
+    {
+        authenticate();
+    },
+    
+    DoPurchase: function(_data)
+    {
+       purchase(UTF8ToString(_data));
     }
 });

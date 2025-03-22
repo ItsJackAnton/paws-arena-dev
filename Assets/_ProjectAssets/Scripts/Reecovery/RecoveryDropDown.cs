@@ -92,7 +92,7 @@ public class RecoveryDropDown : MonoBehaviour
         }
     }
 
-    public void Close()
+    private void Close()
     {
         gameObject.LeanScale(Vector3.zero, animationLength);
         isOpen = false;
@@ -100,7 +100,7 @@ public class RecoveryDropDown : MonoBehaviour
         healButton.onClick.RemoveListener(Heal);
     }
 
-    public void Show()
+    private void Show()
     {
         gameObject.LeanScale(Vector3.one, animationLength);
         isOpen = true;
@@ -114,7 +114,7 @@ public class RecoveryDropDown : MonoBehaviour
         glassOfMilkDisplay.color = DataManager.Instance.PlayerData.GlassOfMilk == 0 ? zeroAmountColor : normalAmountColor;
     }
 
-    public void Heal()
+    private void Heal()
     {
         if (DataManager.Instance.PlayerData.CanFight)
         {
@@ -122,89 +122,37 @@ public class RecoveryDropDown : MonoBehaviour
             return;
         }
 
-        healButton.interactable = false;
         if (recoveryOption == RecoveryOption.JugOfMilk)
         {
-            if (JavaScriptManager.UseMockUpData)
+            if (DataManager.Instance.PlayerData.JugOfMilk <= 0)
             {
-                if (DataManager.Instance.PlayerData.JugOfMilk > 0)
-                {
-                    bool _outcome = UnityEngine.Random.Range(0, 2) == 1;
-                    if (_outcome)
-                    {
-                        DataManager.Instance.PlayerData.JugOfMilk--;
-                    }
-                    HandleBottleHealOutcome(_outcome);
-                }
-                else
-                {
-                    healMessageHolder.SetActive(true);
-                    healButton.interactable = true;
-                    return;
-                }
+                healMessageHolder.SetActive(true);
+                return;
             }
-            else
-            {
-                //todo fix me Abstract
-            }
+
+            DataManager.Instance.PlayerData.JugOfMilk--;
+            DataManager.Instance.PlayerData.RecoveryEndDate = DateTime.UtcNow;
+            EventsManager.OnHealedKitty?.Invoke();
+            EventsManager.OnUsedMilkBottle?.Invoke();
         }
         else
         {
-            if (JavaScriptManager.UseMockUpData)
+            if (DataManager.Instance.PlayerData.GlassOfMilk <= 0)
             {
-                if (DataManager.Instance.PlayerData.GlassOfMilk > 0)
-                {
-                    bool _outcome = UnityEngine.Random.Range(0, 2) == 1;
-                    if (_outcome)
-                    {
-                        DataManager.Instance.PlayerData.GlassOfMilk--;
-                    }
-                    HandleGlassHealOutcome(_outcome);
-                }
-                else
-                {
-                    healMessageHolder.SetActive(true);
-                    healButton.interactable = true;
-                    return;
-                }
+                healMessageHolder.SetActive(true);
+                return;
             }
-            else
-            {
-                //todo fix me Abstract
-            }
-        }
 
+            DataManager.Instance.PlayerData.GlassOfMilk--;
+            DataManager.Instance.PlayerData.RecoveryEndDate = DataManager.Instance.PlayerData.RecoveryEndDate.AddMinutes(-15);
+            recoveryHandler.RestartRoutine(DataManager.Instance.PlayerData.RecoveryEndDate);
+            EventsManager.OnHealedKitty?.Invoke();
+            return;
+        }
 
         Close();
     }
-
-    private void HandleBottleHealOutcome(bool _didSucceed)
-    {
-        healButton.interactable = true;
-        if (!_didSucceed)
-        {
-            healMessageHolder.SetActive(true);
-            return;
-        }
-        EventsManager.OnHealedKitty?.Invoke();
-        EventsManager.OnUsedMilkBottle?.Invoke();
-        DataManager.Instance.PlayerData.RecoveryEndDate = DateTime.UtcNow;
-    }
-
-    private void HandleGlassHealOutcome(bool _didSucceed)
-    {
-        healButton.interactable = true;
-        if (!_didSucceed)
-        {
-            healMessageHolder.SetActive(true);
-            return;
-        }
-        
-        EventsManager.OnHealedKitty?.Invoke();
-        DataManager.Instance.PlayerData.RecoveryEndDate = DataManager.Instance.PlayerData.RecoveryEndDate.AddMinutes(-15);
-        recoveryHandler.RestartRoutine(DataManager.Instance.PlayerData.RecoveryEndDate);
-    }
-
+    
     public void BuyMilk()
     {
         buyMilkPanel.Setup();

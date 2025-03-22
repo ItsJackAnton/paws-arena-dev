@@ -27,21 +27,8 @@ public class PlayerNicknameButton : MonoBehaviour
     
     private void SaveNewName(string _nickname)
     {
-        inputModal.ManageButton(false);
-        if (JavaScriptManager.UseMockUpData)
-        {
-            HandleSetNameFinished(_nickname);
-        }
-        else
-        {
-            // todo fix me Abstract
-        }
-    }
-
-    private void HandleSetNameFinished(string _newName)
-    {
         inputModal.ManageButton(true);
-        SetPlayerName(_newName);
+        SetPlayerName(_nickname);
     }
 
     private void SetPlayerName(string _newName)

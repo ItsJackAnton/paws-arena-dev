@@ -1,9 +1,39 @@
-function receiveMessage(_text)
+
+//vracas mi json ime funkcije ReceiveAuthResponse
+// public class AuthResponse
+// {
+//     public bool DidAuth;
+//     public string WalletAddress;
+// }
+function authenticate()
 {
-    console.log("Received from Unity: "+_text);
+
 }
 
-function sendMessageToUnity(_text)
+
+
+// _data je json
+// public class PurchaseRequest
+// {
+//     public int Amount;
+//     public int Price;
+//     public string ToAddress;
+// }
+
+
+//vracas mi json, ime funkcije je ReceivePurchaseResponse
+// public class PurchaseResponse
+// {
+//     public bool DidPurchase;
+// }
+
+
+function purchase(_data)
 {
-    gameInstance.SendMessage("JavaScriptManager", "ReceiveMessageOutside", "This is a test message from JS");
+
+}
+
+function sendMessageToUnity(functionName, data)
+{
+    gameInstance.SendMessage("JavaScriptManager", functionName, data);
 }

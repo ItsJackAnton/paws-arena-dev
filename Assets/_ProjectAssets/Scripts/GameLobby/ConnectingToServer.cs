@@ -4,9 +4,11 @@ using UnityEngine.UI;
 
 public class ConnectingToServer : MonoBehaviour
 {
-    public const string DEFAULT_KITTY = "https://webapiwithssl20230210160824.azurewebsites.net/download/files/blackKitty.svg";
+    private const string DEFAULT_KITTY = "https://webapiwithssl20230210160824.azurewebsites.net/download/files/blackKitty.svg";
+    
     [SerializeField] private Button connect;
     [SerializeField] private TextMeshProUGUI logText;
+    [SerializeField] private GameObject failedToAuth;
 
     private void OnEnable()
     {
@@ -21,25 +23,34 @@ public class ConnectingToServer : MonoBehaviour
     private void Connect()
     {
         logText.text = "Waiting the connection with ICP Wallet to be approved...";
-        if (JavaScriptManager.UseMockUpData)
+        JavaScriptManager.Instance.AuthenticateAbstract(HanleAuthResponse);
+    }
+
+    private void HanleAuthResponse(AuthResponse _auth)
+    {
+        if (!_auth.DidAuth)
         {
-            GameState.principalId = "UnityEditor123asdK";
-            FinishConnecting();
+            failedToAuth.SetActive(true);
+            return;
         }
-        else
-        {
-            //todo fix me Abstract
-            // var _loginDataResult = BoomDaoUtility.Instance.GetLoginData;
-            // var _loginDataAsOk = _loginDataResult.AsOk();
-            //
-            // GameState.principalId = _loginDataAsOk.principal;
-        }
+        
+        GameState.principalId = _auth.WalletAddress;
+        FinishConnecting();
     }
 
     private void FinishConnecting()
     {
         logText.text = "Connection made!";
-        DataManager.Instance.Setup();
+        FirebaseManager.Instance.Authenticate(GameState.principalId, SetupData);
+    }
+
+    private void SetupData()
+    {
+        DataManager.Instance.Setup(FinishSetup);
+    }
+
+    public void FinishSetup()
+    {
         DataManager.Instance.PlayerData.Nft = (new NFT { imageUrl = DEFAULT_KITTY });
         SceneManager.Instance.LoadNftSelection();
     }
