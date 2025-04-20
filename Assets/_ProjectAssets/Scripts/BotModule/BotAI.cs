@@ -469,6 +469,7 @@ public class BotAI : MonoBehaviour
         if (chosenWeapon == Weapon.Split)
         {
             yield return new WaitForSeconds(chosenLocation.locationSims[chosenWeapon].eta - 1);
+        Debug.Log("22222222");
             api.Shoot();
         }        
     }

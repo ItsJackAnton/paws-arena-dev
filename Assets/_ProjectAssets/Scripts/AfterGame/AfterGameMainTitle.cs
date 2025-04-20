@@ -106,7 +106,7 @@ namespace com.colorfulcoding.AfterGame
             }
         }
 
-        private void SaveKittyHealth()
+        public static void SaveKittyHealth()
         {
             if (CreateFriendlyMatch.IsFriendly)
             {

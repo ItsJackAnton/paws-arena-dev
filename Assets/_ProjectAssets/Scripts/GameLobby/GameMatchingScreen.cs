@@ -3,7 +3,6 @@ using Photon.Realtime;
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 using TMPro;
 using UnityEngine;
 using Random = UnityEngine.Random;
@@ -26,17 +25,17 @@ public class GameMatchingScreen : MonoBehaviour
     public List<SeatGameobject> seats;
     public Countdown countdown;
 
-    [SerializeField] private GameObject wheelHolder;
-    [SerializeField] private GameObject searchingForOpponent;
+    [SerializeField] protected GameObject wheelHolder;
+    [SerializeField] protected GameObject searchingForOpponent;
 
-    private void OnEnable()
+    protected virtual void OnEnable()
     {
         Init();
         PUNRoomUtils.onPlayerJoined += OnPlayerJoined;
         PUNRoomUtils.onPlayerLeft += OnPlayerLeft;
     }
 
-    private void OnDisable()
+    protected virtual void OnDisable()
     {
         PUNRoomUtils.onPlayerJoined -= OnPlayerJoined;
         PUNRoomUtils.onPlayerLeft -= OnPlayerLeft;
@@ -98,7 +97,7 @@ public class GameMatchingScreen : MonoBehaviour
         }
     }
 
-    private IEnumerator BringBotAfterSeconds(float seconds)
+    protected virtual IEnumerator BringBotAfterSeconds(float seconds)
     {
         yield return new WaitForSeconds(seconds-3);
         PhotonNetwork.CurrentRoom.IsVisible = false;
@@ -112,7 +111,7 @@ public class GameMatchingScreen : MonoBehaviour
     }
 
     [ContextMenu("Bring Bot")]
-    public void BringBot()
+    public virtual void BringBot()
     {
         BotInformation botInformation = GetRandomBot();
 
@@ -123,7 +122,7 @@ public class GameMatchingScreen : MonoBehaviour
         StartSinglePlayerGame();
     }
 
-    private BotInformation GetRandomBot()
+    protected BotInformation GetRandomBot()
     {
         var _bots = new List<BotInformation>
         {
@@ -282,7 +281,7 @@ public class GameMatchingScreen : MonoBehaviour
         TryExitRoom();
     }
 
-    public void TryExitRoom()
+    public virtual void TryExitRoom()
     {
         punRoomUtils.TryLeaveRoom();
     }
@@ -339,7 +338,7 @@ public class GameMatchingScreen : MonoBehaviour
         StartCountdown(SceneManager.SINGLE_PLAYER_GAME);
     }
 
-    private void StartCountdown(string _sceneName)
+    protected virtual void StartCountdown(string _sceneName)
     {
         if (searchingForOpponent)
         {

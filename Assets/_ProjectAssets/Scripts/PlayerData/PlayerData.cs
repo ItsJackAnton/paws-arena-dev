@@ -9,12 +9,14 @@ public class PlayerData
     public static Action OnUpdatedJugOfMilk;
     public static Action OnUpdatedGlassOfMilk;
     public static Action OnUpdatedCookies;
+    public static Action OnUpdatedHasPlayedTutorial;
     
     private string username = string.Empty;
     private DateTime recoveryEndDate;
     private int glassOfMilk;
     private int jugOfMilk;
     private int cookies;
+    private bool hasPlayedTutorial;
     
     [JsonIgnore]public bool CanFight => RecoveryEndDate < DateTime.UtcNow;
     
@@ -86,6 +88,16 @@ public class PlayerData
         {
             cookies = value;
             OnUpdatedCookies?.Invoke();
+        }
+    }
+
+    public bool HasPlayedTutorial
+    {
+        get => hasPlayedTutorial;
+        set
+        {
+            hasPlayedTutorial = value;
+            OnUpdatedHasPlayedTutorial?.Invoke();
         }
     }
 }

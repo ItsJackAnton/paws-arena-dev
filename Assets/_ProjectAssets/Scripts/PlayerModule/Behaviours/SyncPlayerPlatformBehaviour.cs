@@ -26,6 +26,27 @@ public class SyncPlayerPlatformBehaviour : MonoBehaviour
 
     private async void Start()
     {
+        if (!PhotonNetwork.IsConnected)
+        {
+            if (isBot)
+            {
+                NFT nft = new NFT()
+                {
+                    imageUrl = GameState.botInfo.kittyUrl
+                };
+
+                await nft.GrabImage();
+                playerCustomization.wrapper.SetActive(true);
+                playerCustomization.SetTransientCat(nft.imageUrl, nft.ids);
+            }
+            else
+            {
+                ShowCat();
+            }
+            
+            Reposition();
+            return;
+        }
         photonView = GetComponent<PhotonView>();
 
         if (photonView.IsMine && !isBot)
@@ -65,6 +86,11 @@ public class SyncPlayerPlatformBehaviour : MonoBehaviour
         var config = playerCustomization.SetCat(GameState.selectedNFT.imageUrl, GameState.selectedNFT.ids);
         string serializedConfig = JsonUtility.ToJson(config.GetSerializableObject());
 
+        if (!PhotonNetwork.IsConnected)
+        {
+            SetCatStyle(GameState.selectedNFT.imageUrl, serializedConfig);
+            return;
+        }
         photonView.RPC("SetCatStyle", RpcTarget.Others, GameState.selectedNFT.imageUrl, serializedConfig);
     }
 
@@ -81,9 +107,12 @@ public class SyncPlayerPlatformBehaviour : MonoBehaviour
         transform.localScale = pose.scale;
 
         //Set my seat on room props
-        if ((photonView == null && !isBot) || photonView.IsMine)
+        if (PhotonNetwork.IsConnected)
         {
-            punRoomUtils.AddPlayerCustomProperty("seat", "" + pose.seatIdx);
+            if ((photonView == null && !isBot) || photonView.IsMine)
+            {
+                punRoomUtils.AddPlayerCustomProperty("seat", "" + pose.seatIdx);
+            }
         }
 
         if (CreateFriendlyMatch.AllowSpectators)
@@ -118,11 +147,21 @@ public class SyncPlayerPlatformBehaviour : MonoBehaviour
 
     public void TurnOffLights()
     {
+        if (!PhotonNetwork.IsConnected)
+        {
+            DoTurnOffLights();
+            return;
+        }
         photonView.RPC(nameof(DoTurnOffLights), RpcTarget.AllBuffered);
     }
     
     public void TurnOnLights()
     {
+        if (!PhotonNetwork.IsConnected)
+        {
+            DoTurnOnLights();
+            return;
+        }
         photonView.RPC(nameof(DoTurnOnLights), RpcTarget.AllBuffered);
     }
 

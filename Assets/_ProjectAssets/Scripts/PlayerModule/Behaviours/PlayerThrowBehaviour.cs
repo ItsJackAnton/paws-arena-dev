@@ -89,7 +89,11 @@ public class PlayerThrowBehaviour : MonoBehaviour
 
     private void PrepareLaunch()
     {
-        if (!isEnabled) return;
+        if (!isEnabled)
+        {
+            return;
+        }
+
         isEnabled = false;
 
         int weaponIdx = playerComponent.state.weaponIdx;

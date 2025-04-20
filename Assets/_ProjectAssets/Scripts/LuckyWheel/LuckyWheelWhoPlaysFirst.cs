@@ -1,7 +1,4 @@
-using System;
 using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
 using Photon.Pun;
 using UnityEngine;
 using UnityEngine.UI;
@@ -38,12 +35,18 @@ public class LuckyWheelWhoPlaysFirst : MonoBehaviour
     private IEnumerator ChooseStartingPlayer()
     {
         yield return new WaitForSeconds(2);
+        if (!PhotonNetwork.IsConnected)
+        {
+            DoIPlayFirst = Random.Range(0,2)==0;
+            float _targetZ2 = DoIPlayFirst ? Random.Range(20, 170) : Random.Range(190, 350);
+            Spin(_targetZ2,DoIPlayFirst);
+            yield break;
+        }
         
         if (!PhotonNetwork.IsMasterClient)
         {
             yield break;
         }
-        
         DoIPlayFirst = Random.Range(0,2)==0;
 
         if (PhotonNetwork.CurrentRoom==null|| PhotonNetwork.CurrentRoom.PlayerCount==1)

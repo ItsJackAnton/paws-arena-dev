@@ -34,6 +34,7 @@ public class PhotonManager : MonoBehaviourPunCallbacks
     #region ACTIONS
     public void Connect()
     {
+        return;
         PhotonNetwork.AutomaticallySyncScene = true;
         OnStartedConnection?.Invoke();
         if (!PhotonNetwork.IsConnected)
@@ -49,6 +50,9 @@ public class PhotonManager : MonoBehaviourPunCallbacks
 
     public void ConnectToRandomRoom()
     {
+        isSinglePlayer = true;
+        SceneManager.Instance.LoadSinglePlayerGameplay();
+        return;
         isSinglePlayer = false;
         PhotonNetwork.JoinRandomRoom();
     }

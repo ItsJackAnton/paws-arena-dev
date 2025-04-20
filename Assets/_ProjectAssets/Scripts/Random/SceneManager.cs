@@ -10,6 +10,7 @@ public class SceneManager : MonoBehaviour
     private const string AFTER_GAME_SPECTATOR = "AfterGameSpectator";
     private const string LOGIN_SCENE = "Login";
     public const string GAME_ROOM = "GameRoom";
+    public const string GAME_ROOM_SINGLEPLAYER = "GameRoomSingleplayer";
     public const string GAME_ROOM_SPECTATOR = "GameRoomSpectator";
     public const string SINGLE_PLAYER = "SinglePlayerGameRoom";
     public const string GAME_SCENE = "GameScene";
@@ -41,6 +42,11 @@ public class SceneManager : MonoBehaviour
         LoadScene(MAIN_MENU);
     }
 
+    public void LoadSinglePlayerGameplay()
+    {
+        LoadScene(GAME_ROOM_SINGLEPLAYER);
+    }
+
     public void LoadTutorial()
     {
         LoadScene(TUTORIAL);
@@ -61,7 +67,7 @@ public class SceneManager : MonoBehaviour
         LoadScene(UnityEngine.SceneManagement.SceneManager.GetActiveScene().name);
     }
 
-    private void LoadScene(string _key)
+    public void LoadScene(string _key)
     {
         UnityEngine.SceneManagement.SceneManager.LoadScene(_key);
     }

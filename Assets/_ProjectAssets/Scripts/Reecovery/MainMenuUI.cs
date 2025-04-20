@@ -58,7 +58,9 @@ public class MainMenuUI : MonoBehaviour
             RecoveryMessageDisplay.Instance.ShowMessage();
             return;
         }
-
+        
+        lobbyPhotonConnection.TryJoinRoom();
+        return;
         connectingToRoom.SetActive(true);
 
         connectingToRoomText.text = "Connecting to Multiplayer Server(" + PhotonNetwork.CloudRegion + ")...";
@@ -94,5 +96,14 @@ public class MainMenuUI : MonoBehaviour
         };
 
         photonManager.Connect();
+    }
+
+    private void Start()
+    {
+        if (!DataManager.Instance.PlayerData.HasPlayedTutorial)
+        {
+            DataManager.Instance.PlayerData.HasPlayedTutorial = true;
+            SceneManager.Instance.LoadTutorial();
+        }
     }
 }

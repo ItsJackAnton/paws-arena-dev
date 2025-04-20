@@ -2,6 +2,8 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using Newtonsoft.Json;
+using Photon.Pun;
 using UnityEngine;
 
 public enum EquipmentType

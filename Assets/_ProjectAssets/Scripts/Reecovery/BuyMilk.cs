@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
@@ -20,23 +21,25 @@ public class BuyMilk : MonoBehaviour
     {
         ShowGlassOfMilk();
         ShowJugOfMilk();
+        
+        gameObject.SetActive(true);
+    }
 
+    private void OnEnable()
+    {
         doneButton.onClick.AddListener(Done);
         buyJugOfMilkButton.onClick.AddListener(BuyJugOfMilk);
         buyGlassOfMilkButton.onClick.AddListener(BuyGlassOfMIlk);
 
         PlayerData.OnUpdatedJugOfMilk += ShowJugOfMilk;
         PlayerData.OnUpdatedGlassOfMilk += ShowGlassOfMilk;
-
-
-        gameObject.SetActive(true);
     }
 
     private void OnDisable()
     {
-        doneButton.onClick.AddListener(Done);
-        buyJugOfMilkButton.onClick.AddListener(BuyJugOfMilk);
-        buyGlassOfMilkButton.onClick.AddListener(BuyGlassOfMIlk);
+        doneButton.onClick.RemoveListener(Done);
+        buyJugOfMilkButton.onClick.RemoveListener(BuyJugOfMilk);
+        buyGlassOfMilkButton.onClick.RemoveListener(BuyGlassOfMIlk);
 
         PlayerData.OnUpdatedJugOfMilk -= ShowJugOfMilk;
         PlayerData.OnUpdatedGlassOfMilk -= ShowGlassOfMilk;

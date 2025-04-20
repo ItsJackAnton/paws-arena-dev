@@ -4,6 +4,6 @@ using System;
 public class PurchaseRequest
 {
     public int Amount;
-    public int Price;
+    public string Price;
     public string ToAddress;
 }

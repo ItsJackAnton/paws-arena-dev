@@ -33,6 +33,11 @@ public class SyncPlatformsBehaviour : MonoSingleton<SyncPlatformsBehaviour>
     // Start is called before the first frame update
     private void Start()
     {
+        if (!PhotonNetwork.IsConnected)
+        {
+            Instantiate(syncPlayerPlatformPrefab, player1Pose.pos, Quaternion.identity);
+            return;
+        }
         var go = PhotonNetwork.Instantiate(syncPlayerPlatformPrefab.name, player1Pose.pos, Quaternion.identity);
         go.GetComponent<SyncPlayerPlatformBehaviour>().punRoomUtils = punRoomUtils;
     }
@@ -77,6 +82,10 @@ public class SyncPlatformsBehaviour : MonoSingleton<SyncPlatformsBehaviour>
             return player1Pose;
         }
 
+        if (!PhotonNetwork.IsConnected)
+        {
+            return player1Pose;
+        }
         bool isLocalPlayerMaster = PhotonNetwork.CurrentRoom.masterClientId == PhotonNetwork.LocalPlayer.ActorNumber;
         if ((photonView.IsMine && isLocalPlayerMaster) ||
             (!photonView.IsMine && !isLocalPlayerMaster))

@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using com.colorfulcoding.AfterGame;
 using Newtonsoft.Json;
 using UnityEngine;
 
@@ -54,6 +55,7 @@ public class DataManager : MonoBehaviour
         PlayerData.OnUpdatedRecoverEndDate += SaveData;
         PlayerData.OnUpdatedUsername += SaveData;
         PlayerData.OnUpdatedCookies += SaveData;
+        PlayerData.OnUpdatedHasPlayedTutorial += SaveData;
     }
 
     private void SaveData()
@@ -72,5 +74,17 @@ public class DataManager : MonoBehaviour
         yield return new WaitForSeconds(1);
         isPushingUpdate = false;
         FirebaseManager.Instance.SavePlayerData(JsonConvert.SerializeObject(PlayerData));
+    }
+
+    public void DelayCalculateOfHurtTime()
+    {
+        StartCoroutine(Delay());
+
+        IEnumerator Delay()
+        {
+            yield return new WaitForSeconds(0.2f);
+            AfterGameMainTitle.SaveKittyHealth();
+            SceneManager.Instance.Reload();
+        }
     }
 }

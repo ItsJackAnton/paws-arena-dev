@@ -41,4 +41,7 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/_ProjectAssets/Scenes/GameScene/GameScene/AfterGameSpectator.unity
     guid: f4c34778a17d15c45a3fd27c42fdc306
+  - enabled: 1
+    path: Assets/_ProjectAssets/Scenes/GameScene/MatchMaking/GameRoomSingleplayer.unity
+    guid: f8622b9985c653d44a26a27beb9033c6
   m_configObjects: {}

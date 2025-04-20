@@ -4,6 +4,7 @@ using com.colorfulcoding.GameScene;
 using Photon.Pun;
 using System;
 using System.Collections;
+using com.colorfulcoding.AfterGame;
 using Newtonsoft.Json;
 using UnityEngine;
 
@@ -119,7 +120,17 @@ public class RoomStateManager : MonoSingleton<RoomStateManager>
         }
         else
         {
+            if (!PhotonNetwork.IsConnected)
+            {
+                SetState(new BotTurnState());
+                return;
+            }
             SetState(new OtherPlayerTurnState());
+        }
+
+        if (!PhotonNetwork.IsConnected)
+        {
+            return;
         }
 
         if (PhotonNetwork.CurrentRoom==null || PhotonNetwork.CurrentRoom.PlayerCount==1&&!LuckyWheelWhoPlaysFirst.DoIPlayFirst)
@@ -222,8 +233,6 @@ public class RoomStateManager : MonoSingleton<RoomStateManager>
     {
         get
         {
-            Debug.Log("Last round player: "+lastPlayerRound);
-            
             if (CreateFriendlyMatch.AllowSpectators)
             {
                 if (lastPlayerRound == 3)
@@ -300,6 +309,7 @@ public class RoomStateManager : MonoSingleton<RoomStateManager>
         else if (!isMultiplayer)
         {
             SinglePlayerReturnMainMenu();
+            DataManager.Instance.DelayCalculateOfHurtTime();
         }
     }
 

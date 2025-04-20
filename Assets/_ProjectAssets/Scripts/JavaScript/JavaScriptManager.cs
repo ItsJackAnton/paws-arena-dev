@@ -25,13 +25,8 @@ public class JavaScriptManager : MonoBehaviour
 
     private bool UseMockUpData => Application.isEditor;
     private Action<AuthResponse> _authCallBack;
-    private Action<bool,int> purchaseCallBack;
-    private PurchaseRequest purchaseRequest = new()
-    {
-        Amount = 100,
-        Price = 100000,
-        ToAddress =  "0x4F9E97c9332380ECf4aDf75F4D30Bc05e9FB7dfe"
-    };
+    private Action<bool,PurchaseRequest> purchaseCallBack;
+    private PurchaseRequest purchaseRequest;
 
     private void Awake()
     {
@@ -96,9 +91,10 @@ public class JavaScriptManager : MonoBehaviour
         _authCallBack?.Invoke(JsonConvert.DeserializeObject<AuthResponse>(_json));
     }
 
-    public void PurchaseCookies(Action<bool,int> _callBack)
+    public void PurchaseCookies(PurchaseRequest _request,Action<bool,PurchaseRequest> _callBack)
     {
         purchaseCallBack = _callBack;
+        purchaseRequest = _request;
         if (UseMockUpData)
         {
             PurchaseResponse _response = new PurchaseResponse { DidPurchase = true };
@@ -112,6 +108,6 @@ public class JavaScriptManager : MonoBehaviour
     public void ReceivePurchaseResponse(string _json)
     {
         PurchaseResponse _response = JsonConvert.DeserializeObject<PurchaseResponse>(_json);
-        purchaseCallBack?.Invoke(_response.DidPurchase, purchaseRequest.Amount);
+        purchaseCallBack?.Invoke(_response.DidPurchase, purchaseRequest);
     }
 }
